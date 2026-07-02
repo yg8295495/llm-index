@@ -1,0 +1,3402 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="apple-light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 选型超级助手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Orbitron:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  /* ===================================================
+     THEME 1: Apple Light (default)
+     =================================================== */
+  :root[data-theme="apple-light"]{
+    --bg-base:#f5f5f7;
+    --bg-surface:#ffffff;
+    --bg-elevated:#fafafc;
+    --bg-hover:#f0f0f2;
+    --bg-section:#e8e8ed;
+    --bg-detail:#f0f0f5;
+    --text-primary:#1d1d1f;
+    --text-secondary:#424245;
+    --text-tertiary:#86868b;
+    --text-inverse:#ffffff;
+    --accent:#0066cc;
+    --accent-soft:rgba(0,102,204,.08);
+    --accent-heatmap:rgba(0,102,204,.35);
+    --accent-hover:#0071e3;
+    --border:#d2d2d7;
+    --border-bright:rgba(0,0,0,.14);
+    --shadow-sm:none;
+    --shadow-md:none;
+    --shadow-lg:none;
+    --success:#28a745;
+    --error:#dc3545;
+    --gold:#bf8f4d;
+    --silver:#6e6e73;
+    --bronze:#a87547;
+    --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Inter',sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC','Inter',sans-serif;
+    --font-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  }
+
+  /* ===================================================
+     THEME 2: Gold Classic (黑金+衬线)
+     =================================================== */
+  :root[data-theme="gold-classic"]{
+    --bg-base:#1a1714;
+    --bg-surface:#252019;
+    --bg-elevated:#2d2720;
+    --bg-hover:#2d2720;
+    --bg-section:#352e26;
+    --bg-detail:#2a241e;
+    --text-primary:#e8dcc8;
+    --text-secondary:#b8a88e;
+    --text-tertiary:#8a7e68;
+    --text-inverse:#1a1714;
+    --accent:#d4a853;
+    --accent-soft:rgba(212,168,83,.14);
+    --accent-heatmap:rgba(212,168,83,.28);
+    --accent-hover:#e8c078;
+    --border:#3d3529;
+    --border-bright:rgba(245,241,232,.18);
+    --shadow-sm:none;
+    --shadow-md:none;
+    --shadow-lg:none;
+    --success:#7fa895;
+    --error:#c97064;
+    --gold:#d4a74a;
+    --silver:#b8b5ae;
+    --bronze:#a97142;
+    --font-display:'Fraunces',Georgia,'Noto Serif SC',serif;
+    --font-body:'Inter','PingFang SC','Hiragino Sans GB',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+
+  /* ===================================================
+     THEME 3: Dark Pro (GitHub Dark style)
+     =================================================== */
+  :root[data-theme="dark-pro"]{
+    --bg-base:#0d1117;
+    --bg-surface:#161b22;
+    --bg-elevated:#1c2128;
+    --bg-hover:#1c2128;
+    --bg-section:#21262d;
+    --bg-detail:#161b22;
+    --text-primary:#e6edf3;
+    --text-secondary:#9da5b0;
+    --text-tertiary:#6e7681;
+    --text-inverse:#0d1117;
+    --accent:#58a6ff;
+    --accent-soft:rgba(88,166,255,.12);
+    --accent-heatmap:rgba(88,166,255,.25);
+    --accent-hover:#79c0ff;
+    --border:#30363d;
+    --border-bright:rgba(240,246,252,.2);
+    --shadow-sm:none;
+    --shadow-md:none;
+    --shadow-lg:none;
+    --success:#3fb950;
+    --error:#f85149;
+    --gold:#d29922;
+    --silver:#8b949e;
+    --bronze:#db6d28;
+    --font-display:'Inter','PingFang SC',sans-serif;
+    --font-body:'Inter','PingFang SC',sans-serif;
+    --font-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  }
+
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font-body);
+    background:var(--bg-base);
+    color:var(--text-primary);
+    min-height:100vh;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-feature-settings:"tnum";
+  }
+  .container{max-width:1600px;margin:0 auto;padding:0 32px}
+
+  /* ===================================================
+     TOP BAR: Title + View Tabs (center) + Theme Switcher
+     =================================================== */
+  .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:2px solid var(--border-bright);
+    gap:16px;
+    background:var(--bg-surface);
+  }
+  .app-title{
+    display:flex;
+    align-items:center;
+    white-space:nowrap;
+    line-height:1;
+  }
+  .logo-img{
+    height:40px;
+    width:auto;
+    display:none;
+  }
+  :root[data-theme="apple-light"] .logo-light,
+  :root[data-theme="dark-pro"] .logo-dark,
+  :root[data-theme="gold-classic"] .logo-dark{
+    display:block;
+  }
+  .top-bar-center{
+    display:flex;
+    justify-content:center;
+    flex:1;
+  }
+  .top-bar-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .theme-label{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-tertiary);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    white-space:nowrap;
+  }
+  .theme-switcher{
+    display:flex;
+    gap:4px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:3px;
+  }
+  .theme-btn{
+    font-family:var(--font-mono);
+    font-size:11px;
+    padding:5px 12px;
+    border:none;
+    border-radius:6px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+    letter-spacing:.03em;
+  }
+  .theme-btn:hover{color:var(--text-primary)}
+  .theme-btn.active{
+    background:var(--accent);
+    color:var(--text-inverse);
+  }
+
+  /* ===================================================
+     VIEW TABS (moved into top-bar center)
+     =================================================== */
+  .view-tabs{
+    display:flex;
+    gap:4px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:3px;
+  }
+  .view-tab{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:600;
+    padding:6px 16px;
+    border:none;
+    border-radius:6px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .view-tab:hover{color:var(--text-primary)}
+  .view-tab.active{
+    background:var(--accent);
+    color:var(--text-inverse);
+  }
+  .compare-count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:16px;
+    height:16px;
+    padding:0 4px;
+    border-radius:8px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:600;
+  }
+  .view-tab.active .compare-count{
+    background:rgba(255,255,255,.2);
+    color:var(--text-inverse);
+  }
+
+  /* ===================================================
+     FILTER BAR: search + provider chips + advanced filter
+     =================================================== */
+  .filter-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  .search-input{
+    font-family:var(--font-body);
+    font-size:13px;
+    padding:6px 12px;
+    width:200px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text-primary);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  .search-input::placeholder{color:var(--text-tertiary)}
+  .search-input:focus{border-color:var(--accent)}
+  .search-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .filter-chips{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .filter-chips.collapsed{display:none}
+  .provider-toggle{
+    font-family:var(--font-mono);
+    font-size:11px;
+    padding:4px 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .12s ease;
+  }
+  .provider-toggle:hover{color:var(--text-primary);border-color:var(--border-bright)}
+  .chip{
+    font-family:var(--font-mono);
+    font-size:11px;
+    padding:4px 10px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    transition:background .12s ease,color .12s ease,border-color .15s ease;
+    white-space:nowrap;
+  }
+  .chip:hover{
+    color:var(--text-primary);
+    border-color:var(--border-bright);
+  }
+  .chip.active{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-color:var(--accent);
+  }
+  .filter-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:auto;
+    flex-shrink:0;
+  }
+  .filter-sep{
+    color:var(--border-bright);
+  }
+  .adv-filter-btn{
+    font-family:var(--font-body);
+    font-size:12px;
+    padding:6px 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--bg-surface);
+    color:var(--text-secondary);
+    cursor:pointer;
+    transition:background .12s ease,color .12s ease;
+  }
+  .adv-filter-btn:hover{
+    color:var(--text-primary);
+    background:var(--bg-hover);
+  }
+  .adv-filter-dropdown{
+    position:absolute;
+    top:calc(100% + 4px);
+    right:0;
+    min-width:260px;
+    background:var(--bg-surface);
+    border:1px solid var(--border-bright);
+    border-radius:8px;
+    box-shadow:none;
+    padding:12px;
+    z-index:50;
+  }
+  .adv-filter-group{
+    padding:8px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .adv-filter-group:last-child{border-bottom:none}
+  .adv-filter-label{
+    font-family:var(--font-mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+    margin-bottom:6px;
+  }
+  .adv-filter-options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  /* ===================================================
+     STATS INLINE (merged into filter-bar)
+     =================================================== */
+  .stats-inline{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-tertiary);
+    white-space:nowrap;
+  }
+  .stat-inline{
+    color:var(--text-secondary);
+  }
+  .stat-inline span{
+    color:var(--text-primary);
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat-sep{
+    color:var(--border-bright);
+  }
+
+  /* ===================================================
+     DIMENSION NAV: two-level tabs
+     =================================================== */
+  .dimension-nav{
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .dim-nav-row{
+    display:flex;
+    align-items:center;
+    gap:0;
+  }
+  .dim-tabs{
+    display:flex;
+    gap:0;
+    flex-shrink:0;
+  }
+  .dim-tab{
+    padding:10px 20px;
+    border:none;
+    border-bottom:2px solid transparent;
+    background:transparent;
+    cursor:pointer;
+    transition:border-color .15s ease,background .12s ease;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    align-items:flex-start;
+  }
+  .dim-tab:hover{background:var(--bg-hover)}
+  .dim-tab.active{border-bottom-color:var(--accent)}
+  .dim-tab-label{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-tertiary);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .dim-tab-name{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-primary);
+  }
+  .dim-tab.active .dim-tab-name{color:var(--accent)}
+  .dim-separator{
+    width:1px;
+    height:28px;
+    background:var(--border-bright);
+    margin:0 16px;
+    flex-shrink:0;
+  }
+  .bench-chips{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    overflow:hidden;
+    max-height:0;
+    opacity:0;
+    transition:max-height .3s ease,opacity .25s ease;
+  }
+  .bench-chips.visible{
+    max-height:60px;
+    opacity:1;
+  }
+  .bench-chip{
+    position:relative;
+    padding:6px 14px;
+    border:1px solid var(--border);
+    border-radius:9999px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    font-family:var(--font-body);
+    font-size:12px;
+    transition:background .12s ease,color .12s ease,border-color .15s ease;
+    white-space:nowrap;
+  }
+  .bench-chip:hover{
+    color:var(--text-primary);
+    border-color:var(--border-bright);
+  }
+  .bench-chip.active{
+    background:var(--accent);
+    color:var(--text-inverse);
+    border-color:var(--accent);
+  }
+  .bench-chip.active:hover::after{
+    content:attr(data-desc);
+    position:absolute;
+    top:100%;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--bg-elevated);
+    color:var(--text-secondary);
+    font-size:11px;
+    padding:4px 8px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    white-space:nowrap;
+    z-index:10;
+    margin-top:4px;
+    pointer-events:none;
+  }
+
+  /* ===================================================
+     MAIN
+     =================================================== */
+  .main{
+    padding:16px 0 48px;
+  }
+
+  /* ===================================================
+     RANKING TABLE (Layer 2 - medium)
+     =================================================== */
+  .ranking-table{
+    background:var(--bg-section);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    position:relative;
+  }
+  .ranking-table::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:2px;
+    background:var(--accent);
+    z-index:1;
+  }
+  .table-header,
+  .table-row{
+    display:grid;
+    grid-template-columns:50px 50px 1fr 70px 100px 70px 140px 40px 36px;
+    align-items:center;
+    gap:0;
+  }
+  .table-header{
+    padding:10px 12px;
+    background:var(--bg-elevated);
+    border-bottom:1px solid var(--border);
+    font-family:var(--font-display);
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0;
+    color:var(--text-primary);
+  }
+  .table-header > div{padding:0 4px;text-align:center}
+  .table-header .th-model{text-align:left}
+  .table-row > div{padding:0 4px;text-align:center}
+  .table-row .model-cell{text-align:left}
+  .table-row{
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  .table-row:last-child{border-bottom:none}
+  .table-row:hover{background:var(--bg-hover)}
+  .table-row.expanded{background:var(--bg-detail)}
+  .table-row > div{padding:0 4px}
+
+  .marker-cell{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    align-items:flex-start;
+  }
+  .marker{
+    font-family:var(--font-mono);
+    font-size:9px;
+    padding:1px 4px;
+    border-radius:9999px;
+    line-height:1.4;
+    letter-spacing:.02em;
+  }
+  .marker.mm{background:var(--accent-soft);color:var(--accent)}
+  .marker.tts{background:var(--accent-soft);color:var(--accent)}
+  .marker.text{background:var(--bg-section);color:var(--text-tertiary)}
+  .marker.open{background:rgba(40,167,69,.12);color:var(--success)}
+  .marker.closed{background:var(--bg-hover);color:var(--text-tertiary)}
+  .marker.mixed{background:var(--accent-soft);color:var(--accent)}
+
+  .rank{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:600;
+    text-align:center;
+    color:var(--text-primary);
+    font-variant-numeric:tabular-nums;
+  }
+  .rank.r1{color:var(--gold)}
+  .rank.r2{color:var(--silver)}
+  .rank.r3{color:var(--bronze)}
+
+  .model-cell{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+  }
+  .model-name{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-primary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .model-id{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-tertiary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .score-col{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    align-items:center;
+    padding:0 4px;
+  }
+  .score{
+    font-family:var(--font-display);
+    font-size:15px;
+    font-weight:600;
+    color:var(--text-primary);
+    font-variant-numeric:tabular-nums;
+  }
+  .score.cost-zero{
+    color:var(--error);
+    opacity:.7;
+  }
+  .cost-zero-badge{
+    font-family:var(--font-mono);
+    font-size:9px;
+    padding:1px 4px;
+    border-radius:2px;
+    background:rgba(220,53,69,.1);
+    color:var(--error);
+    margin-left:4px;
+    vertical-align:middle;
+  }
+  .sub-dim{
+    font-size:11px;
+    color:var(--text-secondary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .subdim-col{
+    font-size:11px;
+    color:var(--text-secondary);
+    padding:0 4px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .comp-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    padding:0 4px;
+  }
+  .comp-score{
+    font-family:var(--font-mono);
+    font-size:14px;
+    font-weight:400;
+    color:var(--text-secondary);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+  }
+  .comp-rank-badge{
+    font-family:var(--font-mono);
+    font-size:9px;
+    font-weight:600;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:1px 5px;
+    border-radius:3px;
+    line-height:1.3;
+  }
+  .cost-col{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    padding:0 4px;
+    font-family:var(--font-mono);
+    font-feature-settings:"tnum";
+    font-size:11px;
+    color:var(--text-tertiary);
+  }
+  .cost-val{
+    white-space:nowrap;
+  }
+  .token-val{
+    white-space:nowrap;
+  }
+  .compare-col{
+    display:flex;
+    justify-content:center;
+  }
+  .expand-col{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .expand-arrow{
+    font-size:16px;
+    color:var(--accent);
+    transition:transform .15s ease;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;
+    height:24px;
+    border-radius:4px;
+    background:var(--accent-soft);
+  }
+  .expand-arrow.open{
+    transform:rotate(90deg);
+  }
+  .actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+  }
+  .action-btn{
+    font-family:var(--font-body);
+    font-size:11px;
+    padding:3px 8px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    transition:background .12s ease,color .12s ease,border-color .15s ease;
+    white-space:nowrap;
+  }
+  .action-btn:hover{
+    color:var(--accent);
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .action-btn.active{
+    background:var(--accent);
+    color:var(--text-inverse);
+    border-color:var(--accent);
+  }
+
+  /* ===================================================
+     BENCH HEADER: title + stats (flex layout)
+     =================================================== */
+  .bench-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    padding:8px 0 16px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .bench-header-left{
+    flex:1;
+    min-width:0;
+  }
+  .bench-title{
+    font-family:var(--font-display);
+    font-size:18px;
+    font-weight:600;
+    color:var(--text-primary);
+    letter-spacing:-0.01em;
+  }
+  .bench-desc{
+    font-size:12px;
+    color:var(--text-secondary);
+    margin-top:4px;
+  }
+  .bench-header-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-tertiary);
+    white-space:nowrap;
+  }
+  .bench-stat{
+    color:var(--text-secondary);
+  }
+  .bench-stat-val{
+    color:var(--text-primary);
+    font-weight:600;
+  }
+  .bench-stat-total{
+    color:var(--text-tertiary);
+  }
+
+  /* ===================================================
+     DRILLDOWN PANEL: 3-column layout (Layer 3 - lightest)
+     =================================================== */
+  .drilldown-panel{
+    display:grid;
+    grid-template-columns:1fr 3fr 1.5fr;
+    gap:20px;
+    padding:20px;
+    background:var(--bg-detail);
+    border:1px solid var(--border);
+    border-top:none;
+    overflow:hidden;
+    max-height:0;
+    padding-top:0;
+    padding-bottom:0;
+    border-bottom-left-radius:12px;
+    border-bottom-right-radius:12px;
+    transition:max-height .25s ease,padding .25s ease;
+  }
+  .drilldown-panel.open{
+    max-height:600px;
+    padding-top:20px;
+    padding-bottom:20px;
+  }
+  .drill-left{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:0;
+  }
+  .drill-left-title{
+    font-family:var(--font-display);
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-secondary);
+    margin-bottom:8px;
+  }
+  .drill-left-stat{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:6px 0;
+    border-bottom:1px solid var(--border);
+    gap:8px;
+  }
+  .drill-left-stat:last-child{border-bottom:none}
+  .drill-left-label{
+    font-size:11px;
+    color:var(--text-tertiary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:normal;
+    line-height:1.3;
+    max-width:120px;
+  }
+  .drill-left-value{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-secondary);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .drill-middle{
+    min-width:0;
+  }
+  .dim-cards{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+  }
+  .dim-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px;
+    cursor:pointer;
+    transition:border-color .15s ease,background .12s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .dim-card:hover{background:var(--bg-hover)}
+  .dim-card.active{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .dim-card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+    gap:8px;
+  }
+  .dim-card-name{
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-primary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .dim-card-rank{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-tertiary);
+    white-space:nowrap;
+  }
+  .dim-card-score{
+    font-family:var(--font-display);
+    font-size:18px;
+    font-weight:600;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+    margin-bottom:4px;
+  }
+  .dim-card-expand{
+    margin-top:4px;
+    padding-top:6px;
+    border-top:1px solid var(--border);
+    display:none;
+  }
+  .dim-card.expanded .dim-card-expand{display:block}
+  .dim-card-hint{
+    font-size:10px;
+    color:var(--text-tertiary);
+    text-align:center;
+    padding:4px 0 0;
+    margin-top:4px;
+    border-top:1px solid var(--border);
+  }
+  .dim-card.expanded .dim-card-hint{display:none}
+  .dim-sub-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:4px 0;
+    cursor:pointer;
+    transition:color .12s ease;
+    gap:8px;
+  }
+  .dim-sub-item:hover .dim-sub-name{color:var(--accent)}
+  .dim-sub-name{
+    font-size:11px;
+    color:var(--text-secondary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    transition:color .12s ease;
+  }
+  .dim-sub-score{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-primary);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .dim-sub-rank{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-tertiary);
+    white-space:nowrap;
+  }
+
+  .drill-right{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-width:0;
+  }
+  .radar-chart{
+    height:200px;
+    width:100%;
+  }
+  .composite-box{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    padding:8px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .composite-score{
+    font-family:var(--font-display);
+    font-size:24px;
+    font-weight:600;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+    line-height:1.1;
+  }
+  .composite-rank{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-secondary);
+  }
+  .reasoning-compare{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .reasoning-title{
+    font-family:var(--font-mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+    margin-bottom:4px;
+  }
+  .reasoning-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:4px 0;
+    font-size:11px;
+    color:var(--text-secondary);
+    gap:8px;
+  }
+  .reasoning-item.best{
+    color:var(--accent);
+    font-weight:600;
+  }
+  .reasoning-item .reasoning-val{
+    font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ===================================================
+     MATRIX VIEW (Layer 2 - medium)
+     =================================================== */
+  .matrix-view{
+    background:var(--bg-section);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .matrix-table{
+    overflow-x:auto;
+    overflow-y:auto;
+    max-height:80vh;
+  }
+  .matrix-grid{
+    display:inline-grid;
+    min-width:100%;
+    grid-template-rows:auto auto;
+    grid-auto-rows:32px;
+  }
+  .matrix-dim-header{
+    background:var(--bg-elevated);
+    border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
+    padding:8px 10px;
+    font-family:var(--font-display);
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-primary);
+    text-align:center;
+    position:sticky;
+    top:0;
+    z-index:2;
+  }
+  .matrix-dim-header::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:2px;
+    background:var(--accent);
+  }
+  .matrix-bench-header{
+    background:var(--bg-elevated);
+    border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
+    padding:4px 2px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    line-height:1.2;
+    color:var(--text-tertiary);
+    text-align:center;
+    white-space:normal;
+    word-break:break-all;
+    position:sticky;
+    z-index:2;
+  }
+  .matrix-row{
+    display:contents;
+  }
+  .matrix-row > .matrix-cell,
+  .matrix-row > .matrix-row-label{
+    border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
+  }
+  .matrix-row-label{
+    padding:8px 12px;
+    font-family:var(--font-display);
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-secondary);
+    background:var(--bg-elevated);
+    position:sticky;
+    left:0;
+    z-index:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    text-align:center;
+  }
+  .matrix-cell{
+    padding:0 8px;
+    text-align:center;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-secondary);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .matrix-cell.empty{color:var(--text-tertiary)}
+  .matrix-cell.heatmap{
+    background-image:linear-gradient(to right,var(--accent-heatmap) var(--heat-pct,0%),transparent var(--heat-pct,0%));
+    background-color:var(--bg-surface);
+  }
+  .matrix-cell.best{
+    color:var(--accent);
+    font-weight:600;
+  }
+
+  /* ===================================================
+     COMPARE VIEW (Layer 2 - medium)
+     =================================================== */
+  .compare-view{
+    background:var(--bg-section);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:auto;
+    max-height:80vh;
+  }
+  .compare-table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  .compare-table th,
+  .compare-table td{
+    padding:8px 12px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
+    font-size:13px;
+  }
+  .compare-table th:last-child,
+  .compare-table td:last-child{border-right:none}
+  .compare-table tr:last-child td{border-bottom:none}
+  .compare-table thead th{
+    background:var(--bg-elevated);
+    font-family:var(--font-display);
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-primary);
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .compare-col-header{
+    min-width:140px;
+  }
+  .compare-row-label{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-secondary);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    background:var(--bg-elevated);
+    white-space:nowrap;
+  }
+  .compare-cell{
+    font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;
+    color:var(--text-secondary);
+  }
+  .compare-best{
+    color:var(--accent);
+    font-weight:600;
+    background:var(--accent-soft);
+  }
+  .compare-empty{
+    color:var(--text-tertiary);
+  }
+
+  /* ===================================================
+     SCHEMES VIEW
+     =================================================== */
+  .schemes-view{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .schemes-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .schemes-title{
+    font-family:var(--font-display);
+    font-size:16px;
+    font-weight:600;
+    color:var(--text-primary);
+  }
+  .scheme-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .scheme-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    transition:border-color .15s ease;
+  }
+  .scheme-card:hover{border-color:var(--border-bright)}
+  .scheme-card.editing{
+    border-color:var(--accent);
+    background:var(--bg-section);
+  }
+  .scheme-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    gap:12px;
+  }
+  .scheme-name{
+    font-family:var(--font-display);
+    font-size:16px;
+    font-weight:600;
+    color:var(--text-primary);
+  }
+  .scheme-actions{
+    display:flex;
+    gap:6px;
+  }
+  .scheme-weights{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .weight-item{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:80px;
+    flex:1;
+  }
+  .weight-item-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:6px;
+  }
+  .weight-item-label{
+    font-family:var(--font-mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .weight-item-value{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-primary);
+    font-variant-numeric:tabular-nums;
+  }
+  .weight-bar{
+    height:4px;
+    background:var(--bg-hover);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .weight-bar-fill{
+    height:100%;
+    background:var(--accent);
+    border-radius:2px;
+    transition:width .2s ease;
+  }
+  .scheme-editor{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+    display:none;
+  }
+  .scheme-card.editing .scheme-editor{display:block}
+  .weight-slider-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:6px 0;
+  }
+  .weight-slider-label{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-secondary);
+    min-width:100px;
+  }
+  .dim-help-icon{
+    display:inline-block;
+    width:14px;
+    height:14px;
+    line-height:14px;
+    text-align:center;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:10px;
+    font-weight:600;
+    cursor:help;
+    margin-left:4px;
+    vertical-align:middle;
+  }
+  .dim-help-icon:hover{
+    background:var(--accent);
+    color:var(--text-inverse);
+  }
+  .weight-slider{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    background:var(--bg-hover);
+    border-radius:2px;
+    outline:none;
+  }
+  .weight-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+  }
+  .weight-slider::-moz-range-thumb{
+    width:14px;
+    height:14px;
+    border:none;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+  }
+  .weight-slider-value{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-primary);
+    min-width:40px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .sub-dim-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:8px;
+    margin:8px 0 8px 32px;
+    padding:8px 12px;
+    background:var(--bg-detail);
+    border-radius:6px;
+    border:1px solid var(--border);
+  }
+  .sub-dim-item{
+    display:grid;
+    grid-template-columns:70px 1fr 35px;
+    align-items:center;
+    gap:6px;
+    padding:4px 8px;
+    background:var(--bg-surface);
+    border-radius:4px;
+    border:1px solid var(--border);
+  }
+  .sub-dim-label{
+    font-size:11px;
+    color:var(--text-secondary);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .sub-dim-slider{
+    width:100%;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    background:var(--bg-hover);
+    border-radius:2px;
+    outline:none;
+  }
+  .sub-dim-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+  }
+  .sub-dim-slider::-moz-range-thumb{
+    width:12px;
+    height:12px;
+    border:none;
+    border-radius:50%;
+    background:var(--accent);
+    cursor:pointer;
+  }
+  .sub-dim-value{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-primary);
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .scheme-editor-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .scheme-editor-actions .action-btn{padding:6px 14px;font-size:12px}
+
+  /* ===================================================
+     EMPTY STATE
+     =================================================== */
+  main > .empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:64px 24px;
+    color:var(--text-tertiary);
+    text-align:center;
+  }
+  .empty-icon{
+    font-size:32px;
+    opacity:.5;
+  }
+  .empty-text{
+    font-size:13px;
+  }
+
+  /* ===================================================
+     SCROLLBAR
+     =================================================== */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{
+    background:var(--border-bright);
+    border-radius:4px;
+  }
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+
+  /* ===================================================
+     RESPONSIVE
+     =================================================== */
+  @media (max-width:1280px){
+    .drilldown-panel{
+      grid-template-columns:1fr 2fr 1fr;
+      gap:16px;
+    }
+    .dim-cards{grid-template-columns:1fr 1fr}
+  }
+
+  @media (max-width:1024px){
+    .table-header,
+    .table-row{
+      grid-template-columns:50px 50px 1fr 70px 70px 40px 30px;
+    }
+    .table-header .th-subdim,
+    .table-row .subdim-col,
+    .table-header .th-cost,
+    .table-row .cost-col{display:none}
+    .drilldown-panel{
+      grid-template-columns:1fr;
+      gap:16px;
+    }
+    .drill-left{
+      flex-direction:row;
+      flex-wrap:wrap;
+      gap:16px;
+    }
+    .drill-left-stat{
+      flex:1;
+      min-width:120px;
+      border-bottom:none;
+    }
+    .drill-right{order:-1}
+  }
+
+  @media (max-width:768px){
+    .container{padding:0 16px}
+    .top-bar{flex-direction:column;align-items:flex-start;gap:12px}
+    .stats-row{gap:20px;flex-wrap:wrap}
+    .table-header,
+    .table-row{
+      grid-template-columns:40px 40px 1fr 70px;
+    }
+    .table-header .th-subdim,
+    .table-row .subdim-col,
+    .table-header .th-cost,
+    .table-row .cost-col,
+    .table-header div:nth-child(6),
+    .table-row .comp-col,
+    .table-header div:nth-child(8),
+    .table-row .compare-col,
+    .table-header div:nth-child(9),
+    .table-row .expand-col{display:none}
+    .dim-tabs{overflow-x:auto}
+    .dim-tab{padding:8px 14px;flex-shrink:0}
+    .filter-bar{gap:8px}
+    .search-input{width:100%}
+    .adv-filter-btn{margin-left:0}
+    .dim-cards{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 顶部栏：标题 + 视图tabs(居中) + 主题切换 -->
+  <div class="top-bar">
+    <h1 class="app-title">
+  <img src="logo-light.png" alt="AI 选型超级助手" class="logo-img logo-light">
+  <img src="logo-dark.png" alt="AI 选型超级助手" class="logo-img logo-dark">
+</h1>
+    <div class="top-bar-center">
+      <div class="view-tabs">
+        <button class="view-tab active" data-view="ranking">排行榜</button>
+        <button class="view-tab" data-view="matrix">矩阵总览</button>
+        <button class="view-tab" data-view="compare">对比<span class="compare-count" id="compare-count" style="display:none">0</span></button>
+        <button class="view-tab" data-view="schemes">我的方案</button>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <span class="theme-label">主题</span>
+      <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="apple-light">Apple Light</button>
+        <button class="theme-btn" data-theme="gold-classic">Gold Classic</button>
+        <button class="theme-btn" data-theme="dark-pro">Dark Pro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar">
+    <input type="text" class="search-input" id="search-input" placeholder="搜索模型…" aria-label="搜索模型">
+    <button class="provider-toggle" id="provider-toggle" title="收起/展开厂家筛选">厂家 ▾</button>
+    <div class="filter-chips" id="provider-chips"></div>
+    <div class="filter-right">
+      <div class="stats-inline" id="stats-inline">
+        <span class="stat-inline"><span id="stat-models">0</span> 模型</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-inline"><span id="stat-benchmarks">0</span> 评测</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-inline"><span id="stat-obs">0</span> 数据点</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-inline"><span id="stat-dims">5</span> 维度</span>
+      </div>
+      <span class="filter-sep">|</span>
+      <button class="adv-filter-btn" id="adv-filter-btn">高级筛选 ▾</button>
+    </div>
+    <div class="adv-filter-dropdown" id="adv-filter-dropdown" style="display:none">
+      <!-- 筛选项动态生成 -->
+    </div>
+  </div>
+
+  <!-- 维度导航（仅排行榜视图显示） -->
+  <div class="dimension-nav" id="dimension-nav">
+    <div class="dim-nav-row">
+      <div class="dim-tabs" id="dim-tabs"></div>
+      <div class="dim-separator"></div>
+      <div class="bench-chips" id="bench-chips"></div>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+// ===== STATE & CONSTANTS =====
+const state = {
+  view: 'ranking',
+  activeDimension: 'factual',
+  activeBench: null,
+  searchQuery: '',
+  activeProviders: new Set(),
+  advFilters: { releaseTime: 'all', rankRange: 'all', openSource: 'all', multimodal: 'all', reasoningLevel: 'all' },
+  expandedModel: null,
+  _drillExpandedRow: 1,
+  compareList: [],
+  schemes: [],
+  activeScheme: null,
+  editingSchemeId: null,
+  weights: { factual: 0.25, workflow: 0.25, engineering: 0.20, cost: 0.15, preference: 0.15 },
+  benchWeights: {},  // 子维度权重：{ benchmark_key: weight }
+  rankingSort: { key: 'rank', desc: true },
+  expandedWeightDim: null  // 对比视图权重面板：当前展开子维度的主维度 key，null=全部收起
+};
+
+const DIMENSIONS = [
+  { key: 'factual', name: '事实准确', desc: '模型回答事实性问题的准确程度。综合知识问答、研究生级别专业问答、数学推理等评测，分数越高表示模型给出的事实越可靠，适合需要准确信息的场景（如医疗、法律、学术咨询）。' },
+  { key: 'workflow', name: '工作流', desc: '模型作为自主 Agent 完成复杂任务的能力。包括工具调用、多步规划、指令遵循、银行/编程等场景的自动化执行能力。分数越高表示模型越能独立完成端到端的工作流任务。' },
+  { key: 'engineering', name: '工程能力', desc: '模型的实际编码和工程动手能力。包括终端操作、科学编程、实时编程、代码生成等评测。分数越高表示模型作为编程助手时越能交付高质量代码、减少出错。' },
+  { key: 'cost', name: '成本', desc: '模型的使用成本。包括每个任务的实际消耗（美元/任务）和 API 定价参考。分数越高表示越便宜，适合预算敏感的场景。' },
+  { key: 'preference', name: '人类偏好', desc: '真实用户盲测投票的 Elo 评分（来自 LMArena）。分数越高表示用户实际体验越好，反映模型的综合使用感受。' }
+];
+
+const BENCH_GROUPS = {
+  factual: { name: '事实准确', benches: ['aa_omniscience', 'gpqa', 'hle', 'aime25', 'aime'] },
+  workflow: { name: '工作流', benches: ['gdpval_aa', 'gdpval_aa_normalized', 'ifbench', 'tau2_banking', 'tau_banking', 'agentic_index'] },
+  engineering: { name: '工程能力', benches: ['terminalbench_hard', 'scicode', 'livecodebench', 'coding_index'] },
+  cost: { name: '成本', benches: ['cost_per_task', 'pricing'] },
+  preference: { name: '人类偏好', benches: ['lmarena_text'] }
+};
+
+const BENCH_CN = {
+  aa_omniscience: '综合知识', gpqa: '研究生问答', hle: '人类终极考试',
+  aime25: '数学2025', aime: '数学(历史)',
+  gdpval_aa: 'Agent Elo', gdpval_aa_normalized: 'Agent归一化', ifbench: '指令遵循',
+  tau2_banking: '银行Agent', tau_banking: '银行Agent', agentic_index: 'Agent指数',
+  terminalbench_hard: '终端Hard', scicode: '科学编程', livecodebench: '实时编程', coding_index: '编程指数',
+  cost_per_task: '实际消耗', pricing: '定价参考', lmarena_text: 'LMArena'
+};
+
+const PROVIDER_META = {
+  anthropic: { display: 'Anthropic', color: '#c4956a' },
+  google: { display: 'Google', color: '#7fa895' },
+  deepseek: { display: 'DeepSeek', color: '#9b8fd4' },
+  kimi: { display: 'Kimi', color: '#c97064' },
+  minimax: { display: 'MiniMax', color: '#a98d6f' },
+  qwen: { display: 'Qwen', color: '#8fa8c4' },
+  openai: { display: 'OpenAI', color: '#0071e3' },
+  mimo: { display: 'MiMo', color: '#8fb4a4' },
+  glm: { display: 'GLM', color: '#b48fd4' },
+  zhipu: { display: 'Zhipu', color: '#b48fd4' },
+  moonshot: { display: 'Moonshot', color: '#c97064' },
+  xiaomi: { display: 'Xiaomi', color: '#8fb4a4' }
+};
+
+let DATA = null;
+let radarChart = null;
+let _dimScoresCache = null;
+let _dimRankCache = null;
+let _compositeCache = null;
+let _matrixSort = { key: null, desc: true };
+
+// ===== DATA UTILITIES =====
+function getModel(modelId) {
+  if (!DATA || !DATA.models) return null;
+  return DATA.models[modelId] || null;
+}
+
+function isCostBench(benchKey) {
+  return benchKey === 'cost_per_task' || benchKey === 'pricing';
+}
+
+function getCostPerTaskRanking() {
+  if (!DATA || !DATA.benchmarks || !DATA.benchmarks.terminalbench_hard) return [];
+  const result = DATA.benchmarks.terminalbench_hard
+    .filter(item => item.cost_usd != null)
+    .map(item => ({
+      model_id: item.model_id, reasoning_level: item.reasoning_level,
+      display_name: item.display_name, score_raw: item.cost_usd, score_type: 'pricing',
+      input_tokens: item.input_tokens, output_tokens: item.output_tokens,
+      reasoning_tokens: item.reasoning_tokens, cost_usd: item.cost_usd,
+      breakdown: null, source: item.source, confidence: item.confidence
+    }));
+  result.sort((a, b) => a.score_raw - b.score_raw);
+  result.forEach((item, idx) => { item.rank = idx + 1; });
+  return result;
+}
+
+function getPricingRanking() {
+  if (!DATA || !DATA.models) return [];
+  const result = [];
+  Object.values(DATA.models).forEach(m => {
+    if (m.pricing_input != null) {
+      result.push({
+        model_id: m.id, reasoning_level: '', display_name: m.display_name,
+        score_raw: m.pricing_input, score_type: 'pricing',
+        input_tokens: null, output_tokens: null, reasoning_tokens: null, cost_usd: null,
+        breakdown: { pricing_input: m.pricing_input, pricing_output: m.pricing_output },
+        source: 'openrouter', confidence: 1.0
+      });
+    }
+  });
+  result.sort((a, b) => a.score_raw - b.score_raw);
+  result.forEach((item, idx) => { item.rank = idx + 1; });
+  return result;
+}
+
+function getBenchRanking(benchKey) {
+  if (benchKey === 'cost_per_task') return getCostPerTaskRanking();
+  if (benchKey === 'pricing') return getPricingRanking();
+  if (!DATA || !DATA.benchmarks || !DATA.benchmarks[benchKey]) return [];
+  const result = DATA.benchmarks[benchKey]
+    .filter(item => item.score_raw != null)
+    .map(item => ({ ...item }));
+  result.sort((a, b) => b.score_raw - a.score_raw);
+  result.forEach((item, idx) => { item.rank = idx + 1; });
+  return result;
+}
+
+function getFilteredRanking(benchKey) {
+  const ranking = getBenchRanking(benchKey);
+  return ranking.filter(item => applyFilters(item));
+}
+
+function getBenchmarksByDimension(dimKey) {
+  const group = BENCH_GROUPS[dimKey];
+  if (!group) return [];
+  return group.benches.filter(b => {
+    if (b === 'cost_per_task' || b === 'pricing') return true;
+    return DATA && DATA.benchmarks && DATA.benchmarks[b] && DATA.benchmarks[b].length > 0;
+  });
+}
+
+function hasDimensionData(dimKey) {
+  return getBenchmarksByDimension(dimKey).length > 0;
+}
+
+function computeDimScores() {
+  if (!DATA || !DATA.models) return {};
+  const cache = {};
+  DIMENSIONS.forEach(dim => {
+    cache[dim.key] = {};
+    const benches = getBenchmarksByDimension(dim.key);
+    if (benches.length === 0) return;
+    const benchNorm = {};
+    benches.forEach(b => {
+      const ranking = getBenchRanking(b);
+      if (ranking.length === 0) return;
+      const scores = ranking.map(r => r.score_raw).filter(s => s != null);
+      if (scores.length === 0) return;
+      const max = Math.max(...scores);
+      const min = Math.min(...scores);
+      benchNorm[b] = { max, min, isCost: isCostBench(b) };
+    });
+    Object.keys(DATA.models).forEach(modelId => {
+      let total = 0, totalWeight = 0;
+      benches.forEach(b => {
+        if (!benchNorm[b]) return;
+        const ranking = getBenchRanking(b);
+        const entries = ranking.filter(r => r.model_id === modelId);
+        if (entries.length === 0) return;
+        const { max, min, isCost } = benchNorm[b];
+        const best = isCost ? Math.min(...entries.map(e => e.score_raw)) : Math.max(...entries.map(e => e.score_raw));
+        let norm;
+        if (isCost) {
+          norm = max === min ? 50 : (max - best) / (max - min) * 100;
+        } else {
+          norm = max === 0 ? 0 : best / max * 100;
+        }
+        // 使用子维度权重（如果有），否则使用默认平均权重
+        const benchWeight = state.benchWeights?.[b] ?? (1 / benches.length);
+        total += norm * benchWeight;
+        totalWeight += benchWeight;
+      });
+      cache[dim.key][modelId] = totalWeight > 0 ? total / totalWeight : null;
+    });
+  });
+  return cache;
+}
+
+function getDimensionScore(modelId, dimKey) {
+  if (!_dimScoresCache) _dimScoresCache = computeDimScores();
+  return _dimScoresCache[dimKey] ? _dimScoresCache[dimKey][modelId] : null;
+}
+
+function computeDimRanks() {
+  if (!DATA || !DATA.models) return {};
+  const cache = {};
+  DIMENSIONS.forEach(dim => {
+    const scores = Object.keys(DATA.models).map(id => ({ id, score: getDimensionScore(id, dim.key) }))
+      .filter(s => s.score != null).sort((a, b) => b.score - a.score);
+    cache[dim.key] = {};
+    scores.forEach((s, i) => { cache[dim.key][s.id] = i + 1; });
+  });
+  return cache;
+}
+
+function getDimensionRank(modelId, dimKey) {
+  if (!_dimRankCache) _dimRankCache = computeDimRanks();
+  return _dimRankCache[dimKey] ? _dimRankCache[dimKey][modelId] : null;
+}
+
+function getCompositeRanking() {
+  if (_compositeCache) return _compositeCache;
+  if (!DATA || !DATA.models) return [];
+  const activeDims = DIMENSIONS.filter(d => hasDimensionData(d.key));
+  const totalActiveDims = activeDims.length;
+  const withScore = [];
+  const withoutScore = [];
+  Object.keys(DATA.models).forEach(id => {
+    let total = 0, totalWeight = 0, dimCount = 0;
+    activeDims.forEach(dim => {
+      const score = getDimensionScore(id, dim.key);
+      if (score != null) {
+        const w = state.weights[dim.key] || 0;
+        total += score * w;
+        totalWeight += w;
+        dimCount++;
+      }
+    });
+    const rawScore = totalWeight > 0 ? total / totalWeight : null;
+    // 覆盖率惩罚：维度覆盖不足时综合分按比例降低，避免单维度高分模型排名虚高
+    const coverage = totalActiveDims > 0 ? dimCount / totalActiveDims : 0;
+    const score = rawScore != null ? rawScore * coverage : null;
+    if (score != null) {
+      withScore.push({ id, score, rawScore, coverage });
+    } else {
+      withoutScore.push({ id, score: null, rawScore: null, coverage: 0 });
+    }
+  });
+  withScore.sort((a, b) => b.score - a.score);
+  withScore.forEach((s, i) => { s.rank = i + 1; });
+  withoutScore.forEach((s, i) => { s.rank = withScore.length + i + 1; });
+  _compositeCache = [...withScore, ...withoutScore];
+  return _compositeCache;
+}
+
+function getCompositeScore(modelId) {
+  const ranking = getCompositeRanking();
+  const item = ranking.find(s => s.id === modelId);
+  return item ? item.score : null;
+}
+
+function getCompositeRank(modelId) {
+  const ranking = getCompositeRanking();
+  const item = ranking.find(s => s.id === modelId);
+  return item ? item.rank : null;
+}
+
+// 对比视图专用：缺失维度用对比池内最低分填充
+function getCompareCompositeScore(modelIds) {
+  if (!DATA || !DATA.models || modelIds.length === 0) return {};
+  const activeDims = DIMENSIONS.filter(d => hasDimensionData(d.key));
+
+  // 先计算每个维度在对比池内的最低分
+  const dimMinScores = {};
+  activeDims.forEach(dim => {
+    const scores = modelIds.map(id => getDimensionScore(id, dim.key)).filter(s => s != null);
+    dimMinScores[dim.key] = scores.length > 0 ? Math.min(...scores) : 0;
+  });
+
+  // 记录哪些模型在哪些维度缺失数据
+  const missingInfo = {};
+  modelIds.forEach(id => { missingInfo[id] = []; });
+
+  const results = {};
+  modelIds.forEach(id => {
+    let total = 0, totalWeight = 0;
+    activeDims.forEach(dim => {
+      let score = getDimensionScore(id, dim.key);
+      const w = state.weights[dim.key] || 0;
+      if (score == null) {
+        // 用对比池内最低分填充
+        score = dimMinScores[dim.key];
+        missingInfo[id].push(dim.name);
+      }
+      total += score * w;
+      totalWeight += w;
+    });
+    results[id] = {
+      score: totalWeight > 0 ? total / totalWeight : null,
+      missingDims: missingInfo[id]
+    };
+  });
+
+  return results;
+}
+
+function getModelRankInBench(modelId, benchKey) {
+  const ranking = getBenchRanking(benchKey);
+  const item = ranking.find(r => r.model_id === modelId);
+  return item ? item.rank : null;
+}
+
+function invalidateCache() {
+  _compositeCache = null;
+}
+
+function formatScore(v) {
+  if (v == null) return '—';
+  if (v <= 1.0 && v >= 0) return (v * 100).toFixed(1);
+  return Number.isInteger(v) ? v.toString() : v.toFixed(1);
+}
+
+function formatCtx(c) {
+  if (!c) return '—';
+  if (c >= 1000000) return (c / 1000000).toFixed(1) + 'M';
+  if (c >= 1000) return (c / 1000).toFixed(0) + 'K';
+  return c.toString();
+}
+
+function formatCost(v) {
+  if (v == null) return '—';
+  return '$' + (v < 1 ? v.toFixed(3) : v.toFixed(2));
+}
+
+function formatTokens(v) {
+  if (v == null) return '—';
+  if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
+  if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+  return v.toString();
+}
+
+function getSubDimText(item, benchKey) {
+  if (!item) return '';
+  if (benchKey === 'cost_per_task') return formatCost(item.score_raw) + '/任务';
+  if (benchKey === 'pricing') return '$' + item.score_raw.toFixed(2) + '/M tok';
+  const bd = item.breakdown;
+  if (bd) {
+    if (bd.total && bd.total.accuracy != null) return '准确率 ' + (bd.total.accuracy * 100).toFixed(1) + '%';
+    if (bd.accuracy_pct != null) return '准确率 ' + bd.accuracy_pct + '%';
+    if (bd.cost_per_task_usd != null) return formatCost(bd.cost_per_task_usd) + '/任务';
+    if (bd.output_tokens_per_task != null) return formatTokens(bd.output_tokens_per_task) + ' tok';
+  }
+  if (item.cost_usd != null) return formatCost(item.cost_usd);
+  if (item.input_tokens != null) return formatTokens(item.input_tokens) + ' tok';
+  return '';
+}
+
+function getMarkers(model) {
+  let html = '<div class="marker-cell">';
+  // 模态标签
+  if (model.supports_vision && model.supports_audio) html += '<span class="marker mm">多模态</span>';
+  else if (model.supports_vision) html += '<span class="marker mm">多模态</span>';
+  else if (model.supports_audio) html += '<span class="marker tts">TTS</span>';
+  else html += '<span class="marker text">文本</span>';
+  // 开源状态标签
+  if (model.open_source === 'Open') html += '<span class="marker open">开源</span>';
+  else if (model.open_source === 'Proprietary') html += '<span class="marker closed">闭源</span>';
+  else if (model.open_source === 'Hybrid') html += '<span class="marker mixed">混合</span>';
+  html += '</div>';
+  return html;
+}
+
+function getReasoningLevels(modelId, benchKey) {
+  if (benchKey === 'pricing') return [];
+  const ranking = getBenchRanking(benchKey);
+  const entries = ranking.filter(r => r.model_id === modelId);
+  if (entries.length <= 1) return [];
+  const isCost = isCostBench(benchKey);
+  const sorted = [...entries].sort((a, b) => isCost ? a.score_raw - b.score_raw : b.score_raw - a.score_raw);
+  sorted.forEach((e, i) => {
+    e.label = e.reasoning_level || '默认';
+    e.best = i === 0;
+  });
+  return sorted;
+}
+
+function getThemeColor(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+// ===== DIMENSION NAV =====
+function renderDimensionNav() {
+  const dimTabs = document.getElementById('dim-tabs');
+  const benchChips = document.getElementById('bench-chips');
+  if (!DATA) return;
+
+  dimTabs.innerHTML = DIMENSIONS.map(dim => `
+    <button class="dim-tab ${state.activeDimension === dim.key ? 'active' : ''}" data-dim="${dim.key}" data-tooltip="${dim.desc.replace(/"/g, '&quot;')}">
+      <span class="dim-tab-name">${dim.name}</span>
+    </button>
+  `).join('');
+
+  dimTabs.querySelectorAll('.dim-tab').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // 点击问号不切换维度
+      if (e.target.classList.contains('dim-help-icon')) return;
+      state.activeDimension = btn.dataset.dim;
+      const benches = getBenchmarksByDimension(state.activeDimension);
+      state.activeBench = benches.length > 0 ? benches[0] : null;
+      state.expandedModel = null;
+      renderDimensionNav();
+      renderCurrentView();
+    });
+  });
+
+  // 绑定维度 tab 的 tooltip
+  dimTabs.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+
+  const benches = getBenchmarksByDimension(state.activeDimension);
+  const hasBenches = benches.length > 0;
+
+  if (hasBenches) {
+    benchChips.innerHTML = benches.map(b => {
+      const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[b]) || {};
+      const desc = meta.description || '';
+      return `<button class="bench-chip ${state.activeBench === b ? 'active' : ''}" data-bench="${b}" data-tooltip="${desc.replace(/"/g, '&quot;')}">${BENCH_CN[b] || b}</button>`;
+    }).join('');
+    benchChips.classList.add('visible');
+
+    benchChips.querySelectorAll('.bench-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.activeBench = btn.dataset.bench;
+        state.expandedModel = null;
+        renderDimensionNav();
+        renderCurrentView();
+      });
+    });
+
+    // 绑定 benchmark chip 的 tooltip
+    benchChips.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', showTooltip);
+      el.addEventListener('mouseleave', hideTooltip);
+    });
+  } else {
+    benchChips.innerHTML = '<span style="font-size:12px;color:var(--text-tertiary);padding:6px 0">数据待入库</span>';
+    benchChips.classList.add('visible');
+  }
+}
+
+// ===== RANKING VIEW =====
+function renderRankingView() {
+  const main = document.getElementById('main');
+  const benchKey = state.activeBench;
+  if (!benchKey || !DATA) {
+    main.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">请选择一个评测</div></div>';
+    return;
+  }
+
+  const meta = DATA.benchmark_meta[benchKey] || {};
+  let ranking = getFilteredRanking(benchKey);
+  const totalRanking = getBenchRanking(benchKey);
+  const isCost = isCostBench(benchKey);
+
+  // Apply ranking sort
+  if (state.rankingSort.key === 'rank') {
+    ranking.sort((a, b) => state.rankingSort.desc ? a.rank - b.rank : b.rank - a.rank);
+  } else if (state.rankingSort.key === 'score') {
+    ranking.sort((a, b) => {
+      const va = a.score_raw ?? -Infinity;
+      const vb = b.score_raw ?? -Infinity;
+      return state.rankingSort.desc ? vb - va : va - vb;
+    });
+  } else if (state.rankingSort.key === 'composite') {
+    ranking.sort((a, b) => {
+      const va = getCompositeScore(a.model_id) ?? -Infinity;
+      const vb = getCompositeScore(b.model_id) ?? -Infinity;
+      return state.rankingSort.desc ? vb - va : va - vb;
+    });
+  } else if (state.rankingSort.key === 'cost') {
+    ranking.sort((a, b) => {
+      const tbR = getBenchRanking('terminalbench_hard');
+      const va = tbR.find(r => r.model_id === a.model_id)?.cost_usd ?? Infinity;
+      const vb = tbR.find(r => r.model_id === b.model_id)?.cost_usd ?? Infinity;
+      return state.rankingSort.desc ? vb - va : va - vb;
+    });
+  }
+
+  const sortIcon = (key) => {
+    if (state.rankingSort.key !== key) return ' <span style="opacity:.3">▲</span>';
+    return state.rankingSort.desc ? ' ▼' : ' ▲';
+  };
+
+  let html = `<div class="bench-header" style="min-height:0;padding:4px 0">
+    <div class="bench-header-left" style="display:none"></div>
+    <div class="bench-header-right">
+      <span class="bench-stat"><span class="bench-stat-val">${ranking.length}</span>/<span class="bench-stat-total">${totalRanking.length}</span> 条数据</span>
+      ${meta.source ? `<span class="bench-stat">来源: ${meta.source}</span>` : ''}
+    </div>
+  </div>`;
+
+  if (ranking.length === 0) {
+    html += '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">当前筛选条件下无匹配数据</div></div>';
+    main.innerHTML = html;
+    return;
+  }
+
+  html += '<div class="ranking-table">';
+  html += '<div class="table-header"><div>标记</div><div class="th-sortable" data-sort="rank" style="cursor:pointer">排名' + sortIcon('rank') + '</div><div>模型</div><div class="th-sortable" data-sort="score" style="cursor:pointer">分数' + sortIcon('score') + '</div><div>子维度</div><div class="th-sortable" data-sort="composite" style="cursor:pointer">五维' + sortIcon('composite') + '</div><div class="th-sortable" data-sort="cost" style="cursor:pointer">成本' + sortIcon('cost') + '</div><div>对比</div><div></div></div>';
+
+  ranking.forEach(item => {
+    const model = getModel(item.model_id);
+    if (!model) return;
+    const expKey = item.model_id + '|' + (item.reasoning_level || '');
+    const isExpanded = state.expandedModel === expKey;
+    const rankClass = item.rank <= 3 ? `r${item.rank}` : '';
+    const inCompare = state.compareList.includes(item.model_id);
+    const scoreDisplay = isCost ? formatCost(item.score_raw) : formatScore(item.score_raw);
+    const isCostZero = isCost && item.score_raw != null && item.score_raw === Math.max(...getBenchRanking(benchKey).map(r => r.score_raw).filter(s => s != null));
+    const compScore = getCompositeScore(item.model_id);
+    const compRank = getCompositeRank(item.model_id);
+    const tbRanking = getBenchRanking('terminalbench_hard');
+    const tbItem = tbRanking.find(r => r.model_id === item.model_id);
+    const tbCost = tbItem && tbItem.cost_usd != null ? formatCost(tbItem.cost_usd) + '/任务' : '';
+    const tbTokens = tbItem && tbItem.output_tokens != null ? formatTokens(tbItem.output_tokens) + ' token/任务' : '';
+    const subDimText = getSubDimText(item, benchKey);
+
+    html += `<div class="table-row ${isExpanded ? 'expanded' : ''}" data-model="${item.model_id}" data-reasoning="${item.reasoning_level || ''}">
+      ${getMarkers(model)}
+      <div class="rank ${rankClass}">No.${item.rank}</div>
+      <div class="model-cell">
+        <div class="model-name">${item.display_name || model.display_name}</div>
+        <div class="model-id">${item.model_id}${item.reasoning_level ? ' · ' + item.reasoning_level : ''}</div>
+      </div>
+      <div class="score-col">
+        <div class="score ${isCostZero ? 'cost-zero' : ''}">${scoreDisplay}${isCostZero ? '<span class="cost-zero-badge">最贵</span>' : ''}</div>
+      </div>
+      <div class="subdim-col">${subDimText || '—'}</div>
+      <div class="comp-col">
+        ${compRank ? '<span class="comp-rank-badge">No.' + compRank + '</span>' : ''}
+        <span class="comp-score">${compScore != null ? compScore.toFixed(1) : '—'}</span>
+      </div>
+      <div class="cost-col">
+        ${tbCost ? '<span class="cost-val">' + tbCost + '</span>' : ''}
+        ${tbTokens ? '<span class="token-val">' + tbTokens + '</span>' : ''}
+      </div>
+      <div class="compare-col">
+        <button class="action-btn ${inCompare ? 'active' : ''}" data-action="compare" data-model="${item.model_id}">${inCompare ? '✓' : '对比'}</button>
+      </div>
+      <div class="expand-col">
+        <span class="expand-arrow ${isExpanded ? 'open' : ''}">▸</span>
+      </div>
+    </div>`;
+
+    if (isExpanded) {
+      html += renderDrilldownHTML(item, benchKey);
+    }
+  });
+
+  html += '</div>';
+  main.innerHTML = html;
+
+  // Bind row events
+  main.querySelectorAll('.table-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.action-btn')) return;
+      const modelId = row.dataset.model;
+      const reasoning = row.dataset.reasoning;
+      const expKey = modelId + '|' + reasoning;
+      state.expandedModel = state.expandedModel === expKey ? null : expKey;
+      renderRankingView();
+    });
+  });
+
+  // Bind action buttons
+  main.querySelectorAll('[data-action="compare"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCompare(btn.dataset.model);
+      renderRankingView();
+    });
+  });
+
+  // Bind sort headers
+  main.querySelectorAll('.th-sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if (state.rankingSort.key === key) state.rankingSort.desc = !state.rankingSort.desc;
+      else { state.rankingSort.key = key; state.rankingSort.desc = true; }
+      renderRankingView();
+    });
+  });
+
+  // Initialize radar chart if expanded
+  if (state.expandedModel) {
+    const [modelId] = state.expandedModel.split('|');
+    renderRadar(modelId);
+    // Bind dimension card clicks
+    bindDrilldownEvents();
+  }
+}
+
+function renderDrilldownHTML(item, benchKey) {
+  const modelId = item.model_id;
+  const model = getModel(modelId);
+  if (!model) return '';
+
+  // Left column
+  let left = '<div class="drill-left"><div class="drill-left-title">当前评测</div>';
+  left += `<div class="drill-left-stat"><span class="drill-left-label">分数</span><span class="drill-left-value">${formatScore(item.score_raw)}</span></div>`;
+  left += `<div class="drill-left-stat"><span class="drill-left-label">排名</span><span class="drill-left-value">No.${item.rank}</span></div>`;
+  if (item.input_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输入 tokens</span><span class="drill-left-value">${formatTokens(item.input_tokens)}</span></div>`;
+  if (item.output_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输出 tokens</span><span class="drill-left-value">${formatTokens(item.output_tokens)}</span></div>`;
+  if (item.reasoning_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">推理 tokens</span><span class="drill-left-value">${formatTokens(item.reasoning_tokens)}</span></div>`;
+  if (item.cost_usd != null) left += `<div class="drill-left-stat"><span class="drill-left-label">成本</span><span class="drill-left-value">${formatCost(item.cost_usd)}</span></div>`;
+  if (item.source) left += `<div class="drill-left-stat"><span class="drill-left-label">来源</span><span class="drill-left-value">${item.source}</span></div>`;
+  if (item.confidence != null) left += `<div class="drill-left-stat"><span class="drill-left-label">置信度</span><span class="drill-left-value">${(item.confidence * 100).toFixed(0)}%</span></div>`;
+  // Breakdown details
+  if (item.breakdown && typeof item.breakdown === 'object') {
+    const bd = item.breakdown;
+    if (bd.total && typeof bd.total === 'object') {
+      if (bd.total.accuracy != null) left += `<div class="drill-left-stat"><span class="drill-left-label">总准确率</span><span class="drill-left-value">${(bd.total.accuracy * 100).toFixed(1)}%</span></div>`;
+      if (bd.total.omniscience != null) left += `<div class="drill-left-stat"><span class="drill-left-label">Omniscience</span><span class="drill-left-value">${bd.total.omniscience.toFixed(1)}</span></div>`;
+    }
+    if (bd.pricing_input != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输入价格</span><span class="drill-left-value">$${bd.pricing_input}/M</span></div>`;
+    if (bd.pricing_output != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输出价格</span><span class="drill-left-value">$${bd.pricing_output}/M</span></div>`;
+  }
+  left += '</div>';
+
+  // Middle column - dimension cards (exclude current dimension, 2x2 layout with row interlock)
+  const otherDims = DIMENSIONS.filter(dim => dim.key !== state.activeDimension);
+  let middle = '<div class="drill-middle"><div class="dim-cards">';
+  otherDims.forEach((dim, idx) => {
+    const score = getDimensionScore(modelId, dim.key);
+    const rank = getDimensionRank(modelId, dim.key);
+    const hasData = hasDimensionData(dim.key);
+    const row = idx < 2 ? 1 : 2;  // 第1行 or 第2行
+    const isRow1Expanded = state._drillExpandedRow !== 2;  // 默认第1行展开
+    const isExpanded = (row === 1 && isRow1Expanded) || (row === 2 && !isRow1Expanded);
+    middle += `<div class="dim-card ${isExpanded ? 'expanded' : ''}" data-dim="${dim.key}" data-row="${row}">`;
+    middle += `<div class="dim-card-head"><span class="dim-card-name">${dim.name}</span><span class="dim-card-rank">${hasData ? 'No.' + (rank || '—') : '无数据'}</span></div>`;
+    middle += `<div class="dim-card-score">${score != null ? score.toFixed(1) : '—'}${dim.key === 'cost' && score === 0 ? '<span class="cost-zero-badge">最贵</span>' : ''}</div>`;
+    middle += `<div class="dim-card-expand">`;
+    if (hasData) {
+      const benches = getBenchmarksByDimension(dim.key);
+      benches.forEach(b => {
+        const bRanking = getBenchRanking(b);
+        const bItem = bRanking.find(r => r.model_id === modelId);
+        const bScore = bItem ? bItem.score_raw : null;
+        const bRank = bItem ? bItem.rank : null;
+        const scoreDisplay = isCostBench(b) ? formatCost(bScore) : formatScore(bScore);
+        middle += `<div class="dim-sub-item" data-bench="${b}" data-dim="${dim.key}">
+          <span class="dim-sub-name">${BENCH_CN[b] || b}</span>
+          <span><span class="dim-sub-score">${scoreDisplay}</span> <span class="dim-sub-rank">No.${bRank || '—'}</span></span>
+        </div>`;
+      });
+    } else {
+      middle += '<div style="font-size:11px;color:var(--text-tertiary);padding:4px 0">数据待入库</div>';
+    }
+    middle += `</div>`;
+    if (!isExpanded) {
+      middle += `<div class="dim-card-hint">点击展开 ↓</div>`;
+    }
+    middle += `</div>`;
+  });
+  middle += '</div></div>';
+
+  // Right column
+  let right = '<div class="drill-right">';
+  right += '<div class="radar-chart" id="radar-chart"></div>';
+  const compScore = getCompositeScore(modelId);
+  const compRank = getCompositeRank(modelId);
+  right += `<div class="composite-box"><div class="composite-score">${compScore != null ? compScore.toFixed(1) : '—'}</div><div class="composite-rank">综合排名 No.${compRank || '—'}</div></div>`;
+  // Reasoning level comparison
+  const reasoningLevels = getReasoningLevels(modelId, benchKey);
+  if (reasoningLevels.length > 1) {
+    right += '<div class="reasoning-compare"><div class="reasoning-title">推理级别对比</div>';
+    reasoningLevels.forEach(r => {
+      const scoreDisplay = isCostBench(benchKey) ? formatCost(r.score_raw) : formatScore(r.score_raw);
+      right += `<div class="reasoning-item ${r.best ? 'best' : ''}"><span>${r.label}</span><span class="reasoning-val">${scoreDisplay}</span></div>`;
+    });
+    right += '</div>';
+  }
+  right += '</div>';
+
+  return `<div class="drilldown-panel open">${left}${middle}${right}</div>`;
+}
+
+function bindDrilldownEvents() {
+  const main = document.getElementById('main');
+  main.querySelectorAll('.dim-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.dim-sub-item')) return;
+      const clickedRow = parseInt(card.dataset.row);
+      const currentExpandedRow = state._drillExpandedRow || 1;
+      if (clickedRow === currentExpandedRow) {
+        state._drillExpandedRow = clickedRow === 1 ? 2 : 1;
+      } else {
+        state._drillExpandedRow = clickedRow;
+      }
+      const cards = main.querySelectorAll('.dim-card');
+      cards.forEach(c => {
+        const row = parseInt(c.dataset.row);
+        const isExpanded = row === state._drillExpandedRow;
+        c.classList.toggle('expanded', isExpanded);
+        const hint = c.querySelector('.dim-card-hint');
+        if (hint) hint.style.display = isExpanded ? 'none' : 'block';
+      });
+    });
+  });
+  main.querySelectorAll('.dim-sub-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const bench = item.dataset.bench;
+      const dim = item.dataset.dim;
+      state.activeDimension = dim;
+      state.activeBench = bench;
+      state.expandedModel = null;
+      renderDimensionNav();
+      renderCurrentView();
+    });
+  });
+}
+
+// ===== MATRIX VIEW =====
+function renderMatrixView() {
+  const main = document.getElementById('main');
+  document.getElementById('dimension-nav').style.display = 'none';
+
+  const dimBenches = [];
+  DIMENSIONS.forEach(dim => {
+    const benches = getBenchmarksByDimension(dim.key);
+    if (benches.length > 0) dimBenches.push({ dim, benches });
+  });
+  const allBenches = dimBenches.flatMap(db => db.benches);
+
+  if (allBenches.length === 0) {
+    main.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">暂无数据</div></div>';
+    return;
+  }
+
+  // Get filtered models
+  let models = Object.keys(DATA.models).filter(id => {
+    const m = getModel(id);
+    if (!m) return false;
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      if (!(m.display_name || id).toLowerCase().includes(q) && !id.toLowerCase().includes(q)) return false;
+    }
+    if (state.activeProviders.size > 0 && !state.activeProviders.has(m.provider)) return false;
+    return true;
+  });
+
+  // Sort models
+  if (_matrixSort.key) {
+    const benchKey = _matrixSort.key;
+    const ranking = getBenchRanking(benchKey);
+    models.sort((a, b) => {
+      const aItem = ranking.find(r => r.model_id === a);
+      const bItem = ranking.find(r => r.model_id === b);
+      if (!aItem && !bItem) return 0;
+      if (!aItem) return 1;
+      if (!bItem) return -1;
+      return _matrixSort.desc ? bItem.score_raw - aItem.score_raw : aItem.score_raw - bItem.score_raw;
+    });
+  } else {
+    // 默认排序：有综合分的排前面，无数据的排后面
+    models.sort((a, b) => {
+      const aScore = getCompositeScore(a);
+      const bScore = getCompositeScore(b);
+      const aHas = aScore != null;
+      const bHas = bScore != null;
+      if (aHas !== bHas) return aHas ? -1 : 1;
+      return (bScore || 0) - (aScore || 0);
+    });
+  }
+
+  // Column stats for heatmap
+  const colStats = {};
+  allBenches.forEach(b => {
+    const ranking = getBenchRanking(b);
+    const scores = ranking.map(r => r.score_raw).filter(s => s != null);
+    if (scores.length > 0) colStats[b] = { max: Math.max(...scores), min: Math.min(...scores) };
+  });
+
+  let html = '<div class="matrix-view"><div class="matrix-table"><div class="matrix-grid" style="grid-template-columns: 120px repeat(' + allBenches.length + ', minmax(50px, 1fr));">';
+
+  // Dimension header row
+  html += '<div class="matrix-row"><div class="matrix-row-label"></div>';
+  dimBenches.forEach(db => {
+    html += `<div class="matrix-dim-header" style="grid-column: span ${db.benches.length}" data-tooltip="${db.dim.desc.replace(/"/g, '&quot;')}">${db.dim.name}</div>`;
+  });
+  html += '</div>';
+
+  // Benchmark header row — 长名称拆两行压缩列宽
+  html += '<div class="matrix-row"><div class="matrix-row-label">模型</div>';
+  allBenches.forEach(b => {
+    const name = BENCH_CN[b] || b;
+    const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[b]) || {};
+    const desc = meta.description || '';
+    const splitMap = {
+      '综合知识':'综合<br>知识','研究生问答':'研究生<br>问答','人类终极考试':'人类<br>终极',
+      '数学2025':'数学<br>2025','数学(历史)':'数学<br>(历史)',
+      'Agent Elo':'Agent<br>ELO','Agent归一化':'Agent<br>归一化','指令遵循':'指令<br>遵循',
+      'Agent指数':'Agent<br>指数','终端Hard':'终端<br>Hard','科学编程':'科学<br>编程',
+      '实时编程':'实时<br>编程','编程指数':'编程<br>指数','实际消耗':'实际<br>消耗',
+      '定价参考':'定价<br>参考'
+    };
+    const displayName = splitMap[name] || name;
+    html += `<div class="matrix-bench-header" data-bench="${b}" data-tooltip="${desc.replace(/"/g, '&quot;')}" style="cursor:pointer">${displayName}</div>`;
+  });
+  html += '</div>';
+
+  // Model rows
+  models.forEach(modelId => {
+    const model = getModel(modelId);
+    html += '<div class="matrix-row">';
+    html += `<div class="matrix-row-label">${model.display_name || modelId}</div>`;
+    allBenches.forEach(b => {
+      const ranking = getBenchRanking(b);
+      const item = ranking.find(r => r.model_id === modelId);
+      if (item) {
+        const stats = colStats[b];
+        let heatPct = 0;
+        if (stats) {
+          const isCost = isCostBench(b);
+          const range = stats.max - stats.min || 1;
+          const ratio = isCost ? (stats.max - item.score_raw) / range : (item.score_raw - stats.min) / range;
+          heatPct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+        }
+        const scoreDisplay = isCostBench(b) ? formatCost(item.score_raw) : formatScore(item.score_raw);
+        html += `<div class="matrix-cell heatmap" data-model="${modelId}" data-bench="${b}" style="cursor:pointer;--heat-pct:${heatPct}%">${scoreDisplay}</div>`;
+      } else {
+        html += `<div class="matrix-cell empty" data-model="${modelId}" data-bench="${b}">—</div>`;
+      }
+    });
+    html += '</div>';
+  });
+
+  html += '</div></div></div>';
+  main.innerHTML = html;
+
+  // 冻结表头：计算第一行高度，设置第二行 top 值
+  const dimHeaders = main.querySelectorAll('.matrix-dim-header');
+  if (dimHeaders.length > 0) {
+    const firstRowHeight = dimHeaders[0].offsetHeight;
+    const benchHeaders = main.querySelectorAll('.matrix-bench-header');
+    benchHeaders.forEach(header => {
+      header.style.top = firstRowHeight + 'px';
+    });
+    // 第一行的 row-label 也要 sticky
+    const firstRowLabel = main.querySelector('.matrix-row:first-child .matrix-row-label');
+    if (firstRowLabel) {
+      firstRowLabel.style.position = 'sticky';
+      firstRowLabel.style.top = '0';
+      firstRowLabel.style.zIndex = '3';
+    }
+    // 第二行的 row-label 也要 sticky
+    const secondRowLabel = main.querySelector('.matrix-row:nth-child(2) .matrix-row-label');
+    if (secondRowLabel) {
+      secondRowLabel.style.position = 'sticky';
+      secondRowLabel.style.top = firstRowHeight + 'px';
+      secondRowLabel.style.zIndex = '3';
+    }
+  }
+
+  // Bind tooltip for dimension headers and benchmark headers
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+
+  // Bind header sort
+  main.querySelectorAll('.matrix-bench-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const bench = header.dataset.bench;
+      if (_matrixSort.key === bench) _matrixSort.desc = !_matrixSort.desc;
+      else { _matrixSort.key = bench; _matrixSort.desc = true; }
+      renderMatrixView();
+    });
+  });
+
+  // Bind cell click
+  main.querySelectorAll('.matrix-cell:not(.empty)').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const modelId = cell.dataset.model;
+      const bench = cell.dataset.bench;
+      const dim = DIMENSIONS.find(d => BENCH_GROUPS[d.key].benches.includes(bench));
+      if (dim) {
+        state.activeDimension = dim.key;
+        state.activeBench = bench;
+      }
+      state.view = 'ranking';
+      state.expandedModel = modelId + '|';
+      document.querySelectorAll('.view-tab').forEach(b => b.classList.toggle('active', b.dataset.view === 'ranking'));
+      document.getElementById('dimension-nav').style.display = '';
+      renderDimensionNav();
+      renderCurrentView();
+    });
+  });
+}
+
+// ===== COMPARE VIEW =====
+function renderCompareView() {
+  const main = document.getElementById('main');
+  document.getElementById('dimension-nav').style.display = 'none';
+
+  if (state.compareList.length === 0) {
+    main.innerHTML = '<div class="empty"><div class="empty-icon">⚖️</div><div class="empty-text">对比列表为空，请在排行榜中点击"对比"按钮添加模型</div></div>';
+    return;
+  }
+
+  // 使用对比视图专用计算（缺失维度用对比池内最低分填充）
+  const modelIds = state.compareList.filter(id => getModel(id));
+  const compareScores = getCompareCompositeScore(modelIds);
+
+  // Sort models by compare-specific composite score
+  const models = modelIds.map(id => getModel(id)).filter(m => m);
+  const sortedModels = models.slice().sort((a, b) => {
+    const scoreA = compareScores[a.id]?.score ?? -Infinity;
+    const scoreB = compareScores[b.id]?.score ?? -Infinity;
+    return scoreB - scoreA;
+  });
+
+  // 收集缺失信息用于提示
+  const allMissingInfo = [];
+  sortedModels.forEach(m => {
+    const info = compareScores[m.id];
+    if (info && info.missingDims.length > 0) {
+      allMissingInfo.push(`${m.display_name} 在 ${info.missingDims.join('、')} 维度无数据`);
+    }
+  });
+
+  const dimBenches = [];
+  DIMENSIONS.forEach(dim => {
+    const benches = getBenchmarksByDimension(dim.key);
+    if (benches.length > 0) dimBenches.push({ dim, benches });
+  });
+
+  // Weight sliders with collapsible sub-dimensions
+  let html = '<div class="compare-view">';
+  html += '<div class="weight-panel" style="padding:12px 16px;border-bottom:1px solid var(--border)">';
+  html += '<div class="weight-panel-header" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none" id="weight-panel-toggle">';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary)">权重调整（实时重算）</div>';
+  html += '<span class="weight-panel-arrow" style="font-size:12px;color:var(--text-tertiary);transition:transform 0.2s">▼</span>';
+  html += '</div>';
+  html += '<div class="weight-panel-content" style="margin-top:8px">';
+  DIMENSIONS.forEach(dim => {
+    const w = Math.round((state.weights[dim.key] || 0) * 100);
+    const benches = getBenchmarksByDimension(dim.key);
+    const hasSubDims = benches.length > 0;
+    const isExpanded = state.expandedWeightDim === dim.key;
+    
+    html += `<div class="weight-dim-group" data-dim="${dim.key}">`;
+    html += `<div class="weight-slider-row" style="cursor:${hasSubDims ? 'pointer' : 'default'}" data-toggle-dim="${hasSubDims ? dim.key : ''}">
+      <span class="weight-slider-label">
+        ${dim.name}
+        <span class="dim-help-icon" data-tooltip="${dim.desc.replace(/"/g, '&quot;')}">?</span>
+      </span>
+      <input type="range" class="weight-slider" min="0" max="100" value="${w}" data-dim="${dim.key}">
+      <span class="weight-slider-value">${w}%</span>
+      ${hasSubDims ? `<span class="sub-dim-toggle" data-dim="${dim.key}" style="display:inline-flex;align-items:center;gap:4px;padding:4px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s ease;${isExpanded ? 'background:var(--accent);color:var(--text-inverse)' : 'background:var(--accent-soft);color:var(--accent)'}">${isExpanded ? '收起' : '子维度'}</span>` : ''}
+    </div>`;
+    
+    // Sub-dimension sliders - hidden by default, shown when expanded (accordion)
+    if (hasSubDims) {
+      html += `<div class="sub-dim-row" data-parent-dim="${dim.key}" style="display:${isExpanded ? 'grid' : 'none'}">`;
+      benches.forEach(b => {
+        const benchW = state.benchWeights?.[b] ?? (1 / benches.length);
+        const benchPct = Math.round(benchW * 100);
+        const benchName = BENCH_CN[b] || b;
+        html += `<div class="sub-dim-item">
+          <span class="sub-dim-label">${benchName}</span>
+          <input type="range" class="sub-dim-slider" min="0" max="100" value="${benchPct}" data-bench="${b}" data-parent-dim="${dim.key}">
+          <span class="sub-dim-value">${benchPct}%</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  html += `<div style="margin-top:8px;font-size:11px;color:var(--text-tertiary)">子维度共同组成该维度的评分体系，可展开调整各子维度权重，获得更符合你需求的排名</div>`;
+  html += `<div style="margin-top:8px"><button class="action-btn" id="reset-weights">重置默认权重</button></div>`;
+  html += '</div></div>';
+
+  // Compare table with sorted models
+  html += '<table class="compare-table"><thead><tr><th>评测</th>';
+  sortedModels.forEach((m, idx) => {
+    const compScore = compareScores[m.id]?.score;
+    const rankLabel = compScore != null ? `<span style="color:var(--accent);font-weight:600">No.${idx + 1}</span>` : '';
+    const missingBadge = compareScores[m.id]?.missingDims?.length > 0
+      ? `<br><span style="font-size:9px;color:var(--text-tertiary);font-weight:normal">⚠ 缺 ${compareScores[m.id].missingDims.length} 维</span>`
+      : '';
+    html += `<th class="compare-col-header">${rankLabel}<br>${m.display_name}${missingBadge}<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);font-weight:normal">${m.id}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // Benchmark rows grouped by dimension
+  dimBenches.forEach(db => {
+    html += `<tr><td colspan="${sortedModels.length + 1}" style="background:var(--bg-section);font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--accent)">${db.dim.name}</td></tr>`;
+    db.benches.forEach(b => {
+      const values = sortedModels.map(m => {
+        const ranking = getBenchRanking(b);
+        const item = ranking.find(r => r.model_id === m.id);
+        return item ? item.score_raw : null;
+      });
+      const isCost = isCostBench(b);
+      const validVals = values.filter(v => v != null);
+      let bestIdx = -1;
+      if (validVals.length > 0) {
+        const best = isCost ? Math.min(...validVals) : Math.max(...validVals);
+        bestIdx = values.indexOf(best);
+      }
+      // Add tooltip for benchmark description
+      const meta = DATA.benchmark_meta[b] || {};
+      const tooltipText = meta.description || meta.full_name || BENCH_CN[b] || b;
+      html += `<tr><td class="compare-row-label" data-tooltip="${tooltipText.replace(/"/g, '&quot;')}">${BENCH_CN[b] || b}</td>`;
+      values.forEach((v, i) => {
+        const scoreDisplay = v == null ? '<span class="compare-empty">—</span>' : (isCost ? formatCost(v) : formatScore(v));
+        const bestClass = i === bestIdx ? ' compare-best' : '';
+        html += `<td class="compare-cell${bestClass}">${scoreDisplay}</td>`;
+      });
+      html += '</tr>';
+    });
+  });
+
+  // Composite score row
+  html += `<tr><td class="compare-row-label" style="font-weight:600;color:var(--accent)">综合指数</td>`;
+  const compScores = sortedModels.map(m => compareScores[m.id]?.score);
+  const validComp = compScores.filter(s => s != null);
+  let bestComp = -1;
+  if (validComp.length > 0) {
+    const best = Math.max(...validComp);
+    bestComp = compScores.indexOf(best);
+  }
+  compScores.forEach((s, i) => {
+    const display = s != null ? s.toFixed(1) : '<span class="compare-empty">—</span>';
+    const bestClass = i === bestComp ? ' compare-best' : '';
+    html += `<td class="compare-cell${bestClass}" style="font-size:16px;font-weight:600">${display}</td>`;
+  });
+  html += '</tr>';
+
+  html += '</tbody></table>';
+
+  // 缺失数据提示
+  if (allMissingInfo.length > 0) {
+    html += `<div style="margin-top:12px;padding:12px 16px;background:var(--bg-section);border-radius:8px;font-size:12px;color:var(--text-secondary);line-height:1.6">`;
+    html += `<div style="font-weight:600;margin-bottom:6px">⚠ 数据缺失说明</div>`;
+    html += `<div>${allMissingInfo.join('；')}。</div>`;
+    html += `<div style="margin-top:6px;color:var(--text-tertiary)">缺失维度已按对比池内最低分参照计算，排名仅供参考，请更关注您所重视的维度。</div>`;
+    html += `</div>`;
+  }
+
+  html += '</div>';
+  main.innerHTML = html;
+
+  // Bind weight panel toggle
+  const toggleBtn = document.getElementById('weight-panel-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const content = main.querySelector('.weight-panel-content');
+      const arrow = main.querySelector('.weight-panel-arrow');
+      if (content.style.display === 'none') {
+        content.style.display = '';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        content.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    });
+  }
+
+  // Bind sub-dimension toggle: click entire row or the ▶ button to expand/collapse
+  const toggleWeightDim = (dimKey) => {
+    if (state.expandedWeightDim === dimKey) {
+      state.expandedWeightDim = null;
+    } else {
+      state.expandedWeightDim = dimKey;
+    }
+    renderCompareView();
+  };
+
+  // Click on the toggle button (▶/▼)
+  main.querySelectorAll('.sub-dim-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWeightDim(btn.dataset.dim);
+    });
+  });
+
+  // Click on the entire row (but not on slider or ? icon)
+  main.querySelectorAll('.weight-slider-row[data-toggle-dim]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      // 不拦截滑块拖动和问号 tooltip
+      if (e.target.tagName === 'INPUT' || e.target.classList.contains('dim-help-icon')) return;
+      const dimKey = row.dataset.toggleDim;
+      if (dimKey) toggleWeightDim(dimKey);
+    });
+  });
+
+  // Bind weight sliders - 拖动时其他不动，松开时按比例分配
+  main.querySelectorAll('.weight-slider').forEach(slider => {
+    // 拖动时只更新当前滑块显示，不重建DOM
+    slider.addEventListener('input', () => {
+      const row = slider.closest('.weight-slider-row');
+      row.querySelector('.weight-slider-value').textContent = slider.value + '%';
+      // 更新权重状态，但不重建DOM
+      const dim = slider.dataset.dim;
+      state.weights[dim] = parseInt(slider.value) / 100;
+      invalidateCache();
+      // 只更新表格内容，不重建权重面板
+      updateCompareTableOnly();
+    });
+
+    // 松开鼠标时，按比例分配剩余值给其他维度
+    slider.addEventListener('change', () => {
+      const dim = slider.dataset.dim;
+      const val = parseInt(slider.value) / 100;
+
+      // 计算其他维度的当前权重
+      const otherDims = DIMENSIONS.filter(d => d.key !== dim);
+      const otherWeights = otherDims.map(d => state.weights[d.key] || 0);
+      const otherSum = otherWeights.reduce((a, b) => a + b, 0);
+      const remaining = 1 - val;
+
+      // 设置当前维度
+      state.weights[dim] = val;
+
+      // 按比例分配剩余值给其他维度
+      if (otherSum > 0) {
+        otherDims.forEach(d => {
+          state.weights[d.key] = (state.weights[d.key] / otherSum) * remaining;
+        });
+      } else {
+        // 如果其他维度都是 0，平均分配
+        const avg = remaining / otherDims.length;
+        otherDims.forEach(d => {
+          state.weights[d.key] = avg;
+        });
+      }
+
+      // 更新所有滑块的显示
+      main.querySelectorAll('.weight-slider').forEach(s => {
+        const d = s.dataset.dim;
+        const v = Math.round((state.weights[d] || 0) * 100);
+        s.value = v;
+        s.closest('.weight-slider-row').querySelector('.weight-slider-value').textContent = v + '%';
+      });
+
+      invalidateCache();
+      renderCompareView();
+    });
+  });
+
+  // Bind sub-dimension sliders
+  main.querySelectorAll('.sub-dim-slider').forEach(slider => {
+    slider.addEventListener('input', () => {
+      const bench = slider.dataset.bench;
+      const parentDim = slider.dataset.parentDim;
+      const val = parseInt(slider.value) / 100;
+
+      // 初始化 benchWeights
+      if (!state.benchWeights) state.benchWeights = {};
+
+      // 获取同一维度下的所有 benchmark
+      const benches = getBenchmarksByDimension(parentDim);
+      const currentSlider = slider;
+      const otherSliders = Array.from(main.querySelectorAll(`.sub-dim-slider[data-parent-dim="${parentDim}"]`))
+        .filter(s => s !== currentSlider);
+
+      // 计算其他滑块的当前值
+      const otherValues = otherSliders.map(s => parseInt(s.value) / 100);
+      const otherSum = otherValues.reduce((a, b) => a + b, 0);
+      const remaining = 1 - val;
+
+      // 设置当前 benchmark 的权重
+      state.benchWeights[bench] = val;
+
+      // 按比例分配剩余值给其他 benchmark
+      if (otherSum > 0) {
+        otherSliders.forEach((s, i) => {
+          const otherBench = s.dataset.bench;
+          const newVal = (otherValues[i] / otherSum) * remaining;
+          state.benchWeights[otherBench] = newVal;
+        });
+      } else {
+        // 如果其他都是 0，平均分配
+        const avg = remaining / otherSliders.length;
+        otherSliders.forEach(s => {
+          const otherBench = s.dataset.bench;
+          state.benchWeights[otherBench] = avg;
+        });
+      }
+
+      // 更新所有子维度滑块的显示
+      otherSliders.forEach(s => {
+        const otherBench = s.dataset.bench;
+        const v = Math.round((state.benchWeights[otherBench] || 0) * 100);
+        s.value = v;
+        s.closest('.sub-dim-item').querySelector('.sub-dim-value').textContent = v + '%';
+      });
+
+      // 更新当前滑块显示
+      slider.closest('.sub-dim-item').querySelector('.sub-dim-value').textContent = Math.round(val * 100) + '%';
+
+      invalidateCache();
+      renderCompareView();
+    });
+  });
+
+  // Reset weights
+  const resetBtn = document.getElementById('reset-weights');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      state.weights = { factual: 0.25, workflow: 0.25, engineering: 0.20, cost: 0.15, preference: 0.15 };
+      state.activeScheme = null;
+      invalidateCache();
+      renderCompareView();
+    });
+  }
+
+  // Bind benchmark tooltips
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+// Tooltip functions
+function showTooltip(e) {
+  const text = e.target.dataset.tooltip;
+  if (!text) return;
+  let tooltip = document.getElementById('global-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'global-tooltip';
+    tooltip.style.cssText = 'position:fixed;background:rgba(30,30,30,0.98);color:#fff;padding:16px 20px;border-radius:8px;font-size:13px;line-height:1.6;max-width:400px;box-shadow:0 8px 24px rgba(0,0,0,0.4);pointer-events:none;z-index:9999;opacity:0;transition:opacity 0.15s;border:1px solid rgba(255,255,255,0.1)';
+    document.body.appendChild(tooltip);
+  }
+  tooltip.textContent = text;
+  tooltip.style.opacity = '1';
+  const rect = e.target.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  let left = rect.left;
+  let top = rect.bottom + 12;
+  // Prevent overflow right
+  if (left + tooltipRect.width > window.innerWidth - 20) {
+    left = window.innerWidth - tooltipRect.width - 20;
+  }
+  // Prevent overflow bottom
+  if (top + tooltipRect.height > window.innerHeight - 20) {
+    top = rect.top - tooltipRect.height - 12;
+  }
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  const tooltip = document.getElementById('global-tooltip');
+  if (tooltip) tooltip.style.opacity = '0';
+}
+
+// ===== SCHEMES VIEW =====
+function renderSchemesView() {
+  const main = document.getElementById('main');
+  document.getElementById('dimension-nav').style.display = 'none';
+
+  let html = '<div class="schemes-view">';
+  html += '<div class="schemes-toolbar"><div class="schemes-title">我的权重方案</div>';
+  html += '<button class="action-btn" id="new-scheme-btn" style="padding:6px 14px;font-size:12px">+ 新建方案</button></div>';
+
+  if (state.schemes.length === 0) {
+    html += '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">暂无保存的方案，点击"新建方案"创建</div></div>';
+  } else {
+    html += '<div class="scheme-list">';
+    state.schemes.forEach(scheme => {
+      const isActive = state.activeScheme === scheme.id;
+      const isEditing = state.editingSchemeId === scheme.id;
+      html += `<div class="scheme-card ${isEditing ? 'editing' : ''}" data-id="${scheme.id}">`;
+      html += '<div class="scheme-head">';
+      html += `<div class="scheme-name">${scheme.name}${isActive ? ' ✓ 当前应用' : ''}</div>`;
+      html += '<div class="scheme-actions">';
+      html += `<button class="action-btn ${isActive ? 'active' : ''}" data-action="apply" data-id="${scheme.id}">应用</button>`;
+      html += `<button class="action-btn" data-action="edit" data-id="${scheme.id}">编辑</button>`;
+      html += `<button class="action-btn" data-action="delete" data-id="${scheme.id}">删除</button>`;
+      html += '</div></div>';
+      // Weight bars
+      html += '<div class="scheme-weights">';
+      DIMENSIONS.forEach(dim => {
+        const w = (scheme.weights[dim.key] || 0) * 100;
+        html += `<div class="weight-item">
+          <div class="weight-item-head">
+            <span class="weight-item-label">${dim.name}<span class="dim-help-icon" data-tooltip="${dim.desc.replace(/"/g, '&quot;')}">?</span></span>
+            <span class="weight-item-value">${w.toFixed(0)}%</span>
+          </div>
+          <div class="weight-bar"><div class="weight-bar-fill" style="width:${w}%"></div></div>
+        </div>`;
+      });
+      html += '</div>';
+      // Editor
+      html += '<div class="scheme-editor">';
+      html += `<input type="text" class="search-input" style="width:100%;margin-bottom:8px" value="${scheme.name}" data-field="name" placeholder="方案名称">`;
+      DIMENSIONS.forEach(dim => {
+        const w = Math.round((scheme.weights[dim.key] || 0) * 100);
+        const benches = getBenchmarksByDimension(dim.key);
+        const hasSubDims = benches.length > 0;
+        const isExpanded = state.expandedWeightDim === dim.key;
+        html += `<div class="weight-dim-group" data-dim="${dim.key}">`;
+        html += `<div class="weight-slider-row" style="cursor:${hasSubDims ? 'pointer' : 'default'}" data-toggle-dim="${hasSubDims ? dim.key : ''}" data-scheme-id="${scheme.id}">
+          <span class="weight-slider-label">${dim.name}<span class="dim-help-icon" data-tooltip="${dim.desc.replace(/"/g, '&quot;')}">?</span></span>
+          <input type="range" class="weight-slider" min="0" max="100" value="${w}" data-dim="${dim.key}" data-id="${scheme.id}">
+          <span class="weight-slider-value">${w}%</span>
+          ${hasSubDims ? `<span class="sub-dim-toggle" data-dim="${dim.key}" style="display:inline-flex;align-items:center;gap:4px;padding:4px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s ease;${isExpanded ? 'background:var(--accent);color:var(--text-inverse)' : 'background:var(--accent-soft);color:var(--accent)'}">${isExpanded ? '收起' : '子维度'}</span>` : ''}
+        </div>`;
+        // Sub-dimension sliders - hidden by default, shown when expanded (accordion)
+        if (hasSubDims) {
+          html += `<div class="sub-dim-row" data-parent-dim="${dim.key}" data-scheme-id="${scheme.id}" style="display:${isExpanded ? 'grid' : 'none'}">`;
+          benches.forEach(b => {
+            const benchW = scheme.benchWeights?.[b] ?? (1 / benches.length);
+            const benchPct = Math.round(benchW * 100);
+            const benchName = BENCH_CN[b] || b;
+            html += `<div class="sub-dim-item">
+              <span class="sub-dim-label">${benchName}</span>
+              <input type="range" class="sub-dim-slider" min="0" max="100" value="${benchPct}" data-bench="${b}" data-parent-dim="${dim.key}" data-scheme-id="${scheme.id}">
+              <span class="sub-dim-value">${benchPct}%</span>
+            </div>`;
+          });
+          html += '</div>';
+        }
+        html += '</div>';
+      });
+      html += `<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px" data-role="sum">总和: ${DIMENSIONS.reduce((s, d) => s + (scheme.weights[d.key] || 0) * 100, 0).toFixed(0)}%</div>`;
+      html += `<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">子维度共同组成该维度的评分体系，可展开调整各子维度权重，获得更符合你需求的排名</div>`;
+      html += '<div class="scheme-editor-actions">';
+      html += `<button class="action-btn" data-action="save" data-id="${scheme.id}" style="background:var(--accent);color:var(--text-inverse);border-color:var(--accent)">保存</button>`;
+      html += `<button class="action-btn" data-action="cancel" data-id="${scheme.id}">取消</button>`;
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  main.innerHTML = html;
+
+  // Bind events
+  main.querySelectorAll('[data-action="apply"]').forEach(btn => {
+    btn.addEventListener('click', () => applyScheme(btn.dataset.id));
+  });
+  main.querySelectorAll('[data-action="edit"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.editingSchemeId = btn.dataset.id;
+      renderSchemesView();
+    });
+  });
+  main.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (state.editingSchemeId === btn.dataset.id) state.editingSchemeId = null;
+      deleteScheme(btn.dataset.id);
+    });
+  });
+  main.querySelectorAll('[data-action="save"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.scheme-card');
+      const id = btn.dataset.id;
+      const scheme = state.schemes.find(s => s.id === id);
+      if (!scheme) return;
+      const nameInput = card.querySelector('[data-field="name"]');
+      scheme.name = nameInput.value || '未命名方案';
+      card.querySelectorAll('.weight-slider').forEach(slider => {
+        scheme.weights[slider.dataset.dim] = parseInt(slider.value) / 100;
+      });
+      // Normalize weights
+      const sum = DIMENSIONS.reduce((s, d) => s + (scheme.weights[d.key] || 0), 0);
+      if (sum > 0) DIMENSIONS.forEach(d => { scheme.weights[d.key] = (scheme.weights[d.key] || 0) / sum; });
+      saveSchemes();
+      state.editingSchemeId = null;
+      renderSchemesView();
+    });
+  });
+  main.querySelectorAll('[data-action="cancel"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.editingSchemeId = null;
+      renderSchemesView();
+    });
+  });
+
+  // Weight slider - proportional redistribution (same as compare view)
+  main.querySelectorAll('.scheme-editor .weight-slider').forEach(slider => {
+    slider.addEventListener('input', () => {
+      // Only update current display during drag, don't move others
+      slider.closest('.weight-slider-row').querySelector('.weight-slider-value').textContent = slider.value + '%';
+    });
+
+    // On release: redistribute proportionally and save
+    slider.addEventListener('change', () => {
+      const dim = slider.dataset.dim;
+      const schemeId = slider.dataset.id;
+      const val = parseInt(slider.value) / 100;
+      const card = slider.closest('.scheme-card');
+      const scheme = state.schemes.find(s => s.id === schemeId);
+      if (!scheme) return;
+
+      // Set current dimension
+      scheme.weights[dim] = val;
+
+      // Proportionally redistribute to siblings
+      const otherSliders = Array.from(card.querySelectorAll('.scheme-editor .weight-slider'))
+        .filter(s => s !== slider);
+      const otherDims = otherSliders.map(s => s.dataset.dim);
+      const otherValues = otherDims.map(d => scheme.weights[d] || 0);
+      const otherSum = otherValues.reduce((a, b) => a + b, 0);
+      const remaining = 1 - val;
+
+      if (otherSum > 0) {
+        otherDims.forEach((d, i) => {
+          scheme.weights[d] = (otherValues[i] / otherSum) * remaining;
+        });
+      } else {
+        const avg = remaining / otherDims.length;
+        otherDims.forEach(d => {
+          scheme.weights[d] = avg;
+        });
+      }
+
+      saveSchemes();
+      renderSchemesView();
+    });
+  });
+
+  // Sub-dimension sliders for schemes
+  main.querySelectorAll('.scheme-editor .sub-dim-slider').forEach(slider => {
+    slider.addEventListener('input', () => {
+      const bench = slider.dataset.bench;
+      const parentDim = slider.dataset.parentDim;
+      const schemeId = slider.dataset.schemeId;
+      const val = parseInt(slider.value) / 100;
+
+      // Get the scheme
+      const scheme = state.schemes.find(s => s.id === schemeId);
+      if (!scheme) return;
+
+      // Initialize benchWeights for this scheme
+      if (!scheme.benchWeights) scheme.benchWeights = {};
+
+      // Get sibling sliders
+      const card = slider.closest('.scheme-card');
+      const siblingSliders = Array.from(card.querySelectorAll(`.sub-dim-slider[data-parent-dim="${parentDim}"]`))
+        .filter(s => s !== slider);
+
+      // Calculate other values
+      const otherValues = siblingSliders.map(s => parseInt(s.value) / 100);
+      const otherSum = otherValues.reduce((a, b) => a + b, 0);
+      const remaining = 1 - val;
+
+      // Set current bench weight
+      scheme.benchWeights[bench] = val;
+
+      // Distribute remaining to siblings proportionally
+      if (otherSum > 0) {
+        siblingSliders.forEach((s, i) => {
+          const otherBench = s.dataset.bench;
+          const newVal = (otherValues[i] / otherSum) * remaining;
+          scheme.benchWeights[otherBench] = newVal;
+        });
+      } else {
+        const avg = remaining / siblingSliders.length;
+        siblingSliders.forEach(s => {
+          const otherBench = s.dataset.bench;
+          scheme.benchWeights[otherBench] = avg;
+        });
+      }
+
+      // Update all sibling displays
+      siblingSliders.forEach(s => {
+        const otherBench = s.dataset.bench;
+        const v = Math.round((scheme.benchWeights[otherBench] || 0) * 100);
+        s.value = v;
+        s.closest('.sub-dim-item').querySelector('.sub-dim-value').textContent = v + '%';
+      });
+
+      // Update current slider display
+      slider.closest('.sub-dim-item').querySelector('.sub-dim-value').textContent = Math.round(val * 100) + '%';
+    });
+  });
+
+  // Sub-dimension toggle (accordion) for scheme view
+  const toggleSchemeDim = (dimKey) => {
+    if (state.expandedWeightDim === dimKey) {
+      state.expandedWeightDim = null;
+    } else {
+      state.expandedWeightDim = dimKey;
+    }
+    renderSchemesView();
+  };
+  main.querySelectorAll('.scheme-editor .sub-dim-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSchemeDim(btn.dataset.dim);
+    });
+  });
+  main.querySelectorAll('.scheme-editor .weight-slider-row[data-toggle-dim]').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.classList.contains('dim-help-icon')) return;
+      const dimKey = row.dataset.toggleDim;
+      if (dimKey) toggleSchemeDim(dimKey);
+    });
+  });
+
+  // New scheme button
+  const newBtn = document.getElementById('new-scheme-btn');
+  if (newBtn) {
+    newBtn.addEventListener('click', () => {
+      const name = '方案 ' + (state.schemes.length + 1);
+      const weights = { ...state.weights };
+      const benchWeights = { ...state.benchWeights };
+      createScheme(name, weights, benchWeights);
+      state.editingSchemeId = state.schemes[state.schemes.length - 1].id;
+      renderSchemesView();
+    });
+  }
+
+  // Bind tooltips for scheme view
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+// ===== FILTERS =====
+function renderProviderChips() {
+  const container = document.getElementById('provider-chips');
+  if (!DATA || !DATA.models) return;
+  const providers = new Set();
+  Object.values(DATA.models).forEach(m => { if (m.provider) providers.add(m.provider); });
+  const sorted = [...providers].sort();
+  container.innerHTML = sorted.map(p => {
+    const meta = PROVIDER_META[p] || { display: p };
+    return `<button class="chip ${state.activeProviders.has(p) ? 'active' : ''}" data-provider="${p}">${meta.display}</button>`;
+  }).join('');
+  container.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.provider;
+      if (state.activeProviders.has(p)) state.activeProviders.delete(p);
+      else state.activeProviders.add(p);
+      renderProviderChips();
+      renderCurrentView();
+    });
+  });
+}
+
+function renderAdvFilter() {
+  const dropdown = document.getElementById('adv-filter-dropdown');
+  const groups = [
+    { key: 'rankRange', label: '排名范围', options: [['all', '全部'], ['top10', 'TOP 10'], ['top50', 'TOP 50'], ['top100', 'TOP 100']] },
+    { key: 'openSource', label: '开源状态', options: [['all', '全部'], ['Open', '开源'], ['Proprietary', '闭源'], ['Hybrid', '混合']] },
+    { key: 'multimodal', label: '多模态', options: [['all', '全部'], ['vision', '视觉'], ['audio', '音频'], ['both', '视觉+音频']] },
+    { key: 'reasoningLevel', label: '推理能力', options: [['all', '全部'], ['reasoning', '推理模型'], ['non-reasoning', '非推理']] }
+  ];
+  dropdown.innerHTML = groups.map(g => `
+    <div class="adv-filter-group">
+      <div class="adv-filter-label">${g.label}</div>
+      <div class="adv-filter-options">
+        ${g.options.map(opt => `<button class="chip ${state.advFilters[g.key] === opt[0] ? 'active' : ''}" data-filter="${g.key}" data-value="${opt[0]}">${opt[1]}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  dropdown.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.advFilters[btn.dataset.filter] = btn.dataset.value;
+      renderAdvFilter();
+      renderCurrentView();
+    });
+  });
+}
+
+function applyFilters(item) {
+  const model = getModel(item.model_id);
+  if (!model) return false;
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    const name = (item.display_name || model.display_name || item.model_id).toLowerCase();
+    if (!name.includes(q) && !item.model_id.toLowerCase().includes(q)) return false;
+  }
+  if (state.activeProviders.size > 0 && !state.activeProviders.has(model.provider)) return false;
+  if (state.advFilters.rankRange !== 'all') {
+    const limit = state.advFilters.rankRange === 'top10' ? 10 : state.advFilters.rankRange === 'top50' ? 50 : 100;
+    if (item.rank > limit) return false;
+  }
+  if (state.advFilters.openSource !== 'all' && model.open_source !== state.advFilters.openSource) return false;
+  if (state.advFilters.multimodal !== 'all') {
+    if (state.advFilters.multimodal === 'vision' && !model.supports_vision) return false;
+    if (state.advFilters.multimodal === 'audio' && !model.supports_audio) return false;
+    if (state.advFilters.multimodal === 'both' && (!model.supports_vision || !model.supports_audio)) return false;
+  }
+  if (state.advFilters.reasoningLevel !== 'all') {
+    if (state.advFilters.reasoningLevel === 'reasoning' && !model.is_reasoning) return false;
+    if (state.advFilters.reasoningLevel === 'non-reasoning' && model.is_reasoning) return false;
+  }
+  return true;
+}
+
+// ===== STATS =====
+function updateStats() {
+  if (!DATA) return;
+  document.getElementById('stat-models').textContent = Object.keys(DATA.models).length;
+  document.getElementById('stat-benchmarks').textContent = Object.keys(DATA.benchmark_meta).length;
+  let obsCount = 0;
+  Object.values(DATA.benchmarks).forEach(arr => { obsCount += arr.length; });
+  document.getElementById('stat-obs').textContent = obsCount;
+  document.getElementById('stat-dims').textContent = '5';
+}
+
+// ===== MAIN RENDER =====
+function renderCurrentView() {
+  if (!DATA) return;
+  const nav = document.getElementById('dimension-nav');
+  if (state.view === 'ranking') {
+    nav.style.display = '';
+    renderRankingView();
+  } else if (state.view === 'matrix') {
+    renderMatrixView();
+  } else if (state.view === 'compare') {
+    renderCompareView();
+  } else if (state.view === 'schemes') {
+    renderSchemesView();
+  }
+}
+
+// ===== RADAR CHART =====
+function renderRadar(modelId) {
+  const container = document.getElementById('radar-chart');
+  if (!container) return;
+  if (radarChart) radarChart.dispose();
+  radarChart = echarts.init(container);
+
+  const values = DIMENSIONS.map(dim => {
+    const score = getDimensionScore(modelId, dim.key);
+    return score != null ? Math.round(score) : 0;
+  });
+
+  const accent = getThemeColor('--accent') || '#0071e3';
+  const textSec = getThemeColor('--text-secondary') || '#6e6e73';
+  const border = getThemeColor('--border') || 'rgba(0,0,0,.08)';
+
+  radarChart.setOption({
+    radar: {
+      indicator: DIMENSIONS.map(dim => ({ name: dim.name, max: 100 })),
+      shape: 'polygon', splitNumber: 4, radius: '65%',
+      axisName: { color: textSec, fontSize: 10 },
+      splitLine: { lineStyle: { color: border } },
+      splitArea: { areaStyle: { color: ['transparent'] } },
+      axisLine: { lineStyle: { color: border } }
+    },
+    series: [{
+      type: 'radar',
+      data: [{
+        value: values,
+        areaStyle: { color: accent + '33' },
+        lineStyle: { color: accent, width: 2 },
+        itemStyle: { color: accent }
+      }]
+    }]
+  });
+}
+
+// ===== SCHEMES MANAGEMENT =====
+function loadSchemes() {
+  try {
+    const raw = localStorage.getItem('llm-index-schemes');
+    state.schemes = raw ? JSON.parse(raw) : [];
+  } catch (e) { state.schemes = []; }
+}
+
+function saveSchemes() {
+  try { localStorage.setItem('llm-index-schemes', JSON.stringify(state.schemes)); } catch (e) {}
+}
+
+function applyScheme(schemeId) {
+  const scheme = state.schemes.find(s => s.id === schemeId);
+  if (!scheme) return;
+  state.weights = { ...scheme.weights };
+  state.benchWeights = scheme.benchWeights ? { ...scheme.benchWeights } : {};
+  state.activeScheme = schemeId;
+  invalidateCache();
+  renderSchemesView();
+}
+
+function deleteScheme(schemeId) {
+  state.schemes = state.schemes.filter(s => s.id !== schemeId);
+  if (state.activeScheme === schemeId) state.activeScheme = null;
+  saveSchemes();
+  renderSchemesView();
+}
+
+function createScheme(name, weights, benchWeights) {
+  const scheme = { id: 'scheme_' + Date.now(), name, weights: { ...weights }, benchWeights: benchWeights ? { ...benchWeights } : {} };
+  state.schemes.push(scheme);
+  saveSchemes();
+}
+
+// ===== COMPARE MANAGEMENT =====
+function toggleCompare(modelId) {
+  const idx = state.compareList.indexOf(modelId);
+  if (idx >= 0) state.compareList.splice(idx, 1);
+  else state.compareList.push(modelId);
+  updateCompareCount();
+}
+
+function updateCompareCount() {
+  const el = document.getElementById('compare-count');
+  if (state.compareList.length > 0) {
+    el.textContent = state.compareList.length;
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function clearCompare() {
+  state.compareList = [];
+  updateCompareCount();
+  renderCurrentView();
+}
+
+// ===== INIT =====
+async function initApp() {
+  try {
+    const response = await fetch('data.json');
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    DATA = await response.json();
+  } catch (err) {
+    document.getElementById('main').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">数据加载失败，请通过 HTTP 服务器访问（如 python -m http.server）</div></div>';
+    return;
+  }
+
+  // Compute caches
+  _dimScoresCache = computeDimScores();
+  _dimRankCache = computeDimRanks();
+
+  // Set default active bench
+  const factualBenches = getBenchmarksByDimension('factual');
+  state.activeBench = factualBenches.length > 0 ? factualBenches[0] : null;
+
+  // Restore theme
+  const savedTheme = localStorage.getItem('llm-index-theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === savedTheme));
+  }
+
+  // Load schemes
+  loadSchemes();
+
+  // Render
+  updateStats();
+  renderProviderChips();
+  renderAdvFilter();
+  renderDimensionNav();
+  renderCurrentView();
+  updateCompareCount();
+}
+
+// ===== EVENT BINDINGS =====
+document.addEventListener('DOMContentLoaded', () => {
+  // View tabs
+  document.querySelectorAll('.view-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.view = btn.dataset.view;
+      state.expandedModel = null;
+      document.querySelectorAll('.view-tab').forEach(b => b.classList.toggle('active', b === btn));
+      renderCurrentView();
+    });
+  });
+
+  // Search
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    renderCurrentView();
+  });
+
+  // Provider toggle
+  document.getElementById('provider-toggle').addEventListener('click', () => {
+    const chips = document.getElementById('provider-chips');
+    const btn = document.getElementById('provider-toggle');
+    chips.classList.toggle('collapsed');
+    btn.textContent = chips.classList.contains('collapsed') ? '厂家 ▸' : '厂家 ▾';
+  });
+
+  // Theme
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
+      localStorage.setItem('llm-index-theme', theme);
+      if (radarChart && state.expandedModel) {
+        const [modelId] = state.expandedModel.split('|');
+        renderRadar(modelId);
+      }
+    });
+  });
+
+  // Advanced filter toggle
+  document.getElementById('adv-filter-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dropdown = document.getElementById('adv-filter-dropdown');
+    const isVisible = dropdown.style.display === 'block';
+    dropdown.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) renderAdvFilter();
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('adv-filter-dropdown');
+    if (dropdown.style.display === 'block' && !e.target.closest('.filter-bar')) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Init app
+  initApp();
+});
+</script>
+</body>
+</html>

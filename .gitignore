@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+.env
+
+# Data (keep frontend/data.json)
+data/raw/
+data/raw_*/
+data/*.db
+data/*.db.bak*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Logs
+*.log
