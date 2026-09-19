@@ -1,0 +1,207 @@
+# Endpoint Pool — 已验证的数据采集端点
+# 基于 2026-06-16 实测经验建立
+# 用途: web-data-scout Skill 和采集脚本参考
+#
+# 端点分类:
+#   api       — 有标准 API, 可用 httpx 直接调用
+#   playwright — 需 Playwright 浏览器渲染后提取
+#   html      — 静态 HTML, 可用 httpx + BeautifulSoup
+#   image     — 数据在图片中, 需 OCR/视觉识别
+#   manual    — 需人工采集
+#
+# 状态:
+#   verified  — 已实测成功
+#   untested  — 未测试
+#   broken    — 已知不可用
+
+endpoints:
+
+  # =========================================================================
+  # Artificial Analysis (AA) — 多个评测维度
+  # =========================================================================
+  - name: "AA-Omniscience"
+    url: "https://artificialanalysis.ai/evaluations/omniscience"
+    method: playwright
+    status: verified
+    notes: "数据在 RSC inline payload 的 <script> 标签中, Playwright 加载后提取"
+    data_file: "data/raw/aa_omniscience_2026-06-16.yaml"
+    coverage: 28
+    last_verified: "2026-06-16"
+
+  - name: "AA-GDPval-v2"
+    url: "https://artificialanalysis.ai/evaluations/gdpval-aa"
+    method: html
+    status: verified
+    notes: "WebFetch 可直接获取, Elo 评分在 HTML 中"
+    data_file: "data/raw/gdpval_aa_v2_2026-06-16.yaml"
+    coverage: 26
+    last_verified: "2026-06-16"
+
+  - name: "AA-Terminal-Bench-Hard"
+    url: "https://artificialanalysis.ai/evaluations/terminalbench-hard"
+    method: html
+    status: verified
+    notes: "WebFetch 可直接获取, 百分比评分在 HTML 中"
+    data_file: "data/raw/terminalbench_hard_2026-06-16.yaml"
+    coverage: 29
+    last_verified: "2026-06-16"
+
+  - name: "AA-Terminal-Bench-v2.1"
+    url: "https://artificialanalysis.ai/evaluations/terminalbench-v2-1"
+    method: html
+    status: untested
+    notes: "Terminal-Bench v2.0 的验证刷新版, 89 个任务"
+
+  - name: "AA-APEX-Agents"
+    url: "https://artificialanalysis.ai/evaluations/apex-agents-aa"
+    method: html
+    status: untested
+    notes: "长程跨应用 Agent 评测, 专业服务场景"
+
+  - name: "AA-Tau2-Bench-Telecom"
+    url: "https://artificialanalysis.ai/evaluations/tau2-bench"
+    method: html
+    status: untested
+    notes: "电信技术支持场景双控对话评测"
+
+  - name: "AA-Tau3-Banking"
+    url: "https://artificialanalysis.ai/evaluations/tau3-banking"
+    method: html
+    status: untested
+    notes: "金融客服场景, 多步骤工具调用"
+
+  - name: "AA-ITBench"
+    url: "https://artificialanalysis.ai/evaluations/itbench-aa"
+    method: html
+    status: untested
+    notes: "Kubernetes 事故根因分析"
+
+  - name: "AA-Intelligence-Index"
+    url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"
+    method: playwright
+    status: untested
+    notes: "综合 9 个评测的复合指数"
+
+  - name: "AA-IFBench"
+    url: "https://artificialanalysis.ai/evaluations/ifbench"
+    method: html
+    status: untested
+    notes: "指令遵循能力评测"
+
+  - name: "AA-GPQA-Diamond"
+    url: "https://artificialanalysis.ai/evaluations/gpqa-diamond"
+    method: html
+    status: untested
+    notes: "GPQA Diamond, PhD 级别科学推理"
+
+  # =========================================================================
+  # Berkeley BFCL — 函数调用 / 工具使用
+  # =========================================================================
+  - name: "BFCL-V4"
+    url: "https://gorilla.cs.berkeley.edu/leaderboard.html"
+    method: html
+    status: verified
+    notes: "WebFetch 可获取完整 HTML 表格, 含 FC/Prompt 双模式对比"
+    data_file: "data/raw/bfcl_v4_2026-06-16.yaml"
+    coverage: 52
+    last_verified: "2026-06-16"
+    github: "https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard"
+
+  # =========================================================================
+  # LMArena — 人类偏好
+  # =========================================================================
+  - name: "LMArena-Leaderboard"
+    url: "https://lmarena.ai/leaderboard"
+    method: playwright
+    status: untested
+    notes: "当前通过 fboulnois/llm-leaderboard-csv 间接获取"
+
+  - name: "LMArena-CSV-Mirror"
+    url: "https://github.com/fboulnois/llm-leaderboard-csv"
+    method: api
+    status: untested
+    notes: "第三方 CSV 镜像, 每日更新"
+
+  # =========================================================================
+  # SWE-Bench — 工程能力
+  # =========================================================================
+  - name: "SWE-Bench-Official"
+    url: "https://www.swebench.com/"
+    method: playwright
+    status: verified
+    notes: "数据严重滞后 2-4 周, JSON 中 Agent/模型名混合需拆分"
+    data_file: "data/raw/swe_bench_verified_2026-06-16.yaml"
+    coverage: 30
+    last_verified: "2026-06-16"
+
+  - name: "SWE-Bench-Verified-Mini"
+    url: "https://www.swebench.com/"
+    method: playwright
+    status: untested
+    notes: "50 个人工校验的 Python 实例"
+
+  # =========================================================================
+  # GAIA — 通用 AI 助手
+  # =========================================================================
+  - name: "GAIA-Leaderboard"
+    url: "https://huggingface.co/spaces/gaia-benchmark/leaderboard"
+    method: html
+    status: untested
+    notes: "HuggingFace Spaces, 可能需要 Playwright"
+
+  # =========================================================================
+  # OpenRouter — API 定价
+  # =========================================================================
+  - name: "OpenRouter-Models-API"
+    url: "https://openrouter.ai/api/v1/models"
+    method: api
+    status: verified
+    notes: "标准 REST API, 返回 JSON, 含定价信息"
+    last_verified: "2026-06-16"
+
+  # =========================================================================
+  # HuggingFace — 开源模型评测
+  # =========================================================================
+  - name: "HF-Open-LLM-Leaderboard"
+    url: "https://huggingface.co/datasets/open-llm-leaderboard/results"
+    method: api
+    status: untested
+    notes: "开源模型评测结果数据集, 格式: {org}/{model}/results_*.json"
+
+  # =========================================================================
+  # 厂商官方博客/发布页 — SWE-Bench 厂商自报
+  # =========================================================================
+  - name: "OpenAI-Blog"
+    url: "https://openai.com/index/"
+    method: manual
+    status: untested
+    notes: "GPT 系列发布报告, 含 SWE-Bench 等分数"
+
+  - name: "Anthropic-News"
+    url: "https://www.anthropic.com/news"
+    method: manual
+    status: untested
+    notes: "Claude 系列发布报告"
+
+  - name: "Google-AI-Blog"
+    url: "https://blog.google/technology/ai/"
+    method: manual
+    status: untested
+    notes: "Gemini 系列发布报告"
+
+  - name: "DeepSeek-API-Docs"
+    url: "https://api-docs.deepseek.com/news"
+    method: manual
+    status: untested
+    notes: "DeepSeek 模型发布说明"
+
+  # =========================================================================
+  # 豆包工作目录 — 图片识别半自动采集
+  # =========================================================================
+  - name: "Doubao-Screenshots"
+    url: "local://data/doubao/screenshots/"
+    method: image
+    status: untested
+    notes: "Playwright 截图存放目录, 豆包桌面端读取并提取"
+    output_dir: "data/doubao/output/"
+    archive_dir: "data/doubao/archive/"

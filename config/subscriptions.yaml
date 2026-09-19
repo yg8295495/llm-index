@@ -1,0 +1,210 @@
+# 订阅价格表 — 各厂商订阅方案 & 编程工具定价
+#
+# 范围: 仅九家封闭厂商 (2026-06-17 确认)
+#   御三家: OpenAI / Anthropic / Google
+#   国内六家: DeepSeek / GLM(智谱) / Kimi(月之暗面) / Qwen(阿里) / MiMo(小米) / MiniMax
+#
+# 已移除: xAI (Grok Free / Grok Premium)
+#
+# 数据来源: 各厂商官网定价页 (2026-06)
+# 更新频率: manual (价格变动时手动更新)
+#
+# 字段说明:
+#   product:       产品名
+#   provider:      厂商
+#   price_usd:     月费 (USD)
+#   price_cny:     月费 (CNY, 估算, 汇率 ~7.2)
+#   models:        包含的模型 (关键模型)
+#   usage_type:    subscription / pay_per_use / freemium
+#   category:      chat / coding_ide / coding_agent / api
+#   notes:         备注
+
+subscriptions:
+
+  # ===== 对话产品 =====
+  - product: "ChatGPT Free"
+    provider: "OpenAI"
+    price_usd: 0
+    price_cny: 0
+    models: ["gpt-4o-mini", "o4-mini (limited)"]
+    usage_type: freemium
+    category: chat
+    notes: "有限额,高峰期降级"
+
+  - product: "ChatGPT Plus"
+    provider: "OpenAI"
+    price_usd: 20
+    price_cny: 144
+    models: ["gpt-4o", "o3", "o4-mini"]
+    usage_type: subscription
+    category: chat
+    notes: "月度用量上限"
+
+  - product: "ChatGPT Pro"
+    provider: "OpenAI"
+    price_usd: 200
+    price_cny: 1440
+    models: ["gpt-5.5", "o3 (high)", "o4-mini (unlimited)"]
+    usage_type: subscription
+    category: chat
+    notes: "无限制访问顶级模型"
+
+  - product: "Claude Free"
+    provider: "Anthropic"
+    price_usd: 0
+    price_cny: 0
+    models: ["claude-sonnet-4 (limited)"]
+    usage_type: freemium
+    category: chat
+    notes: "每日限额"
+
+  - product: "Claude Pro"
+    provider: "Anthropic"
+    price_usd: 20
+    price_cny: 144
+    models: ["claude-sonnet-4", "claude-opus-4 (limited)"]
+    usage_type: subscription
+    category: chat
+    notes: "年付 $17/月"
+
+  - product: "Claude Max 5x"
+    provider: "Anthropic"
+    price_usd: 100
+    price_cny: 720
+    models: ["claude-opus-4", "claude-sonnet-4"]
+    usage_type: subscription
+    category: chat
+    notes: "5x Pro 用量"
+
+  - product: "Claude Max 20x"
+    provider: "Anthropic"
+    price_usd: 200
+    price_cny: 1440
+    models: ["claude-opus-4", "claude-sonnet-4"]
+    usage_type: subscription
+    category: chat
+    notes: "20x Pro 用量"
+
+  - product: "Gemini Free"
+    provider: "Google"
+    price_usd: 0
+    price_cny: 0
+    models: ["gemini-2.5-flash"]
+    usage_type: freemium
+    category: chat
+    notes: "限额"
+
+  - product: "Gemini Advanced"
+    provider: "Google"
+    price_usd: 20
+    price_cny: 144
+    models: ["gemini-2.5-pro", "gemini-2.5-flash"]
+    usage_type: subscription
+    category: chat
+    notes: "含 1TB Google One"
+
+  # ===== 编程工具 =====
+  - product: "Cursor Free"
+    provider: "Cursor"
+    price_usd: 0
+    price_cny: 0
+    models: ["gpt-4o-mini", "claude-3.5-haiku"]
+    usage_type: freemium
+    category: coding_ide
+    notes: "2000 补全/月"
+
+  - product: "Cursor Pro"
+    provider: "Cursor"
+    price_usd: 20
+    price_cny: 144
+    models: ["claude-sonnet-4", "gpt-4o", "gemini-2.5-pro"]
+    usage_type: subscription
+    category: coding_ide
+    notes: "500 快速请求/月,之后降速"
+
+  - product: "Cursor Business"
+    provider: "Cursor"
+    price_usd: 40
+    price_cny: 288
+    models: ["claude-sonnet-4", "gpt-4o", "gemini-2.5-pro"]
+    usage_type: subscription
+    category: coding_ide
+    notes: "每人/月,含管理功能"
+
+  - product: "Claude Code"
+    provider: "Anthropic"
+    price_usd: null
+    price_cny: null
+    models: ["claude-sonnet-4", "claude-opus-4"]
+    usage_type: pay_per_use
+    category: coding_agent
+    notes: "按 API 用量计费,无订阅费。Sonnet ~$0.15/请求,Opus ~$0.75/请求"
+
+  - product: "GitHub Copilot Free"
+    provider: "GitHub"
+    price_usd: 0
+    price_cny: 0
+    models: ["gpt-4o-mini"]
+    usage_type: freemium
+    category: coding_ide
+    notes: "2000 补全/月,50 聊天/月"
+
+  - product: "GitHub Copilot Individual"
+    provider: "GitHub"
+    price_usd: 10
+    price_cny: 72
+    models: ["gpt-4o", "claude-sonnet-4", "gemini-2.5-pro"]
+    usage_type: subscription
+    category: coding_ide
+    notes: "无限补全,多模型选择"
+
+  - product: "GitHub Copilot Business"
+    provider: "GitHub"
+    price_usd: 19
+    price_cny: 137
+    models: ["gpt-4o", "claude-sonnet-4"]
+    usage_type: subscription
+    category: coding_ide
+    notes: "每人/月,含管理功能"
+
+  - product: "Windsurf"
+    provider: "Codeium"
+    price_usd: 15
+    price_cny: 108
+    models: ["claude-sonnet-4", "gpt-4o"]
+    usage_type: subscription
+    category: coding_ide
+    notes: "Pro 版"
+
+  # ===== 国内产品 =====
+  - product: "DeepSeek 免费"
+    provider: "DeepSeek"
+    price_usd: 0
+    price_cny: 0
+    models: ["deepseek-v3", "deepseek-r1"]
+    usage_type: freemium
+    category: chat
+    notes: "国内直连,无门槛"
+
+  - product: "通义千问免费"
+    provider: "阿里"
+    price_usd: 0
+    price_cny: 0
+    models: ["qwen3-235b-a22b"]
+    usage_type: freemium
+    category: chat
+    notes: "国内直连"
+
+  - product: "Kimi 免费"
+    provider: "月之暗面"
+    price_usd: 0
+    price_cny: 0
+    models: ["kimi-k2"]
+    usage_type: freemium
+    category: chat
+    notes: "国内直连"
+
+  # ===== 待补全 =====
+  # GLM (智谱): 智谱清言订阅方案待补全
+  # MiniMax: 海螺 AI 订阅方案待补全
+  # MiMo (小米): 小米 MiMo 订阅方案待补全

@@ -1,0 +1,21 @@
+{
+ "snapshot_date": "2026-09-20",
+ "tool": "collect_aa_v3",
+ "source": {
+  "url": "file:///tmp/aa_cached.html",
+  "http_status": 0,
+  "fetched_at": "2026-09-19T21:06:36+00:00",
+  "html_sha256": "d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e",
+  "html_bytes": 1232493,
+  "rsc_chunks": 118
+ },
+ "counts": {
+  "scored": 31,
+  "registry": 653
+ },
+ "config": {
+  "vendors": "vendors.yaml",
+  "benchmarks": "benchmarks.yaml",
+  "benchmarks_version": 5
+ }
+}

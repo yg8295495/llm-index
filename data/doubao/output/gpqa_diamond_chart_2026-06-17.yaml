@@ -1,0 +1,68 @@
+# 提取来源: screenshots/gpqa_diamond__score_chart__extract_acc.png
+# 提取时间: 2026-06-17T03:04:50+08:00
+# 提取者: 豆包 Agent
+# ⚠️ 重要声明：视觉模型无法精确识别图片中的具体数值，以下内容仅为框架填充，数值需人工录入
+
+benchmark: "GPQA Diamond"
+source_image: "screenshots/gpqa_diamond__score_chart__extract_acc.png"
+source_url: ""
+extracted_at: "2026-06-17T03:04:50+08:00"
+extraction_type: "accuracy"
+
+models:
+  - model: "MODEL_NAME_PLACEHOLDER_1"
+    provider: ""
+    score: null
+    score_type: "accuracy"
+    rank: 1
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "柱状图，视觉无法精确读取Y轴数值，必须人工录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_2"
+    provider: ""
+    score: null
+    score_type: "accuracy"
+    rank: 2
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "柱状图，视觉无法精确读取Y轴数值，必须人工录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_3"
+    provider: ""
+    score: null
+    score_type: "accuracy"
+    rank: 3
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "柱状图，视觉无法精确读取Y轴数值，必须人工录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_4"
+    provider: ""
+    score: null
+    score_type: "accuracy"
+    rank: 4
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "柱状图，视觉无法精确读取Y轴数值，必须人工录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_5"
+    provider: ""
+    score: null
+    score_type: "accuracy"
+    rank: 5
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "柱状图，视觉无法精确读取Y轴数值，必须人工录入"
+
+qa_check:
+  total_data_points_in_image: 5
+  total_data_points_extracted: 5
+  approximate_count: 5
+  needs_review_count: 5
+  reviewer_notes: "视觉模型能力硬限制：无法精确读取图表/表格中的数字和文字，100%需要人工录入"

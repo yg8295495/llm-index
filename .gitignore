@@ -6,11 +6,18 @@ __pycache__/
 venv/
 .env
 
-# Data (keep frontend/data.json)
-data/raw/
+# Data
+# 数据库与原始 HTML 不进版本库；但每次采集的解析产物 (manifest.json /
+# scored_models.json / registry.json) 必须进 —— 否则别人拿到仓库也无法复现
+# 这一批数据是怎么来的。见 docs/changelog.md #27
+data/raw/*
+!data/raw/snapshots/
+data/raw/snapshots/**/*.html.gz
 data/raw_*/
 data/*.db
 data/*.db.bak*
+data/screenshots/
+data/internal/
 
 # IDE
 .vscode/
@@ -25,3 +32,13 @@ node_modules/
 
 # Logs
 *.log
+_local/
+.pytest_cache/
+# 仅本机保留的大体积历史夹具（现役测试用内联合成数据，不依赖它们）
+tests/fixtures/swebench_*.json
+
+# 归档目录只留本机：废弃原因已记入公开的 docs/changelog.md，公共仓库不必背 708K 死代码
+_archive/
+# 改造过程中的手工备份
+*.bak
+*.bak.*

@@ -1,0 +1,104 @@
+# 数据源配置
+
+# 基准测试数据源
+benchmarks:
+  swe_bench_pro:
+    name: "SWE-Bench Pro"
+    description: "多语言真实工程能力基准"
+    url: "https://www.swebench.com/pro"
+    dimensions:
+      - coding
+    update_frequency: "weekly"
+    parser: "html_table"
+
+  human_eval:
+    name: "HumanEval"
+    description: "代码生成能力基准"
+    url: "https://github.com/openai/human-eval"
+    dimensions:
+      - coding
+    update_frequency: "monthly"
+    parser: "json"
+
+  mmlu:
+    name: "MMLU"
+    description: "多任务语言理解基准"
+    url: "https://huggingface.co/spaces/TIGER-Lab/MMLU-Pro"
+    dimensions:
+      - knowledge
+    update_frequency: "monthly"
+    parser: "leaderboard"
+
+  last_exam:
+    name: "Agents' Last Exam"
+    description: "真实工作流能力基准"
+    url: "https://github.com/agents-last-exam"
+    dimensions:
+      - workflow
+    update_frequency: "quarterly"
+    parser: "json"
+
+  agent_bench:
+    name: "AgentBench"
+    description: "Agent 综合能力基准"
+    url: "https://github.com/THUDM/AgentBench"
+    dimensions:
+      - planning
+      - tool_use
+    update_frequency: "quarterly"
+    parser: "json"
+
+# 价格数据源
+pricing:
+  openrouter:
+    name: "OpenRouter"
+    api_base: "https://openrouter.ai/api/v1"
+    endpoints:
+      models: "/models"
+      pricing: "/models/{model_id}/pricing"
+    update_frequency: "daily"
+    auth_required: false
+
+# Agent 评测数据源
+agent_evals:
+  multi_turn:
+    name: "多轮对话评测"
+    description: "长期记忆与上下文追踪能力"
+    sources:
+      - type: "community_benchmark"
+        url: "https://github.com/example/multi-turn-bench"
+      - type: "internal_test"
+        path: "data/internal/multi_turn_eval.json"
+    dimensions:
+      - multi_turn_dialogue
+    update_frequency: "monthly"
+
+  code_execution:
+    name: "代码执行评测"
+    description: "生成并执行可运行代码能力"
+    sources:
+      - type: "benchmark"
+        url: "https://github.com/example/code-exec-bench"
+    dimensions:
+      - code_execution
+    update_frequency: "monthly"
+
+  task_planning:
+    name: "任务规划评测"
+    description: "复杂任务分解与调度能力"
+    sources:
+      - type: "internal_test"
+        path: "data/internal/planning_eval.json"
+    dimensions:
+      - task_planning
+    update_frequency: "monthly"
+
+  tool_integration:
+    name: "工具集成评测"
+    description: "跨系统 API 调用的准确性"
+    sources:
+      - type: "benchmark"
+        url: "https://github.com/example/tool-use-bench"
+    dimensions:
+      - tool_integration
+    update_frequency: "monthly"

@@ -7,7 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Orbitron:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<!-- echarts 本地自托管: 原先走 cdn.jsdelivr.net, 国内访客与本机浏览器实测
+     ERR_CONNECTION_CLOSED, 雷达图直接挂。改为同源加载, 见 docs/changelog.md #28 -->
+<script src="vendor/echarts.min.js"></script>
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
@@ -528,10 +530,14 @@
   .table-header,
   .table-row{
     display:grid;
-    grid-template-columns:50px 50px 1fr 70px 100px 70px 140px 40px 36px;
+    grid-template-columns:50px 50px 1fr 70px 100px 70px var(--w-base,62px) 140px 40px 36px;
     align-items:center;
     gap:0;
   }
+  /* 无可用基准模型时整列塌掉，不留空表头 */
+  .ranking-table.no-baseline{--w-base:0px}
+  .ranking-table.no-baseline .th-base,
+  .ranking-table.no-baseline .baseline-col{padding:0;overflow:hidden}
   .table-header{
     padding:10px 12px;
     background:var(--bg-elevated);
@@ -943,6 +949,8 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    min-width:0;
+    flex:1 1 auto;
     transition:color .12s ease;
   }
   .dim-sub-score{
@@ -1468,15 +1476,284 @@
     .dim-cards{grid-template-columns:1fr 1fr}
   }
 
+  /* ===================================================
+     PROVENANCE / BASELINE / REFERENCE / DOCS (新增语义元素)
+     =================================================== */
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+  /* 出处链接与状态徽标 */
+  .src-link{
+    color:var(--accent);
+    text-decoration:none;
+    border-bottom:1px dashed var(--accent);
+    font-family:var(--font-mono);
+    font-size:11px;
+  }
+  .src-link:hover{color:var(--accent-hover);border-bottom-style:solid}
+  .src-badge{
+    display:inline-block;
+    font-family:var(--font-mono);
+    font-size:9px;
+    line-height:1.5;
+    padding:0 5px;
+    border-radius:9999px;
+    border:1px solid var(--border);
+    color:var(--text-tertiary);
+    background:var(--bg-hover);
+    letter-spacing:.02em;
+    text-transform:none;
+    vertical-align:middle;
+  }
+  .src-badge.inline{margin-left:4px;font-size:8px;padding:0 4px}
+  .src-badge.src-stale,
+  .src-badge.src-empty{color:var(--error);border-color:var(--error);background:transparent}
+  .src-badge.src-beta{color:var(--gold);border-color:var(--gold);background:transparent}
+  .chip-status{
+    display:inline-block;
+    margin-left:4px;
+    font-family:var(--font-mono);
+    font-size:8px;
+    color:var(--text-tertiary);
+    opacity:.8;
+  }
+  .bench-chip .src-badge{background:transparent;margin-left:4px}
+  .view-source-line{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-tertiary);
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    background:var(--bg-elevated);
+  }
+
+  /* 排行榜控制区（基准 + 参照开关） */
+  .rank-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ctl-label{
+    font-family:var(--font-mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .ctl-select{
+    font-family:var(--font-body);
+    font-size:12px;
+    color:var(--text-primary);
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:3px 6px;
+    max-width:260px;
+    cursor:pointer;
+  }
+  .ctl-select:hover{border-color:var(--accent)}
+
+  /* vs 基准列 */
+  .baseline-col{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
+    color:var(--text-tertiary);
+  }
+  .delta{font-weight:600}
+  .delta.pos{color:var(--success)}
+  .delta.neg{color:var(--error)}
+  .delta-base{
+    font-family:var(--font-mono);
+    font-size:9px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:9999px;
+    padding:0 5px;
+  }
+  .th-base{font-size:11px}
+
+  /* 参照模型 */
+  .marker.ref{background:var(--bg-hover);color:var(--text-tertiary);border:1px dashed var(--border-bright)}
+  .ref-note{
+    font-family:var(--font-mono);
+    font-size:9px;
+    color:var(--text-tertiary);
+    letter-spacing:.02em;
+  }
+  .table-row.is-reference{opacity:.62}
+  .table-row.is-reference:hover{opacity:1}
+  .table-row.is-reference .model-name{font-weight:500;color:var(--text-secondary)}
+  .ref-block{margin-top:20px}
+  .ref-block-title{
+    font-family:var(--font-display);
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-tertiary);
+    letter-spacing:.02em;
+    padding:0 2px 8px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .ref-block-sub{font-family:var(--font-mono);font-size:10px;font-weight:400;opacity:.8}
+  .ref-table{border-style:dashed;background:transparent}
+  .ref-table .table-header{background:var(--bg-detail)}
+  .matrix-row-label.is-reference{color:var(--text-tertiary);font-weight:500}
+  .matrix-cell.is-reference{opacity:.55}
+
+  /* 钻取面板：出处 + 覆盖率 */
+  .dim-sub-meta{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:1px;
+    line-height:1.3;
+  }
+  .dim-sub-src{
+    font-family:var(--font-mono);
+    font-size:9px;
+    color:var(--text-tertiary);
+    white-space:nowrap;
+  }
+  .dim-sub-src a{color:var(--text-tertiary);text-decoration:underline}
+  .dim-sub-src a:hover{color:var(--accent)}
+  .dim-card-cov{
+    font-family:var(--font-mono);
+    font-size:9px;
+    color:var(--text-tertiary);
+    text-align:center;
+    margin-top:2px;
+  }
+  .drill-left-value a{color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent)}
+  .radar-fallback{display:flex;flex-direction:column;gap:6px;padding:4px 0}
+  .radar-fallback-row{display:grid;grid-template-columns:64px 1fr 38px;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary)}
+  .radar-fallback-bar{height:6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:9999px;overflow:hidden}
+  .radar-fallback-bar > span{display:block;height:100%;background:var(--accent)}
+  .radar-fallback-note{font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);margin-top:4px;text-align:center}
+
+  /* 数据说明面板 */
+  .docs-view{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:16px;
+    align-items:start;
+  }
+  .doc-card{
+    background:var(--bg-section);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    min-width:0;
+  }
+  .doc-card.wide{grid-column:1/-1}
+  .doc-card-title{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-primary);
+    margin-bottom:12px;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .doc-card-sub,.doc-card-sub2{
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:400;
+    color:var(--text-tertiary);
+  }
+  .doc-card-sub2{margin:14px 0 8px;letter-spacing:.04em;text-transform:uppercase}
+  .doc-kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .doc-kv{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .doc-k-label{
+    font-family:var(--font-mono);
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+  }
+  .doc-k-value{font-size:13px;color:var(--text-primary);word-break:break-all}
+  .doc-note{
+    font-size:11px;
+    color:var(--text-secondary);
+    line-height:1.6;
+    margin-top:10px;
+  }
+  .doc-caveat{
+    font-size:12px;
+    color:var(--text-secondary);
+    line-height:1.75;
+    border-left:2px solid var(--accent);
+    padding-left:12px;
+  }
+  .doc-table{width:100%;border-collapse:collapse;font-size:11px}
+  .doc-table th{
+    text-align:left;
+    font-family:var(--font-mono);
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-tertiary);
+    font-weight:400;
+    padding:4px 8px 4px 0;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  .doc-table td{
+    padding:6px 8px 6px 0;
+    border-bottom:1px solid var(--border);
+    color:var(--text-secondary);
+    vertical-align:top;
+  }
+  .doc-table tr:last-child td{border-bottom:none}
+  .doc-table td.mono{color:var(--text-primary);white-space:nowrap}
+  .doc-sha{cursor:help}
+  .doc-notes{max-width:280px;font-size:10px;line-height:1.5;color:var(--text-tertiary)}
+  .doc-sha-full{
+    font-size:11px;
+    color:var(--text-primary);
+    word-break:break-all;
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 10px;
+  }
+  .doc-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .doc-list li{font-size:12px;color:var(--text-secondary);line-height:1.6;word-break:break-all}
+  .doc-link{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+  .doc-link:hover{border-bottom-color:var(--accent)}
+  .doc-empty{color:var(--text-tertiary)}
+  .doc-dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+  .doc-dl dt{font-size:11px;color:var(--accent);white-space:nowrap}
+  .doc-dl dd{font-size:12px;color:var(--text-secondary);line-height:1.6}
+  .doc-weights{display:flex;flex-direction:column;gap:8px}
+  .doc-weight{display:grid;grid-template-columns:84px 1fr 40px;align-items:center;gap:10px}
+  .doc-weight-name{font-size:12px;color:var(--text-secondary)}
+  .doc-weight-bar{height:6px;background:var(--bg-elevated);border-radius:9999px;overflow:hidden;border:1px solid var(--border)}
+  .doc-weight-fill{display:block;height:100%;background:var(--accent)}
+  .doc-weight-val{font-size:11px;color:var(--text-primary);text-align:right}
+  .doc-preset-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .doc-preset{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px;
+    background:var(--bg-elevated);
+  }
+  .doc-preset.active{border-color:var(--accent);background:var(--accent-soft)}
+  .doc-preset-name{font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text-primary)}
+  .doc-preset-desc{font-size:10px;color:var(--text-tertiary);line-height:1.5;margin:3px 0}
+  .doc-preset-w{font-size:9px;color:var(--text-secondary);line-height:1.5}
+
   @media (max-width:1024px){
     .table-header,
     .table-row{
-      grid-template-columns:50px 50px 1fr 70px 70px 40px 30px;
+      grid-template-columns:50px 50px 1fr 70px 70px var(--w-base,62px) 40px 30px;
     }
-    .table-header .th-subdim,
-    .table-row .subdim-col,
-    .table-header .th-cost,
-    .table-row .cost-col{display:none}
+    .th-subdim,
+    .subdim-col,
+    .th-cost,
+    .cost-col{display:none}
     .drilldown-panel{
       grid-template-columns:1fr;
       gap:16px;
@@ -1502,16 +1779,12 @@
     .table-row{
       grid-template-columns:40px 40px 1fr 70px;
     }
-    .table-header .th-subdim,
-    .table-row .subdim-col,
-    .table-header .th-cost,
-    .table-row .cost-col,
-    .table-header div:nth-child(6),
-    .table-row .comp-col,
-    .table-header div:nth-child(8),
-    .table-row .compare-col,
-    .table-header div:nth-child(9),
-    .table-row .expand-col{display:none}
+    .th-subdim,.subdim-col,
+    .th-cost,.cost-col,
+    .th-comp,.comp-col,
+    .th-base,.baseline-col,
+    .th-compare,.compare-col,
+    .th-expand,.expand-col{display:none}
     .dim-tabs{overflow-x:auto}
     .dim-tab{padding:8px 14px;flex-shrink:0}
     .filter-bar{gap:8px}
@@ -1521,6 +1794,27 @@
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  }
+  /* ===== 榜单视图 ===== */
+  .board-caption{
+    font-size:12px;color:var(--text-secondary);line-height:1.6;
+    margin:0 0 12px;padding:8px 10px;background:var(--bg-secondary);
+    border-left:2px solid var(--accent);border-radius:0 4px 4px 0;
+  }
+  .board-footnote{
+    font-size:11px;color:var(--text-tertiary);line-height:1.6;margin-top:12px;
+  }
+  .matrix-cell.board-score{font-variant-numeric:tabular-nums;font-weight:600}
+  .board-rank{
+    display:inline-block;margin-left:6px;padding:0 5px;border-radius:3px;
+    font-size:10px;font-weight:500;color:var(--text-tertiary);
+    background:var(--bg-tertiary);
+  }
+  .delta-up{color:var(--positive,#4a7c59);font-variant-numeric:tabular-nums}
+  .delta-down{color:var(--negative,#a8555a);font-variant-numeric:tabular-nums}
+  .delta-base{color:var(--text-tertiary);font-size:11px}
+  @media (max-width:760px){
+    .board-caption{font-size:11px}
   }
 </style>
 </head>
@@ -1535,9 +1829,11 @@
     <div class="top-bar-center">
       <div class="view-tabs">
         <button class="view-tab active" data-view="ranking">排行榜</button>
+        <button class="view-tab" data-view="board">榜单</button>
         <button class="view-tab" data-view="matrix">矩阵总览</button>
         <button class="view-tab" data-view="compare">对比<span class="compare-count" id="compare-count" style="display:none">0</span></button>
         <button class="view-tab" data-view="schemes">我的方案</button>
+        <button class="view-tab" data-view="docs">数据说明</button>
       </div>
     </div>
     <div class="top-bar-right">
@@ -1559,11 +1855,15 @@
       <div class="stats-inline" id="stats-inline">
         <span class="stat-inline"><span id="stat-models">0</span> 模型</span>
         <span class="stat-sep">|</span>
+        <span class="stat-inline"><span id="stat-core-models">0</span> 在榜</span>
+        <span class="stat-sep">|</span>
         <span class="stat-inline"><span id="stat-benchmarks">0</span> 评测</span>
         <span class="stat-sep">|</span>
         <span class="stat-inline"><span id="stat-obs">0</span> 数据点</span>
         <span class="stat-sep">|</span>
         <span class="stat-inline"><span id="stat-dims">5</span> 维度</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-inline">数据截止 <span id="stat-snapshot">—</span></span>
       </div>
       <span class="filter-sep">|</span>
       <button class="adv-filter-btn" id="adv-filter-btn">高级筛选 ▾</button>
@@ -1587,6 +1887,9 @@
 </div>
 
 <script>
+// 兜底权重（config.weights 缺失时使用）
+const DEFAULT_WEIGHTS = { factual: 0.25, workflow: 0.25, engineering: 0.20, cost: 0.15, preference: 0.15 };
+
 // ===== STATE & CONSTANTS =====
 const state = {
   view: 'ranking',
@@ -1601,38 +1904,44 @@ const state = {
   schemes: [],
   activeScheme: null,
   editingSchemeId: null,
-  weights: { factual: 0.25, workflow: 0.25, engineering: 0.20, cost: 0.15, preference: 0.15 },
+  weights: { ...DEFAULT_WEIGHTS },  // 兜底值，实际由 hydrateConfig() 从 config.weights 注入
   benchWeights: {},  // 子维度权重：{ benchmark_key: weight }
   rankingSort: { key: 'rank', desc: true },
+  baseline: null,          // 「vs 基准」列的基准模型 id，来自 config.baseline
+  includeReference: false, // 排行榜主列表是否并入参照模型
+  board: 'capability',     // 榜单视图当前榜型：capability 能力榜 / value 性价比榜 / composite 综合榜
   expandedWeightDim: null  // 对比视图权重面板：当前展开子维度的主维度 key，null=全部收起
 };
 
-const DIMENSIONS = [
+// ===== 兜底常量 =====
+// data.json 带 config 时由 hydrateConfig() 覆盖；缺省时页面仍可运行（旧版 data.json）
+const DEFAULT_DIMENSIONS = [
   { key: 'factual', name: '事实准确', desc: '模型回答事实性问题的准确程度。综合知识问答、研究生级别专业问答、数学推理等评测，分数越高表示模型给出的事实越可靠，适合需要准确信息的场景（如医疗、法律、学术咨询）。' },
   { key: 'workflow', name: '工作流', desc: '模型作为自主 Agent 完成复杂任务的能力。包括工具调用、多步规划、指令遵循、银行/编程等场景的自动化执行能力。分数越高表示模型越能独立完成端到端的工作流任务。' },
   { key: 'engineering', name: '工程能力', desc: '模型的实际编码和工程动手能力。包括终端操作、科学编程、实时编程、代码生成等评测。分数越高表示模型作为编程助手时越能交付高质量代码、减少出错。' },
-  { key: 'cost', name: '成本', desc: '模型的使用成本。包括每个任务的实际消耗（美元/任务）和 API 定价参考。分数越高表示越便宜，适合预算敏感的场景。' },
+  { key: 'cost', name: '成本', desc: '模型的使用成本。包括跑完整轮评测的实际消耗（美元/轮）和 API 定价参考。分数越高表示越便宜，适合预算敏感的场景。' },
   { key: 'preference', name: '人类偏好', desc: '真实用户盲测投票的 Elo 评分（来自 LMArena）。分数越高表示用户实际体验越好，反映模型的综合使用感受。' }
 ];
 
-const BENCH_GROUPS = {
-  factual: { name: '事实准确', benches: ['aa_omniscience', 'gpqa', 'hle', 'aime25', 'aime'] },
-  workflow: { name: '工作流', benches: ['gdpval_aa', 'gdpval_aa_normalized', 'ifbench', 'tau2_banking', 'tau_banking', 'agentic_index'] },
-  engineering: { name: '工程能力', benches: ['terminalbench_hard', 'scicode', 'livecodebench', 'coding_index'] },
-  cost: { name: '成本', benches: ['cost_per_task', 'pricing'] },
-  preference: { name: '人类偏好', benches: ['lmarena_text'] }
+const DEFAULT_BENCH_GROUPS = {
+  factual: ['aa_omniscience', 'gpqa', 'hle', 'aime25', 'aime'],
+  workflow: ['gdpval_aa', 'gdpval_aa_normalized', 'ifbench', 'tau2_banking', 'tau_banking', 'agentic_index'],
+  engineering: ['terminalbench_hard', 'scicode', 'livecodebench', 'coding_index'],
+  cost: ['cost_per_eval', 'pricing'],
+  preference: ['lmarena_text']
 };
 
-const BENCH_CN = {
-  aa_omniscience: '综合知识', gpqa: '研究生问答', hle: '人类终极考试',
-  aime25: '数学2025', aime: '数学(历史)',
-  gdpval_aa: 'Agent Elo', gdpval_aa_normalized: 'Agent归一化', ifbench: '指令遵循',
-  tau2_banking: '银行Agent', tau_banking: '银行Agent', agentic_index: 'Agent指数',
-  terminalbench_hard: '终端Hard', scicode: '科学编程', livecodebench: '实时编程', coding_index: '编程指数',
-  cost_per_task: '实际消耗', pricing: '定价参考', lmarena_text: 'LMArena'
+const DEFAULT_BENCH_CN = {
+  aa_omniscience: '综合知识指数', gpqa: '研究生问答', hle: '人类终极考试',
+  aime25: '数学邀请赛2025', aime: '数学邀请赛',
+  gdpval_aa: 'Agent能力Elo', gdpval_aa_normalized: 'Agent归一化', ifbench: '指令遵循',
+  tau2_banking: '银行场景Agent', tau_banking: '银行场景Agent旧版', agentic_index: 'Agent综合指数',
+  terminalbench_hard: '终端任务Hard', scicode: '科学编程', livecodebench: '实时编程', coding_index: '编程综合指数',
+  cost_per_task: '实际消耗', cost_per_eval: '整轮评测消耗', pricing: '定价参考', lmarena_text: 'LMArena'
 };
 
-const PROVIDER_META = {
+// 厂家展示名 + 低饱和色板（色板仅作为已知厂家的固定色，未知厂家由 providerColor() 哈希推导）
+const DEFAULT_PROVIDER_META = {
   anthropic: { display: 'Anthropic', color: '#c4956a' },
   google: { display: 'Google', color: '#7fa895' },
   deepseek: { display: 'DeepSeek', color: '#9b8fd4' },
@@ -1647,12 +1956,195 @@ const PROVIDER_META = {
   xiaomi: { display: 'Xiaomi', color: '#8fb4a4' }
 };
 
+const DEFAULT_NORMALIZATION = {
+  method: 'min-max',
+  min_score: 0,
+  max_score: 100,
+  cost_reverse: true,
+  missing_value: { strategy: 'exclude_and_reweight', coverage_penalty: true, min_coverage_ratio: 0 }
+};
+
+// 成本类 benchmark：显式名单兜底 + benchmark_meta.dimension === 'cost' 自动识别
+const COST_BENCH_KEYS = ['cost_per_eval', 'pricing', 'cost_per_task'];
+
+// ===== 运行时配置（hydrateConfig() 填充，默认取兜底值） =====
+let DIMENSIONS = DEFAULT_DIMENSIONS;
+let BENCH_GROUPS = DEFAULT_BENCH_GROUPS;   // 统一为 { dimKey: [benchKey, ...] }
+let BENCH_CN = DEFAULT_BENCH_CN;
+let PROVIDER_META = DEFAULT_PROVIDER_META;
+let NORMALIZATION = DEFAULT_NORMALIZATION;
+let BASELINE_CANDIDATES = [];
+let WEIGHTS_NO_PREFERENCE = null;
+
 let DATA = null;
 let radarChart = null;
 let _dimScoresCache = null;
 let _dimRankCache = null;
 let _compositeCache = null;
+let _dimCoverageCache = null;
+let _benchRankCache = null;
+let _compareColumns = [];  // 对比表当前列顺序，供权重拖动时原位刷新用
 let _matrixSort = { key: null, desc: true };
+
+// 把 data.json 的 config 段注入运行时常量。缺字段时保留兜底值，保证旧数据可渲染。
+function hydrateConfig() {
+  const cfg = (DATA && DATA.config) || {};
+  const has = (o) => o && typeof o === 'object';
+
+  // 维度：config.dimensions 已是 {key,name,desc,weight} 形状
+  if (Array.isArray(cfg.dimensions) && cfg.dimensions.length > 0) {
+    const dims = cfg.dimensions.filter(d => has(d) && d.key)
+      .map(d => ({ key: d.key, name: d.name || d.key, desc: d.desc || d.description || '', weight: typeof d.weight === 'number' ? d.weight : null }));
+    if (dims.length > 0) DIMENSIONS = dims;
+  }
+
+  // benchmark 分组：{ dimKey: [benchKey, ...] }，缺失的维度退回兜底
+  if (has(cfg.bench_groups)) {
+    const groups = {};
+    DIMENSIONS.forEach(dim => {
+      const list = cfg.bench_groups[dim.key];
+      groups[dim.key] = Array.isArray(list) ? list.slice() : (DEFAULT_BENCH_GROUPS[dim.key] || []).slice();
+    });
+    // config 里存在但不在 dimensions 中的分组也保留（前向兼容）
+    Object.keys(cfg.bench_groups).forEach(k => {
+      if (!groups[k] && Array.isArray(cfg.bench_groups[k])) groups[k] = cfg.bench_groups[k].slice();
+    });
+    BENCH_GROUPS = groups;
+  }
+
+  if (has(cfg.bench_cn) && Object.keys(cfg.bench_cn).length > 0) {
+    BENCH_CN = Object.assign({}, DEFAULT_BENCH_CN, cfg.bench_cn);
+  }
+
+  // 厂家：展示名取 config.providers，颜色沿用固定色板，未知命名空间按哈希推导稳定低饱和色
+  if (has(cfg.providers) && Object.keys(cfg.providers).length > 0) {
+    const merged = {};
+    Object.keys(cfg.providers).forEach(ns => {
+      const p = cfg.providers[ns] || {};
+      merged[ns] = {
+        display: p.display || ns,
+        tier: p.tier || null,
+        color: (DEFAULT_PROVIDER_META[ns] && DEFAULT_PROVIDER_META[ns].color) || providerColor(ns)
+      };
+    });
+    Object.keys(DEFAULT_PROVIDER_META).forEach(ns => {
+      if (!merged[ns]) merged[ns] = Object.assign({}, DEFAULT_PROVIDER_META[ns]);
+    });
+    PROVIDER_META = merged;
+  }
+
+  NORMALIZATION = has(cfg.normalization) ? Object.assign({}, DEFAULT_NORMALIZATION, cfg.normalization) : DEFAULT_NORMALIZATION;
+  if (!NORMALIZATION.missing_value) NORMALIZATION.missing_value = DEFAULT_NORMALIZATION.missing_value;
+
+  // 权重 + 基准锚点
+  state.weights = defaultWeights();
+  WEIGHTS_NO_PREFERENCE = has(cfg.weights_no_preference) ? cfg.weights_no_preference : null;
+
+  const bl = has(cfg.baseline) ? cfg.baseline : null;
+  const present = DATA && DATA.models ? DATA.models : {};
+  const pool = bl ? [bl.default].concat(Array.isArray(bl.candidates) ? bl.candidates : []) : [];
+  BASELINE_CANDIDATES = pool
+    .filter((id, i) => pool.indexOf(id) === i)     // default 可能同时出现在 candidates 里
+    .filter(id => !!present[id]);
+  state.baseline = BASELINE_CANDIDATES.length > 0 ? BASELINE_CANDIDATES[0] : null;
+
+  // 默认维度：config.dimensions 里的第一个若与兜底 activeDimension 不符则纠正
+  if (!DIMENSIONS.some(d => d.key === state.activeDimension) && DIMENSIONS.length > 0) {
+    state.activeDimension = DIMENSIONS[0].key;
+  }
+  invalidateAllCaches();
+}
+
+// 命名空间 → 稳定、柔和（低饱和中低亮度）的 HSL 色，避免抢占页面主色
+function providerColor(ns) {
+  let h = 2166136261;
+  const s = String(ns);
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  const hue = h % 360;
+  const sat = 24 + ((h >>> 8) % 14);    // 24%-37%
+  const light = 44 + ((h >>> 16) % 12); // 44%-55%
+  return 'hsl(' + hue + ',' + sat + '%,' + light + '%)';
+}
+
+// benchmark 短标签：config.bench_cn 给的是全名（含英文括注），这里压成短名
+function benchLabel(benchKey) {
+  const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[benchKey]) || {};
+  const candidates = [BENCH_CN[benchKey], meta.name, DEFAULT_BENCH_CN[benchKey]];
+  for (let i = 0; i < candidates.length; i++) {
+    const raw = candidates[i];
+    if (!raw) continue;
+    const short = String(raw)
+      .replace(/\s*[（(][^）)]*[)）]\s*/g, '')  // 去掉尾部/中部英文括注
+      .replace(/\s*·.*$/, '')                     // 去掉「· 中位」这类后缀限定
+      .trim();
+    if (short && /[\u4e00-\u9fa5]/.test(short)) return short;
+  }
+  return candidates.find(Boolean) || benchKey;
+}
+
+// benchmark 提示文案：note 优先，其次全名
+function benchTooltip(benchKey) {
+  const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[benchKey]) || {};
+  return meta.note || meta.description || meta.name || BENCH_CN[benchKey] || benchKey;
+}
+
+// benchmark 原始链接：优先取数据条目，其次 benchmark_meta
+function benchSourceUrl(benchKey) {
+  const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[benchKey]) || {};
+  if (meta.source_url) return meta.source_url;
+  const arr = (DATA && DATA.benchmarks && DATA.benchmarks[benchKey]) || [];
+  for (let i = 0; i < arr.length; i++) if (arr[i].source_url) return arr[i].source_url;
+  return (DATA && DATA.provenance && DATA.provenance.leaderboard_url) || null;
+}
+
+// 矩阵列头：短名自动折成两行，避免依赖写死的 benchmark 名单
+function wrapBenchLabel(label) {
+  const s = String(label || '');
+  if (s.length <= 5) return s;
+  let cut = Math.ceil(s.length / 2);
+  const sp = s.indexOf(' ', 2);
+  if (sp > 0 && sp < s.length - 2 && sp <= cut + 2) cut = sp;
+  return s.slice(0, cut).trim() + '<br>' + s.slice(cut).trim();
+}
+
+// 默认权重：config.weights 优先，退回 config.dimensions[].weight，再退回兜底常量
+function defaultWeights() {
+  const cfg = (DATA && DATA.config) || {};
+  const src = (cfg.weights && typeof cfg.weights === 'object') ? cfg.weights : DEFAULT_WEIGHTS;
+  const w = {};
+  DIMENSIONS.forEach(dim => {
+    let v = src[dim.key];
+    if (typeof v !== 'number') v = typeof dim.weight === 'number' ? dim.weight : (DEFAULT_WEIGHTS[dim.key] || 0);
+    w[dim.key] = v;
+  });
+  return w;
+}
+
+// 数据源可靠性标记：thin/过期/测试态一律显式标注，不把薄数据当硬数据
+function benchStatus(benchKey) {
+  const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[benchKey]) || {};
+  const s = meta.status;
+  return (s === 'stale' || s === 'empty' || s === 'beta') ? s : null;
+}
+
+function benchStatusBadge(benchKey, cls) {
+  const s = benchStatus(benchKey);
+  if (!s) return '';
+  return `<span class="src-badge ${cls || ''} src-${s}" data-tooltip="benchmark_meta.status = ${s}：样本有限或口径未定，勿当硬结论">${s}</span>`;
+}
+
+// 快照日（metadata.snapshot_date），旧数据缺省时退回条目自带 observed_at
+function snapshotDate() {
+  return (DATA && DATA.metadata && DATA.metadata.snapshot_date) || null;
+}
+
+function entryDate(item) {
+  if (item && item.observed_at) return item.observed_at;
+  return snapshotDate();
+}
 
 // ===== DATA UTILITIES =====
 function getModel(modelId) {
@@ -1660,55 +2152,37 @@ function getModel(modelId) {
   return DATA.models[modelId] || null;
 }
 
+// 是否成本类（越低越好）benchmark：显式名单兜底 + benchmark_meta 自动识别
 function isCostBench(benchKey) {
-  return benchKey === 'cost_per_task' || benchKey === 'pricing';
-}
-
-function getCostPerTaskRanking() {
-  if (!DATA || !DATA.benchmarks || !DATA.benchmarks.terminalbench_hard) return [];
-  const result = DATA.benchmarks.terminalbench_hard
-    .filter(item => item.cost_usd != null)
-    .map(item => ({
-      model_id: item.model_id, reasoning_level: item.reasoning_level,
-      display_name: item.display_name, score_raw: item.cost_usd, score_type: 'pricing',
-      input_tokens: item.input_tokens, output_tokens: item.output_tokens,
-      reasoning_tokens: item.reasoning_tokens, cost_usd: item.cost_usd,
-      breakdown: null, source: item.source, confidence: item.confidence
-    }));
-  result.sort((a, b) => a.score_raw - b.score_raw);
-  result.forEach((item, idx) => { item.rank = idx + 1; });
-  return result;
-}
-
-function getPricingRanking() {
-  if (!DATA || !DATA.models) return [];
-  const result = [];
-  Object.values(DATA.models).forEach(m => {
-    if (m.pricing_input != null) {
-      result.push({
-        model_id: m.id, reasoning_level: '', display_name: m.display_name,
-        score_raw: m.pricing_input, score_type: 'pricing',
-        input_tokens: null, output_tokens: null, reasoning_tokens: null, cost_usd: null,
-        breakdown: { pricing_input: m.pricing_input, pricing_output: m.pricing_output },
-        source: 'openrouter', confidence: 1.0
-      });
-    }
-  });
-  result.sort((a, b) => a.score_raw - b.score_raw);
-  result.forEach((item, idx) => { item.rank = idx + 1; });
-  return result;
+  if (COST_BENCH_KEYS.indexOf(benchKey) >= 0) return true;
+  const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[benchKey]) || null;
+  if (!meta) return false;
+  if (meta.dimension === 'cost') return true;
+  return meta.direction === 'lower' && NORMALIZATION.cost_reverse !== false;
 }
 
 function getBenchRanking(benchKey) {
-  if (benchKey === 'cost_per_task') return getCostPerTaskRanking();
-  if (benchKey === 'pricing') return getPricingRanking();
   if (!DATA || !DATA.benchmarks || !DATA.benchmarks[benchKey]) return [];
+  if (!_benchRankCache) _benchRankCache = {};
+  if (_benchRankCache[benchKey]) return _benchRankCache[benchKey];
+  const isCost = isCostBench(benchKey);
   const result = DATA.benchmarks[benchKey]
     .filter(item => item.score_raw != null)
     .map(item => ({ ...item }));
-  result.sort((a, b) => b.score_raw - a.score_raw);
+  result.sort((a, b) => isCost ? a.score_raw - b.score_raw : b.score_raw - a.score_raw);
   result.forEach((item, idx) => { item.rank = idx + 1; });
+  _benchRankCache[benchKey] = result;
   return result;
+}
+
+// 成本维度取 cost_per_eval（真实整轮消耗），旧数据退回 terminalbench_hard 的 cost_usd
+function getCostProxyBench() {
+  if (DATA && DATA.benchmarks) {
+    if ((DATA.benchmarks.cost_per_eval || []).length > 0) return 'cost_per_eval';
+    if ((DATA.benchmarks.cost_per_task || []).length > 0) return 'cost_per_task';
+    if ((DATA.benchmarks.pricing || []).length > 0) return 'pricing';
+  }
+  return null;
 }
 
 function getFilteredRanking(benchKey) {
@@ -1717,64 +2191,113 @@ function getFilteredRanking(benchKey) {
 }
 
 function getBenchmarksByDimension(dimKey) {
-  const group = BENCH_GROUPS[dimKey];
-  if (!group) return [];
-  return group.benches.filter(b => {
-    if (b === 'cost_per_task' || b === 'pricing') return true;
-    return DATA && DATA.benchmarks && DATA.benchmarks[b] && DATA.benchmarks[b].length > 0;
-  });
+  const benches = BENCH_GROUPS[dimKey];
+  if (!Array.isArray(benches)) return [];
+  return benches.filter(b => getBenchRanking(b).length > 0);
 }
 
 function hasDimensionData(dimKey) {
   return getBenchmarksByDimension(dimKey).length > 0;
 }
 
+// 维度内可比的 benchmark（≥2 个不同取值）——单值数据源没有区分度，不参与归一化
+function getUsableBenches(dimKey) {
+  return getBenchmarksByDimension(dimKey).filter(b => {
+    const ranking = getBenchRanking(b);
+    let first = null;
+    for (let i = 0; i < ranking.length; i++) {
+      const v = ranking[i].score_raw;
+      if (first === null) first = v;
+      else if (v !== first) return true;
+    }
+    return false;
+  });
+}
+
+// 归一化：min-max（默认）→ [min_score, max_score]；成本维度按 cost_reverse 反向
+function normalizeValue(value, stats, isCost) {
+  const lo = typeof NORMALIZATION.min_score === 'number' ? NORMALIZATION.min_score : 0;
+  const hi = typeof NORMALIZATION.max_score === 'number' ? NORMALIZATION.max_score : 100;
+  const span = stats.max - stats.min;
+  if (!isFinite(span) || span === 0) return null; // 无区分度
+  let ratio;
+  if (isCost && NORMALIZATION.cost_reverse !== false) {
+    ratio = (stats.max - value) / span;
+  } else if (NORMALIZATION.method === 'ratio-to-max' && !(isCost && NORMALIZATION.cost_reverse !== false)) {
+    if (stats.max === 0) return null;
+    ratio = value / stats.max;
+  } else {
+    ratio = (value - stats.min) / span;
+  }
+  const norm = lo + ratio * (hi - lo);
+  return Math.max(lo, Math.min(hi, norm));
+}
+
 function computeDimScores() {
   if (!DATA || !DATA.models) return {};
   const cache = {};
+  const coverage = {};
+  const minCovRatio = (NORMALIZATION.missing_value && typeof NORMALIZATION.missing_value.min_coverage_ratio === 'number')
+    ? NORMALIZATION.missing_value.min_coverage_ratio : 0;
   DIMENSIONS.forEach(dim => {
     cache[dim.key] = {};
-    const benches = getBenchmarksByDimension(dim.key);
+    coverage[dim.key] = {};
+    // 只纳入有区分度（≥2 个不同取值）的数据源；单点数据源不参与归一化，也不计入覆盖分母
+    const benches = getUsableBenches(dim.key);
     if (benches.length === 0) return;
     const benchNorm = {};
     benches.forEach(b => {
       const ranking = getBenchRanking(b);
-      if (ranking.length === 0) return;
-      const scores = ranking.map(r => r.score_raw).filter(s => s != null);
+      const scores = ranking.map(r => r.score_raw)
+        .filter(s => s != null && typeof s === 'number' && isFinite(s));
       if (scores.length === 0) return;
-      const max = Math.max(...scores);
-      const min = Math.min(...scores);
-      benchNorm[b] = { max, min, isCost: isCostBench(b) };
+      benchNorm[b] = {
+        max: Math.max(...scores),
+        min: Math.min(...scores),
+        isCost: isCostBench(b)
+      };
     });
     Object.keys(DATA.models).forEach(modelId => {
-      let total = 0, totalWeight = 0;
+      let total = 0, totalWeight = 0, covered = 0;
       benches.forEach(b => {
         if (!benchNorm[b]) return;
         const ranking = getBenchRanking(b);
-        const entries = ranking.filter(r => r.model_id === modelId);
+        const entries = ranking.filter(r => r.model_id === modelId)
+          .filter(r => r.score_raw != null && typeof r.score_raw === 'number' && isFinite(r.score_raw));
         if (entries.length === 0) return;
+        covered++;
         const { max, min, isCost } = benchNorm[b];
         const best = isCost ? Math.min(...entries.map(e => e.score_raw)) : Math.max(...entries.map(e => e.score_raw));
-        let norm;
-        if (isCost) {
-          norm = max === min ? 50 : (max - best) / (max - min) * 100;
-        } else {
-          norm = max === 0 ? 0 : best / max * 100;
-        }
-        // 使用子维度权重（如果有），否则使用默认平均权重
+        if (!isFinite(best)) return;
+        const norm = normalizeValue(best, { max, min }, isCost);
+        if (norm == null || !isFinite(norm)) return;
         const benchWeight = state.benchWeights?.[b] ?? (1 / benches.length);
         total += norm * benchWeight;
         totalWeight += benchWeight;
       });
+      coverage[dim.key][modelId] = { covered, sources: benches.length };
+      // 缺失策略 exclude_and_reweight 之外再加一道门槛：覆盖源太少则该维度不出分
+      if (benches.length > 0 && covered / benches.length < minCovRatio) {
+        cache[dim.key][modelId] = null;
+        return;
+      }
       cache[dim.key][modelId] = totalWeight > 0 ? total / totalWeight : null;
     });
   });
+  _dimCoverageCache = coverage;
   return cache;
 }
 
 function getDimensionScore(modelId, dimKey) {
   if (!_dimScoresCache) _dimScoresCache = computeDimScores();
   return _dimScoresCache[dimKey] ? _dimScoresCache[dimKey][modelId] : null;
+}
+
+// 该模型在该维度覆盖了多少个数据源
+function getDimensionCoverage(modelId, dimKey) {
+  if (!_dimScoresCache) _dimScoresCache = computeDimScores();
+  const c = _dimCoverageCache && _dimCoverageCache[dimKey];
+  return c ? c[modelId] : null;
 }
 
 function computeDimRanks() {
@@ -1794,13 +2317,23 @@ function getDimensionRank(modelId, dimKey) {
   return _dimRankCache[dimKey] ? _dimRankCache[dimKey][modelId] : null;
 }
 
+// 是否在九家范围内（参照模型默认不进主榜）
+function isInScope(modelId) {
+  const m = getModel(modelId);
+  if (!m) return true;
+  if (typeof m.in_scope === 'boolean') return m.in_scope;
+  return m.tier !== 'reference';
+}
+
 function getCompositeRanking() {
   if (_compositeCache) return _compositeCache;
   if (!DATA || !DATA.models) return [];
   const activeDims = DIMENSIONS.filter(d => hasDimensionData(d.key));
   const totalActiveDims = activeDims.length;
-  const withScore = [];
-  const withoutScore = [];
+  const minCovRatio = (NORMALIZATION.missing_value && typeof NORMALIZATION.missing_value.min_coverage_ratio === 'number')
+    ? NORMALIZATION.missing_value.min_coverage_ratio : 0;
+  const penaltyOn = NORMALIZATION.missing_value && NORMALIZATION.missing_value.coverage_penalty !== false;
+  const scored = [];
   Object.keys(DATA.models).forEach(id => {
     let total = 0, totalWeight = 0, dimCount = 0;
     activeDims.forEach(dim => {
@@ -1815,18 +2348,49 @@ function getCompositeRanking() {
     const rawScore = totalWeight > 0 ? total / totalWeight : null;
     // 覆盖率惩罚：维度覆盖不足时综合分按比例降低，避免单维度高分模型排名虚高
     const coverage = totalActiveDims > 0 ? dimCount / totalActiveDims : 0;
-    const score = rawScore != null ? rawScore * coverage : null;
+    let score = rawScore != null ? (penaltyOn ? rawScore * coverage : rawScore) : null;
+    // 综合覆盖率低于 config.normalization.missing_value.min_coverage_ratio 时不出分
+    if (score != null && totalActiveDims > 0 && coverage < minCovRatio) score = null;
     if (score != null) {
-      withScore.push({ id, score, rawScore, coverage });
+      scored.push({ id, score, rawScore, coverage, reference: !isInScope(id) });
     } else {
-      withoutScore.push({ id, score: null, rawScore: null, coverage: 0 });
+      scored.push({ id, score: null, rawScore: null, coverage, reference: !isInScope(id) });
     }
   });
-  withScore.sort((a, b) => b.score - a.score);
-  withScore.forEach((s, i) => { s.rank = i + 1; });
-  withoutScore.forEach((s, i) => { s.rank = withScore.length + i + 1; });
-  _compositeCache = [...withScore, ...withoutScore];
+  // 默认只对 in_scope 模型排综合名次；参照模型排在榜尾且带 reference 标记
+  const withScore = scored.filter(s => s.score != null);
+  const withoutScore = scored.filter(s => s.score == null);
+  const main = withScore.filter(s => state.includeReference || !s.reference);
+  const refs = state.includeReference ? [] : withScore.filter(s => s.reference);
+  main.sort((a, b) => b.score - a.score);
+  refs.sort((a, b) => b.score - a.score);
+  withoutScore.sort((a, b) => (b.coverage || 0) - (a.coverage || 0));
+  let cursor = 0;
+  main.forEach(s => { s.rank = ++cursor; });
+  refs.forEach(s => { s.rank = ++cursor; });
+  withoutScore.forEach(s => { s.rank = ++cursor; });
+  _compositeCache = [...main, ...refs, ...withoutScore];
   return _compositeCache;
+}
+
+function getReferenceCompositeRanking() {
+  return getCompositeRanking().filter(s => s.reference && !state.includeReference);
+}
+
+// 「vs 基准」：基准模型综合分；基准缺数据时退回候选列表里第一个有数据的
+function getBaselineId() {
+  if (state.baseline && getCompositeScore(state.baseline) != null) return state.baseline;
+  const fallback = BASELINE_CANDIDATES.find(id => getCompositeScore(id) != null);
+  return fallback || null;
+}
+
+function getBaselineDelta(modelId) {
+  const baseId = getBaselineId();
+  if (!baseId) return null;
+  const baseScore = getCompositeScore(baseId);
+  const score = getCompositeScore(modelId);
+  if (baseScore == null || score == null) return null;
+  return score - baseScore;
 }
 
 function getCompositeScore(modelId) {
@@ -1839,6 +2403,14 @@ function getCompositeRank(modelId) {
   const ranking = getCompositeRanking();
   const item = ranking.find(s => s.id === modelId);
   return item ? item.rank : null;
+}
+
+// 参照模型默认不占综合名次（开「含参照模型」后才显示名次）
+function getCompositeRankLabel(modelId) {
+  const item = getCompositeRanking().find(s => s.id === modelId);
+  if (!item || item.score == null) return null;
+  if (item.reference && !state.includeReference) return null;
+  return item.rank;
 }
 
 // 对比视图专用：缺失维度用对比池内最低分填充
@@ -1888,6 +2460,15 @@ function getModelRankInBench(modelId, benchKey) {
 
 function invalidateCache() {
   _compositeCache = null;
+  _dimScoresCache = null;
+  _dimRankCache = null;
+  _dimCoverageCache = null;
+}
+
+// 数据 / 配置整体替换时清掉 benchmark 排名缓存
+function invalidateAllCaches() {
+  _benchRankCache = null;
+  invalidateCache();
 }
 
 function formatScore(v) {
@@ -1917,15 +2498,24 @@ function formatTokens(v) {
 
 function getSubDimText(item, benchKey) {
   if (!item) return '';
-  if (benchKey === 'cost_per_task') return formatCost(item.score_raw) + '/任务';
-  if (benchKey === 'pricing') return '$' + item.score_raw.toFixed(2) + '/M tok';
+  if (isCostBench(benchKey)) {
+    // 单价类（breakdown 暴露 per_1m 字段）按 /M tok 标注，其余按整轮消耗标注
+    const perToken = item.breakdown && typeof item.breakdown === 'object' && item.breakdown.input_per_1m != null;
+    return '$' + Number(item.score_raw).toFixed(2) + (perToken ? '/M tok' : '/轮');
+  }
   const bd = item.breakdown;
-  if (bd) {
-    if (bd.total && bd.total.accuracy != null) return '准确率 ' + (bd.total.accuracy * 100).toFixed(1) + '%';
+  if (bd && typeof bd === 'object') {
+    const acc = (bd.total && bd.total.accuracy != null) ? bd.total.accuracy : bd.accuracy;
+    if (acc != null) {
+      const hal = (bd.total && bd.total.hallucinationRate != null) ? bd.total.hallucinationRate : bd.hallucinationRate;
+      return '准确率 ' + (acc * 100).toFixed(1) + '%' + (hal != null ? ' · 幻觉 ' + (hal * 100).toFixed(0) + '%' : '');
+    }
     if (bd.accuracy_pct != null) return '准确率 ' + bd.accuracy_pct + '%';
+    if (bd.criteriaPass != null) return '通过率 ' + (bd.criteriaPass * 100).toFixed(1) + '%';
     if (bd.cost_per_task_usd != null) return formatCost(bd.cost_per_task_usd) + '/任务';
     if (bd.output_tokens_per_task != null) return formatTokens(bd.output_tokens_per_task) + ' tok';
   }
+  if (item.run_cost_usd != null) return formatCost(item.run_cost_usd) + '/轮';
   if (item.cost_usd != null) return formatCost(item.cost_usd);
   if (item.input_tokens != null) return formatTokens(item.input_tokens) + ' tok';
   return '';
@@ -1933,6 +2523,8 @@ function getSubDimText(item, benchKey) {
 
 function getMarkers(model) {
   let html = '<div class="marker-cell">';
+  // 参照模型（不在九家范围）标记
+  if (model && isInScope(model.id) === false) html += '<span class="marker ref">参照</span>';
   // 模态标签
   if (model.supports_vision && model.supports_audio) html += '<span class="marker mm">多模态</span>';
   else if (model.supports_vision) html += '<span class="marker mm">多模态</span>';
@@ -1947,7 +2539,6 @@ function getMarkers(model) {
 }
 
 function getReasoningLevels(modelId, benchKey) {
-  if (benchKey === 'pricing') return [];
   const ranking = getBenchRanking(benchKey);
   const entries = ranking.filter(r => r.model_id === modelId);
   if (entries.length <= 1) return [];
@@ -2000,9 +2591,9 @@ function renderDimensionNav() {
 
   if (hasBenches) {
     benchChips.innerHTML = benches.map(b => {
-      const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[b]) || {};
-      const desc = meta.description || '';
-      return `<button class="bench-chip ${state.activeBench === b ? 'active' : ''}" data-bench="${b}" data-tooltip="${desc.replace(/"/g, '&quot;')}">${BENCH_CN[b] || b}</button>`;
+      const desc = benchTooltip(b);
+      const status = benchStatus(b);
+      return `<button class="bench-chip ${state.activeBench === b ? 'active' : ''}" data-bench="${b}" data-tooltip="${desc.replace(/"/g, '&quot;')}">${benchLabel(b)}${status ? `<span class="chip-status">${status}</span>` : ''}</button>`;
     }).join('');
     benchChips.classList.add('visible');
 
@@ -2024,6 +2615,154 @@ function renderDimensionNav() {
     benchChips.innerHTML = '<span style="font-size:12px;color:var(--text-tertiary);padding:6px 0">数据待入库</span>';
     benchChips.classList.add('visible');
   }
+}
+
+// ===== 榜单视图（能力榜 / 性价比榜 / 综合榜）=====
+// 为什么拆三榜（docs/changelog.md #29）：单一综合分里"成本该占多少权重"没有客观答案。
+// 实测本批整轮评测消耗从 $7 到 $1094（156 倍），线性归一会让三个能力维都第一的
+// Claude Fable 5.1 因最贵而综合排第 9。拆成"有多强"和"值不值"两个视角更诚实。
+// 能力榜与性价比榜的分数由服务端按 config.leaderboards 算好写入 models[].scores，
+// 口径固定、不随手调权重变化；只有综合榜跟随当前权重实时重算。
+function boardScore(id, board) {
+  if (board === 'composite') return getCompositeScore(id);
+  const s = (getModel(id) || {}).scores || {};
+  return (s[board] === undefined || s[board] === null) ? null : s[board];
+}
+
+function boardValueRaw(id) {
+  const s = (getModel(id) || {}).scores || {};
+  return s.value_raw != null ? s.value_raw : null;
+}
+
+function renderBoardView() {
+  const main = document.getElementById('main');
+  document.getElementById('dimension-nav').style.display = 'none';
+  if (!DATA) return;
+
+  const LB = (DATA.config && DATA.config.leaderboards) || {};
+  const boards = ['capability', 'value', 'composite'].filter(k => LB[k]);
+  if (!boards.includes(state.board)) state.board = boards[0] || 'capability';
+  const active = LB[state.board] || {};
+
+  if (state.board !== 'composite' && !Object.values(DATA.models).some(m => m.scores && m.scores[state.board] != null)) {
+    main.innerHTML = '<div class="empty"><div class="empty-icon">📊</div>'
+      + '<div class="empty-text">该榜单分数尚未由导出器写入 data.json，请重跑 scripts/export_frontend_data.py</div></div>';
+    return;
+  }
+
+  let ids = Object.keys(DATA.models).filter(id => {
+    const m = getModel(id);
+    if (!m) return false;
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      if (!(m.display_name || id).toLowerCase().includes(q) && !id.toLowerCase().includes(q)) return false;
+    }
+    if (state.activeProviders.size > 0 && !state.activeProviders.has(m.provider)) return false;
+    return true;
+  });
+
+  const rows = ids.map(id => ({
+    id, score: boardScore(id, state.board), ref: !isInScope(id),
+    price: (getModel(id).scores || {}).blended_price,
+  }));
+  const ranked = rows.filter(r => r.score != null && (state.includeReference || !r.ref));
+  const unranked = rows.filter(r => r.score == null);
+  ranked.sort((a, b) => b.score - a.score);
+  unranked.sort((a, b) => (b.price == null ? -1 : b.price));
+  ranked.forEach((r, i) => { r.rank = i + 1; });
+
+  const baseId = getBaselineId();
+  const baseScore = baseId != null ? boardScore(baseId, state.board) : null;
+  const dimKeys = ['factual', 'workflow', 'engineering', 'preference'];
+
+  let html = '<div class="matrix-view">';
+  html += '<div class="schemes-toolbar"><div class="schemes-title">'
+    + (active.name || '榜单') + '</div>';
+  html += boards.map(k => `<button class="action-btn ${state.board === k ? 'active' : ''}" `
+    + `data-board="${k}" title="${(LB[k] || {}).caption || ''}">${(LB[k] || {}).name || k}</button>`).join('');
+  html += `<button class="action-btn ${state.includeReference ? 'active' : ''}" id="board-toggle-ref" `
+    + `data-tooltip="参照模型不在九家范围内，默认不占名次">含参照模型</button></div>`;
+
+  const sc = DATA.metadata.scoring || {};
+  html += `<div class="board-caption">${(active.caption || '')}`;
+  if (state.board === 'capability') {
+    const w = sc.capability_weights || {};
+    html += '　固定权重口径：' + Object.keys(w).map(d => `${dimName(d)} ${Math.round(w[d] * 100)}%`).join(' + ');
+    if (sc.preference_status === 'empty_reweighted') {
+      html += '；<span class="src-badge inline">人类偏好本批无数据</span>，其权重已重新分配';
+    }
+  } else if (state.board === 'value') {
+    html += '　公式：' + (sc.value_formula || '能力分 ÷ 混合单价')
+      + '；混合单价按输入:输出 = 3:1 估算，展示分是把该比值在本批内做 min-max';
+  } else {
+    const w = sc.weights_in_effect || {};
+    html += '　随你在「我的方案」里改的权重实时变化：'
+      + Object.keys(w).map(d => `${dimName(d)} ${Math.round(w[d] * 100)}%`).join(' + ');
+  }
+  html += '</div>';
+
+  const cols = '140px ' + dimKeys.map(() => 'minmax(56px,1fr)').join(' ') + ' minmax(78px,1fr) minmax(64px,1fr) minmax(62px,1fr)';
+  html += '<div class="matrix-table"><div class="matrix-grid" style="grid-template-columns:' + cols + '">';
+  html += '<div class="matrix-row"><div class="matrix-row-label">模型</div>';
+  dimKeys.forEach(d => { html += `<div class="matrix-bench-header">${dimName(d)}</div>`; });
+  html += '<div class="matrix-bench-header" data-tooltip="AA 公布定价推算的混合单价，USD / 1M tokens">混合单价</div>';
+  html += `<div class="matrix-bench-header">${active.name || '榜分'}</div>`;
+  html += '<div class="matrix-bench-header" data-tooltip="与所选基准模型的榜分差值">vs 基准</div></div>';
+
+  const rowHtml = (r) => {
+    const m = getModel(r.id);
+    const dims = (m.scores || {}).dims || {};
+    let cells = `<div class="matrix-row-label${r.ref ? ' is-reference' : ''}" `
+      + `data-model="${r.id}" style="cursor:pointer" `
+      + `data-tooltip="${r.ref ? '参照 · 不在九家范围' : m.id}">${m.display_name || r.id}`
+      + `${r.ref ? ' <span class="src-badge inline">参照</span>' : ''}</div>`;
+    dimKeys.forEach(d => {
+      const v = dims[d];
+      cells += `<div class="matrix-cell${r.ref ? ' is-reference' : ''}">${v != null ? v.toFixed(1) : '—'}</div>`;
+    });
+    cells += `<div class="matrix-cell${r.ref ? ' is-reference' : ''}">${r.price != null ? '$' + r.price.toFixed(2) : '—'}</div>`;
+    cells += `<div class="matrix-cell board-score${r.ref ? ' is-reference' : ''}">`
+      + `<b>${r.score != null ? r.score.toFixed(1) : '—'}</b>`
+      + `${r.rank ? `<span class="board-rank">#${r.rank}</span>` : ''}</div>`;
+    let delta = '—';
+    if (r.score != null && baseScore != null && r.id !== baseId) {
+      const d = r.score - baseScore;
+      delta = `<span class="${d >= 0 ? 'delta-up' : 'delta-down'}">${d >= 0 ? '+' : ''}${d.toFixed(1)}</span>`;
+    } else if (r.id === baseId) { delta = '<span class="delta-base">基准</span>'; }
+    cells += `<div class="matrix-cell${r.ref ? ' is-reference' : ''}">${delta}</div>`;
+    return `<div class="matrix-row">${cells}</div>`;
+  };
+
+  ranked.forEach(r => { html += rowHtml(r); });
+  unranked.forEach(r => { html += rowHtml(r); });
+  html += '</div></div>';
+  html += `<div class="board-footnote">榜分与维度分均为 0–100 的批内相对值（min-max），`
+    + `只在本批 ${DATA.metadata.core_model_count} 个核心模型之间可比，跨批次不可直接比大小。`
+    + `数据截止 ${DATA.metadata.snapshot_date}，来源见「数据说明」。</div>`;
+  html += '</div>';
+
+  main.innerHTML = html;
+
+  main.querySelectorAll('[data-board]').forEach(btn => btn.addEventListener('click', () => {
+    state.board = btn.dataset.board;
+    renderBoardView();
+  }));
+  const toggle = main.querySelector('#board-toggle-ref');
+  if (toggle) toggle.addEventListener('click', () => {
+    state.includeReference = !state.includeReference;
+    renderBoardView();
+  });
+  main.querySelectorAll('.matrix-row-label[data-model]').forEach(el => el.addEventListener('click', () => {
+    state.view = 'ranking';
+    document.querySelectorAll('.view-tab').forEach(b => b.classList.toggle('active', b.dataset.view === 'ranking'));
+    state.expandedModel = el.dataset.model;
+    renderCurrentView();
+  }));
+}
+
+function dimName(key) {
+  const d = DIMENSIONS.find(x => x.key === key);
+  return d ? d.name : key;
 }
 
 // ===== RANKING VIEW =====
@@ -2056,12 +2795,16 @@ function renderRankingView() {
       return state.rankingSort.desc ? vb - va : va - vb;
     });
   } else if (state.rankingSort.key === 'cost') {
-    ranking.sort((a, b) => {
-      const tbR = getBenchRanking('terminalbench_hard');
-      const va = tbR.find(r => r.model_id === a.model_id)?.cost_usd ?? Infinity;
-      const vb = tbR.find(r => r.model_id === b.model_id)?.cost_usd ?? Infinity;
-      return state.rankingSort.desc ? vb - va : va - vb;
-    });
+    const costBench = getCostProxyBench();
+    const costR = costBench ? getBenchRanking(costBench) : [];
+    const costOf = (id) => {
+      const hit = costR.find(r => r.model_id === id);
+      return hit && hit.score_raw != null ? hit.score_raw : Infinity;
+    };
+    // 成本：desc=false 表示越便宜越前
+    ranking.sort((a, b) => state.rankingSort.desc
+      ? costOf(b.model_id) - costOf(a.model_id)
+      : costOf(a.model_id) - costOf(b.model_id));
   }
 
   const sortIcon = (key) => {
@@ -2069,46 +2812,78 @@ function renderRankingView() {
     return state.rankingSort.desc ? ' ▼' : ' ▲';
   };
 
+  // 出处信息：快照日 + 置信度 + 原始链接（每个数字都能追到源和日期）
+  const snap = snapshotDate();
+  const conf = meta.confidence;
+  const costBenchKey = getCostProxyBench();
+  const baselineId = getBaselineId();
+  // 下拉：先给 config.baseline 的候选，再补其余模型（候选之外的模型也可作锚点）
+  const baselineOptions = BASELINE_CANDIDATES.slice();
+  Object.keys(DATA.models).sort().forEach(id => { if (baselineOptions.indexOf(id) < 0) baselineOptions.push(id); });
+  if (baselineId && baselineOptions.indexOf(baselineId) < 0) baselineOptions.unshift(baselineId);
+  const showBaselineCol = !!baselineId;
+
   let html = `<div class="bench-header" style="min-height:0;padding:4px 0">
-    <div class="bench-header-left" style="display:none"></div>
+    <div class="bench-header-left">
+      <div class="rank-controls">
+        ${showBaselineCol ? `<label class="ctl-label">基准
+          <select class="ctl-select" id="baseline-select" title="「vs 基准」列的对比锚点，来自 config.baseline">
+            ${baselineOptions.map(id => `<option value="${id}" ${id === baselineId ? 'selected' : ''}>${(getModel(id) || {}).display_name || id}</option>`).join('')}
+          </select>
+        </label>` : ''}
+        <button class="action-btn ${state.includeReference ? 'active' : ''}" id="toggle-reference" data-tooltip="参照模型不在九家范围内，默认不进主榜排名">含参照模型</button>
+      </div>
+    </div>
     <div class="bench-header-right">
       <span class="bench-stat"><span class="bench-stat-val">${ranking.length}</span>/<span class="bench-stat-total">${totalRanking.length}</span> 条数据</span>
       ${meta.source ? `<span class="bench-stat">来源: ${meta.source}</span>` : ''}
+      ${snap ? `<span class="bench-stat">AA 快照 ${snap}</span>` : ''}
+      ${conf != null ? `<span class="bench-stat">置信度 <span class="bench-stat-val">${(conf * 100).toFixed(0)}%</span></span>` : ''}
+      ${benchStatusBadge(benchKey)}
+      ${meta.source_url ? `<a class="src-link" href="${meta.source_url}" target="_blank" rel="noopener">数据来源</a>` : ''}
     </div>
   </div>`;
 
   if (ranking.length === 0) {
     html += '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">当前筛选条件下无匹配数据</div></div>';
     main.innerHTML = html;
+    bindRankingControls(benchKey);
     return;
   }
 
-  html += '<div class="ranking-table">';
-  html += '<div class="table-header"><div>标记</div><div class="th-sortable" data-sort="rank" style="cursor:pointer">排名' + sortIcon('rank') + '</div><div>模型</div><div class="th-sortable" data-sort="score" style="cursor:pointer">分数' + sortIcon('score') + '</div><div>子维度</div><div class="th-sortable" data-sort="composite" style="cursor:pointer">五维' + sortIcon('composite') + '</div><div class="th-sortable" data-sort="cost" style="cursor:pointer">成本' + sortIcon('cost') + '</div><div>对比</div><div></div></div>';
+  const maxScore = totalRanking.length > 0 ? Math.max(...totalRanking.map(r => r.score_raw).filter(s => s != null)) : null;
 
-  ranking.forEach(item => {
+  // 一行榜单（主榜与参照块共用）
+  const renderRow = (item) => {
     const model = getModel(item.model_id);
-    if (!model) return;
+    if (!model) return '';
     const expKey = item.model_id + '|' + (item.reasoning_level || '');
     const isExpanded = state.expandedModel === expKey;
     const rankClass = item.rank <= 3 ? `r${item.rank}` : '';
     const inCompare = state.compareList.includes(item.model_id);
     const scoreDisplay = isCost ? formatCost(item.score_raw) : formatScore(item.score_raw);
-    const isCostZero = isCost && item.score_raw != null && item.score_raw === Math.max(...getBenchRanking(benchKey).map(r => r.score_raw).filter(s => s != null));
+    const isCostZero = isCost && item.score_raw != null && item.score_raw === maxScore;
     const compScore = getCompositeScore(item.model_id);
     const compRank = getCompositeRank(item.model_id);
-    const tbRanking = getBenchRanking('terminalbench_hard');
-    const tbItem = tbRanking.find(r => r.model_id === item.model_id);
-    const tbCost = tbItem && tbItem.cost_usd != null ? formatCost(tbItem.cost_usd) + '/任务' : '';
-    const tbTokens = tbItem && tbItem.output_tokens != null ? formatTokens(tbItem.output_tokens) + ' token/任务' : '';
+    const delta = showBaselineCol ? getBaselineDelta(item.model_id) : null;
+    const isBaselineRow = showBaselineCol && item.model_id === baselineId;
+    let deltaHtml = '—';
+    if (isBaselineRow) deltaHtml = '<span class="delta-base">基准</span>';
+    else if (delta != null) deltaHtml = `<span class="delta ${delta > 0 ? 'pos' : (delta < 0 ? 'neg' : '')}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</span>`;
+    const costItem = costBenchKey ? getBenchRanking(costBenchKey).find(r => r.model_id === item.model_id) : null;
+    const costText = costItem && costItem.score_raw != null ? formatCost(costItem.score_raw) + '/轮' : '';
+    const costTokenText = costItem && costItem.breakdown && costItem.breakdown.input_per_1m != null
+      ? '入$' + costItem.breakdown.input_per_1m + '/出$' + costItem.breakdown.output_per_1m : '';
     const subDimText = getSubDimText(item, benchKey);
+    const refNote = isInScope(item.model_id) ? '' : '<div class="ref-note">参照 · 不在九家范围</div>';
 
-    html += `<div class="table-row ${isExpanded ? 'expanded' : ''}" data-model="${item.model_id}" data-reasoning="${item.reasoning_level || ''}">
+    let row = `<div class="table-row ${isExpanded ? 'expanded' : ''} ${isInScope(item.model_id) ? '' : 'is-reference'}" data-model="${item.model_id}" data-reasoning="${item.reasoning_level || ''}">
       ${getMarkers(model)}
       <div class="rank ${rankClass}">No.${item.rank}</div>
       <div class="model-cell">
         <div class="model-name">${item.display_name || model.display_name}</div>
-        <div class="model-id">${item.model_id}${item.reasoning_level ? ' · ' + item.reasoning_level : ''}</div>
+        <div class="model-id">${item.model_id}${item.reasoning_level ? ' · ' + item.reasoning_level : ''}${entryDate(item) ? ' · ' + entryDate(item) : ''}</div>
+        ${refNote}
       </div>
       <div class="score-col">
         <div class="score ${isCostZero ? 'cost-zero' : ''}">${scoreDisplay}${isCostZero ? '<span class="cost-zero-badge">最贵</span>' : ''}</div>
@@ -2118,9 +2893,10 @@ function renderRankingView() {
         ${compRank ? '<span class="comp-rank-badge">No.' + compRank + '</span>' : ''}
         <span class="comp-score">${compScore != null ? compScore.toFixed(1) : '—'}</span>
       </div>
+      <div class="baseline-col">${showBaselineCol ? deltaHtml : ''}</div>
       <div class="cost-col">
-        ${tbCost ? '<span class="cost-val">' + tbCost + '</span>' : ''}
-        ${tbTokens ? '<span class="token-val">' + tbTokens + '</span>' : ''}
+        ${costText ? '<span class="cost-val">' + costText + '</span>' : ''}
+        ${costTokenText ? '<span class="token-val">' + costTokenText + '</span>' : ''}
       </div>
       <div class="compare-col">
         <button class="action-btn ${inCompare ? 'active' : ''}" data-action="compare" data-model="${item.model_id}">${inCompare ? '✓' : '对比'}</button>
@@ -2130,13 +2906,34 @@ function renderRankingView() {
       </div>
     </div>`;
 
-    if (isExpanded) {
-      html += renderDrilldownHTML(item, benchKey);
-    }
-  });
+    if (isExpanded) row += renderDrilldownHTML(item, benchKey);
+    return row;
+  };
 
-  html += '</div>';
+  // in_scope 进主榜；参照模型默认单独成块（灰显），开「含参照模型」后并入主榜但仍带标记
+  const refSplit = state.includeReference ? { main: ranking, refs: [] } : splitReference(ranking);
+  const colCount = showBaselineCol ? 10 : 9;
+  const headerCells = `<div class="th-mark">标记</div><div class="th-sortable th-rank" data-sort="rank" style="cursor:pointer">排名${sortIcon('rank')}</div><div class="th-model">模型</div><div class="th-sortable th-score" data-sort="score" style="cursor:pointer">分数${sortIcon('score')}</div><div class="th-subdim">子维度</div><div class="th-sortable th-comp" data-sort="composite" style="cursor:pointer">${dimCountLabel()}${sortIcon('composite')}</div>`
+    + `<div class="th-base" data-tooltip="综合分与所选基准模型的差值，锚点来自 config.baseline">${showBaselineCol ? 'vs 基准' : ''}</div>`
+    + `<div class="th-sortable th-cost" data-sort="cost" style="cursor:pointer">成本${sortIcon('cost')}</div><div class="th-compare">对比</div><div class="th-expand"></div>`;
+
+  let body = `<div class="ranking-table${showBaselineCol ? '' : ' no-baseline'}"><div class="table-header">${headerCells}</div>`;
+  body += refSplit.main.map(renderRow).join('');
+  body += '</div>';
+
+  if (refSplit.refs.length > 0) {
+    body += `<div class="ref-block">
+      <div class="ref-block-title">参照模型 · 不在九家范围（${refSplit.refs.length} 个）
+        <span class="ref-block-sub">同一 benchmark 分数，仅用于对照，不占综合名次</span>
+      </div>
+      <div class="ranking-table ref-table${showBaselineCol ? '' : ' no-baseline'}"><div class="table-header">${headerCells}</div>${refSplit.refs.map(renderRow).join('')}</div>
+    </div>`;
+  }
+
+  html += body;
   main.innerHTML = html;
+
+  bindRankingControls(benchKey);
 
   // Bind row events
   main.querySelectorAll('.table-row').forEach(row => {
@@ -2178,20 +2975,66 @@ function renderRankingView() {
   }
 }
 
+// 按 in_scope 拆分榜单行（保持既有排序）
+function splitReference(items) {
+  const main = [], refs = [];
+  items.forEach(it => { (isInScope(it.model_id) ? main : refs).push(it); });
+  return { main, refs };
+}
+
+// 维度数中文标签（5 → 五维），避免写死「五维」
+function dimCountLabel() {
+  const cn = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const n = DIMENSIONS.length;
+  return (cn[n] || n) + '维';
+}
+
+// 基准选择器 + 参照模型开关 + 出处徽标 tooltip
+function bindRankingControls(benchKey) {
+  const sel = document.getElementById('baseline-select');
+  if (sel) {
+    sel.addEventListener('change', () => {
+      state.baseline = sel.value;
+      invalidateCache();
+      renderRankingView();
+    });
+  }
+  const toggle = document.getElementById('toggle-reference');
+  if (toggle) {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.includeReference = !state.includeReference;
+      invalidateCache();
+      renderRankingView();
+    });
+  }
+  const main = document.getElementById('main');
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
 function renderDrilldownHTML(item, benchKey) {
   const modelId = item.model_id;
   const model = getModel(modelId);
   if (!model) return '';
 
   // Left column
-  let left = '<div class="drill-left"><div class="drill-left-title">当前评测</div>';
-  left += `<div class="drill-left-stat"><span class="drill-left-label">分数</span><span class="drill-left-value">${formatScore(item.score_raw)}</span></div>`;
+  const benchMeta = (DATA.benchmark_meta || {})[benchKey] || {};
+  let left = '<div class="drill-left"><div class="drill-left-title">当前评测' + (benchLabel(benchKey) ? ' · ' + benchLabel(benchKey) : '') + '</div>';
+  left += `<div class="drill-left-stat"><span class="drill-left-label">分数</span><span class="drill-left-value">${isCostBench(benchKey) ? formatCost(item.score_raw) : formatScore(item.score_raw)}</span></div>`;
   left += `<div class="drill-left-stat"><span class="drill-left-label">排名</span><span class="drill-left-value">No.${item.rank}</span></div>`;
   if (item.input_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输入 tokens</span><span class="drill-left-value">${formatTokens(item.input_tokens)}</span></div>`;
   if (item.output_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输出 tokens</span><span class="drill-left-value">${formatTokens(item.output_tokens)}</span></div>`;
   if (item.reasoning_tokens != null) left += `<div class="drill-left-stat"><span class="drill-left-label">推理 tokens</span><span class="drill-left-value">${formatTokens(item.reasoning_tokens)}</span></div>`;
-  if (item.cost_usd != null) left += `<div class="drill-left-stat"><span class="drill-left-label">成本</span><span class="drill-left-value">${formatCost(item.cost_usd)}</span></div>`;
+  if (item.run_cost_usd != null) left += `<div class="drill-left-stat"><span class="drill-left-label">本轮消耗</span><span class="drill-left-value">${formatCost(item.run_cost_usd)}</span></div>`;
+  else if (item.cost_usd != null) left += `<div class="drill-left-stat"><span class="drill-left-label">成本</span><span class="drill-left-value">${formatCost(item.cost_usd)}</span></div>`;
   if (item.source) left += `<div class="drill-left-stat"><span class="drill-left-label">来源</span><span class="drill-left-value">${item.source}</span></div>`;
+  // 出处：本条数值的快照日 + 原始链接 + 数据源状态
+  const entryUrl = item.source_url || benchMeta.source_url;
+  left += `<div class="drill-left-stat"><span class="drill-left-label">AA 快照</span><span class="drill-left-value">${entryDate(item) || '—'}${benchStatusBadge(benchKey, 'inline')}</span></div>`;
+  if (entryUrl) left += `<div class="drill-left-stat"><span class="drill-left-label">数据来源</span><span class="drill-left-value"><a class="src-link" href="${entryUrl}" target="_blank" rel="noopener">查看原始页面</a></span></div>`;
   if (item.confidence != null) left += `<div class="drill-left-stat"><span class="drill-left-label">置信度</span><span class="drill-left-value">${(item.confidence * 100).toFixed(0)}%</span></div>`;
   // Breakdown details
   if (item.breakdown && typeof item.breakdown === 'object') {
@@ -2200,8 +3043,17 @@ function renderDrilldownHTML(item, benchKey) {
       if (bd.total.accuracy != null) left += `<div class="drill-left-stat"><span class="drill-left-label">总准确率</span><span class="drill-left-value">${(bd.total.accuracy * 100).toFixed(1)}%</span></div>`;
       if (bd.total.omniscience != null) left += `<div class="drill-left-stat"><span class="drill-left-label">Omniscience</span><span class="drill-left-value">${bd.total.omniscience.toFixed(1)}</span></div>`;
     }
-    if (bd.pricing_input != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输入价格</span><span class="drill-left-value">$${bd.pricing_input}/M</span></div>`;
-    if (bd.pricing_output != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输出价格</span><span class="drill-left-value">$${bd.pricing_output}/M</span></div>`;
+    if (bd.accuracy != null) left += `<div class="drill-left-stat"><span class="drill-left-label">准确率</span><span class="drill-left-value">${(bd.accuracy * 100).toFixed(1)}%</span></div>`;
+    if (bd.hallucinationRate != null) left += `<div class="drill-left-stat"><span class="drill-left-label">幻觉率</span><span class="drill-left-value">${(bd.hallucinationRate * 100).toFixed(1)}%</span></div>`;
+    if (bd.attemptRate != null) left += `<div class="drill-left-stat"><span class="drill-left-label">作答率</span><span class="drill-left-value">${(bd.attemptRate * 100).toFixed(1)}%</span></div>`;
+    if (bd.criteriaPass != null) left += `<div class="drill-left-stat"><span class="drill-left-label">通过率</span><span class="drill-left-value">${(bd.criteriaPass * 100).toFixed(1)}%</span></div>`;
+    const pin = bd.pricing_input != null ? bd.pricing_input : bd.input_per_1m;
+    const pout = bd.pricing_output != null ? bd.pricing_output : bd.output_per_1m;
+    if (pin != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输入价格</span><span class="drill-left-value">$${pin}/M</span></div>`;
+    if (pout != null) left += `<div class="drill-left-stat"><span class="drill-left-label">输出价格</span><span class="drill-left-value">$${pout}/M</span></div>`;
+    if (bd.cache_input_per_1m != null) left += `<div class="drill-left-stat"><span class="drill-left-label">缓存输入</span><span class="drill-left-value">$${bd.cache_input_per_1m}/M</span></div>`;
+    if (bd.assumption) left += `<div class="drill-left-stat"><span class="drill-left-label">计价假设</span><span class="drill-left-value">${bd.assumption}</span></div>`;
+    if (Array.isArray(bd.items)) left += `<div class="drill-left-stat"><span class="drill-left-label">覆盖评测数</span><span class="drill-left-value">${bd.n_benchmarks != null ? bd.n_benchmarks : bd.items.length} 项（取中位）</span></div>`;
   }
   left += '</div>';
 
@@ -2212,12 +3064,14 @@ function renderDrilldownHTML(item, benchKey) {
     const score = getDimensionScore(modelId, dim.key);
     const rank = getDimensionRank(modelId, dim.key);
     const hasData = hasDimensionData(dim.key);
+    const cov = getDimensionCoverage(modelId, dim.key);
     const row = idx < 2 ? 1 : 2;  // 第1行 or 第2行
     const isRow1Expanded = state._drillExpandedRow !== 2;  // 默认第1行展开
     const isExpanded = (row === 1 && isRow1Expanded) || (row === 2 && !isRow1Expanded);
     middle += `<div class="dim-card ${isExpanded ? 'expanded' : ''}" data-dim="${dim.key}" data-row="${row}">`;
     middle += `<div class="dim-card-head"><span class="dim-card-name">${dim.name}</span><span class="dim-card-rank">${hasData ? 'No.' + (rank || '—') : '无数据'}</span></div>`;
     middle += `<div class="dim-card-score">${score != null ? score.toFixed(1) : '—'}${dim.key === 'cost' && score === 0 ? '<span class="cost-zero-badge">最贵</span>' : ''}</div>`;
+    if (score != null && cov && cov.sources) middle += `<div class="dim-card-cov">覆盖 ${cov.covered}/${cov.sources} 个数据源</div>`;
     middle += `<div class="dim-card-expand">`;
     if (hasData) {
       const benches = getBenchmarksByDimension(dim.key);
@@ -2226,10 +3080,16 @@ function renderDrilldownHTML(item, benchKey) {
         const bItem = bRanking.find(r => r.model_id === modelId);
         const bScore = bItem ? bItem.score_raw : null;
         const bRank = bItem ? bItem.rank : null;
+        const bMeta = (DATA.benchmark_meta || {})[b] || {};
+        const bUrl = bItem && bItem.source_url ? bItem.source_url : bMeta.source_url;
+        const bDate = bItem ? entryDate(bItem) : null;
         const scoreDisplay = isCostBench(b) ? formatCost(bScore) : formatScore(bScore);
-        middle += `<div class="dim-sub-item" data-bench="${b}" data-dim="${dim.key}">
-          <span class="dim-sub-name">${BENCH_CN[b] || b}</span>
-          <span><span class="dim-sub-score">${scoreDisplay}</span> <span class="dim-sub-rank">No.${bRank || '—'}</span></span>
+        middle += `<div class="dim-sub-item" data-bench="${b}" data-dim="${dim.key}" data-tooltip="${benchTooltip(b).replace(/"/g, '&quot;')}">
+          <span class="dim-sub-name">${benchLabel(b)}${bScore == null ? '' : benchStatusBadge(b, 'inline')}</span>
+          <span class="dim-sub-meta">
+            <span><span class="dim-sub-score">${scoreDisplay}</span> <span class="dim-sub-rank">No.${bRank || '—'}</span></span>
+            <span class="dim-sub-src">${bDate ? bDate : '—'}${bUrl && bScore != null ? ' · <a href="' + bUrl + '" target="_blank" rel="noopener">源</a>' : ''}</span>
+          </span>
         </div>`;
       });
     } else {
@@ -2247,8 +3107,8 @@ function renderDrilldownHTML(item, benchKey) {
   let right = '<div class="drill-right">';
   right += '<div class="radar-chart" id="radar-chart"></div>';
   const compScore = getCompositeScore(modelId);
-  const compRank = getCompositeRank(modelId);
-  right += `<div class="composite-box"><div class="composite-score">${compScore != null ? compScore.toFixed(1) : '—'}</div><div class="composite-rank">综合排名 No.${compRank || '—'}</div></div>`;
+  const compRank = getCompositeRankLabel(modelId);
+  right += `<div class="composite-box"><div class="composite-score">${compScore != null ? compScore.toFixed(1) : '—'}</div><div class="composite-rank">${compRank ? '综合排名 No.' + compRank : '参照模型 · 不占综合名次'}</div></div>`;
   // Reasoning level comparison
   const reasoningLevels = getReasoningLevels(modelId, benchKey);
   if (reasoningLevels.length > 1) {
@@ -2288,6 +3148,7 @@ function bindDrilldownEvents() {
   });
   main.querySelectorAll('.dim-sub-item').forEach(item => {
     item.addEventListener('click', (e) => {
+      if (e.target.closest('.dim-sub-src a')) return; // 点出处链接不切维度
       e.stopPropagation();
       const bench = item.dataset.bench;
       const dim = item.dataset.dim;
@@ -2297,6 +3158,13 @@ function bindDrilldownEvents() {
       renderDimensionNav();
       renderCurrentView();
     });
+  });
+  main.querySelectorAll('.dim-sub-src a, .drill-left-stat a').forEach(a => {
+    a.addEventListener('click', e => e.stopPropagation());
+  });
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
   });
 }
 
@@ -2342,8 +3210,10 @@ function renderMatrixView() {
       return _matrixSort.desc ? bItem.score_raw - aItem.score_raw : aItem.score_raw - bItem.score_raw;
     });
   } else {
-    // 默认排序：有综合分的排前面，无数据的排后面
+    // 默认排序：in_scope 在前，其次按综合分，无数据的排后面
     models.sort((a, b) => {
+      const aRef = !isInScope(a), bRef = !isInScope(b);
+      if (aRef !== bRef) return aRef ? 1 : -1;
       const aScore = getCompositeScore(a);
       const bScore = getCompositeScore(b);
       const aHas = aScore != null;
@@ -2361,7 +3231,9 @@ function renderMatrixView() {
     if (scores.length > 0) colStats[b] = { max: Math.max(...scores), min: Math.min(...scores) };
   });
 
-  let html = '<div class="matrix-view"><div class="matrix-table"><div class="matrix-grid" style="grid-template-columns: 120px repeat(' + allBenches.length + ', minmax(50px, 1fr));">';
+  let html = '<div class="matrix-view">';
+  html += `<div class="view-source-line">矩阵总览：每列一个 benchmark 数据源，${snapshotDate() ? 'AA 快照 ' + snapshotDate() + ' · ' : ''}共 ${allBenches.length} 个数据源 / ${models.length} 个模型（含参照模型，标「参照」者为九家范围外）</div>`;
+  html += '<div class="matrix-table"><div class="matrix-grid" style="grid-template-columns: 120px repeat(' + allBenches.length + ', minmax(50px, 1fr));">';
 
   // Dimension header row
   html += '<div class="matrix-row"><div class="matrix-row-label"></div>';
@@ -2370,30 +3242,19 @@ function renderMatrixView() {
   });
   html += '</div>';
 
-  // Benchmark header row — 长名称拆两行压缩列宽
+  // Benchmark header row — 短名自动折行压缩列宽
   html += '<div class="matrix-row"><div class="matrix-row-label">模型</div>';
   allBenches.forEach(b => {
-    const name = BENCH_CN[b] || b;
-    const meta = (DATA && DATA.benchmark_meta && DATA.benchmark_meta[b]) || {};
-    const desc = meta.description || '';
-    const splitMap = {
-      '综合知识':'综合<br>知识','研究生问答':'研究生<br>问答','人类终极考试':'人类<br>终极',
-      '数学2025':'数学<br>2025','数学(历史)':'数学<br>(历史)',
-      'Agent Elo':'Agent<br>ELO','Agent归一化':'Agent<br>归一化','指令遵循':'指令<br>遵循',
-      'Agent指数':'Agent<br>指数','终端Hard':'终端<br>Hard','科学编程':'科学<br>编程',
-      '实时编程':'实时<br>编程','编程指数':'编程<br>指数','实际消耗':'实际<br>消耗',
-      '定价参考':'定价<br>参考'
-    };
-    const displayName = splitMap[name] || name;
-    html += `<div class="matrix-bench-header" data-bench="${b}" data-tooltip="${desc.replace(/"/g, '&quot;')}" style="cursor:pointer">${displayName}</div>`;
+    html += `<div class="matrix-bench-header" data-bench="${b}" data-tooltip="${benchTooltip(b).replace(/"/g, '&quot;')}" style="cursor:pointer">${wrapBenchLabel(benchLabel(b))}${benchStatus(b) ? '<span class="src-badge inline">' + benchStatus(b) + '</span>' : ''}</div>`;
   });
   html += '</div>';
 
-  // Model rows
+  // Model rows（矩阵总览保留全部模型，参照模型灰显并标注）
   models.forEach(modelId => {
     const model = getModel(modelId);
+    const isRef = !isInScope(modelId);
     html += '<div class="matrix-row">';
-    html += `<div class="matrix-row-label">${model.display_name || modelId}</div>`;
+    html += `<div class="matrix-row-label${isRef ? ' is-reference' : ''}" data-tooltip="${isRef ? '参照 · 不在九家范围' : ''}">${model.display_name || modelId}${isRef ? ' <span class="src-badge inline">参照</span>' : ''}</div>`;
     allBenches.forEach(b => {
       const ranking = getBenchRanking(b);
       const item = ranking.find(r => r.model_id === modelId);
@@ -2407,9 +3268,9 @@ function renderMatrixView() {
           heatPct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
         }
         const scoreDisplay = isCostBench(b) ? formatCost(item.score_raw) : formatScore(item.score_raw);
-        html += `<div class="matrix-cell heatmap" data-model="${modelId}" data-bench="${b}" style="cursor:pointer;--heat-pct:${heatPct}%">${scoreDisplay}</div>`;
+        html += `<div class="matrix-cell heatmap${isRef ? ' is-reference' : ''}" data-model="${modelId}" data-bench="${b}" data-tooltip="${(entryDate(item) ? entryDate(item) + ' · ' : '') + (item.source_url || benchSourceUrl(b))}" style="cursor:pointer;--heat-pct:${heatPct}%">${scoreDisplay}</div>`;
       } else {
-        html += `<div class="matrix-cell empty" data-model="${modelId}" data-bench="${b}">—</div>`;
+        html += `<div class="matrix-cell empty${isRef ? ' is-reference' : ''}" data-model="${modelId}" data-bench="${b}">—</div>`;
       }
     });
     html += '</div>';
@@ -2463,7 +3324,7 @@ function renderMatrixView() {
     cell.addEventListener('click', () => {
       const modelId = cell.dataset.model;
       const bench = cell.dataset.bench;
-      const dim = DIMENSIONS.find(d => BENCH_GROUPS[d.key].benches.includes(bench));
+      const dim = DIMENSIONS.find(d => (BENCH_GROUPS[d.key] || []).indexOf(bench) >= 0);
       if (dim) {
         state.activeDimension = dim.key;
         state.activeBench = bench;
@@ -2546,7 +3407,7 @@ function renderCompareView() {
       benches.forEach(b => {
         const benchW = state.benchWeights?.[b] ?? (1 / benches.length);
         const benchPct = Math.round(benchW * 100);
-        const benchName = BENCH_CN[b] || b;
+        const benchName = benchLabel(b);
         html += `<div class="sub-dim-item">
           <span class="sub-dim-label">${benchName}</span>
           <input type="range" class="sub-dim-slider" min="0" max="100" value="${benchPct}" data-bench="${b}" data-parent-dim="${dim.key}">
@@ -2562,14 +3423,17 @@ function renderCompareView() {
   html += '</div></div>';
 
   // Compare table with sorted models
+  _compareColumns = sortedModels.map(m => m.id);
+  html += `<div class="view-source-line">对比口径：${dimBenches.reduce((s, db) => s + db.benches.length, 0)} 个数据源${snapshotDate() ? ' · AA 快照 ' + snapshotDate() : ''} · 缺失维度按对比池内最低分填充</div>`;
   html += '<table class="compare-table"><thead><tr><th>评测</th>';
   sortedModels.forEach((m, idx) => {
     const compScore = compareScores[m.id]?.score;
     const rankLabel = compScore != null ? `<span style="color:var(--accent);font-weight:600">No.${idx + 1}</span>` : '';
+    const refBadge = isInScope(m.id) ? '' : '<br><span style="font-size:9px;color:var(--text-tertiary);font-weight:normal">参照 · 不在九家范围</span>';
     const missingBadge = compareScores[m.id]?.missingDims?.length > 0
       ? `<br><span style="font-size:9px;color:var(--text-tertiary);font-weight:normal">⚠ 缺 ${compareScores[m.id].missingDims.length} 维</span>`
       : '';
-    html += `<th class="compare-col-header">${rankLabel}<br>${m.display_name}${missingBadge}<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);font-weight:normal">${m.id}</span></th>`;
+    html += `<th class="compare-col-header">${rankLabel}<br>${m.display_name}${refBadge}${missingBadge}<br><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);font-weight:normal">${m.id}</span></th>`;
   });
   html += '</tr></thead><tbody>';
 
@@ -2591,8 +3455,8 @@ function renderCompareView() {
       }
       // Add tooltip for benchmark description
       const meta = DATA.benchmark_meta[b] || {};
-      const tooltipText = meta.description || meta.full_name || BENCH_CN[b] || b;
-      html += `<tr><td class="compare-row-label" data-tooltip="${tooltipText.replace(/"/g, '&quot;')}">${BENCH_CN[b] || b}</td>`;
+      const tooltipText = benchTooltip(b) + (meta.source ? ' · 来源 ' + meta.source : '') + (snapshotDate() ? ' · AA 快照 ' + snapshotDate() : '');
+      html += `<tr data-bench="${b}"><td class="compare-row-label" data-tooltip="${tooltipText.replace(/"/g, '&quot;')}">${benchLabel(b)}${benchStatus(b) ? '<span class="src-badge inline">' + benchStatus(b) + '</span>' : ''}</td>`;
       values.forEach((v, i) => {
         const scoreDisplay = v == null ? '<span class="compare-empty">—</span>' : (isCost ? formatCost(v) : formatScore(v));
         const bestClass = i === bestIdx ? ' compare-best' : '';
@@ -2603,7 +3467,7 @@ function renderCompareView() {
   });
 
   // Composite score row
-  html += `<tr><td class="compare-row-label" style="font-weight:600;color:var(--accent)">综合指数</td>`;
+  html += `<tr data-role="composite"><td class="compare-row-label" style="font-weight:600;color:var(--accent)">综合指数</td>`;
   const compScores = sortedModels.map(m => compareScores[m.id]?.score);
   const validComp = compScores.filter(s => s != null);
   let bestComp = -1;
@@ -2782,6 +3646,12 @@ function renderCompareView() {
       slider.closest('.sub-dim-item').querySelector('.sub-dim-value').textContent = Math.round(val * 100) + '%';
 
       invalidateCache();
+      updateCompareTableOnly();
+    });
+
+    // 松手后重建（列顺序、缺失说明按新权重重排）
+    slider.addEventListener('change', () => {
+      invalidateCache();
       renderCompareView();
     });
   });
@@ -2790,7 +3660,7 @@ function renderCompareView() {
   const resetBtn = document.getElementById('reset-weights');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      state.weights = { factual: 0.25, workflow: 0.25, engineering: 0.20, cost: 0.15, preference: 0.15 };
+      state.weights = defaultWeights();
       state.activeScheme = null;
       invalidateCache();
       renderCompareView();
@@ -2896,7 +3766,7 @@ function renderSchemesView() {
           benches.forEach(b => {
             const benchW = scheme.benchWeights?.[b] ?? (1 / benches.length);
             const benchPct = Math.round(benchW * 100);
-            const benchName = BENCH_CN[b] || b;
+            const benchName = benchLabel(b);
             html += `<div class="sub-dim-item">
               <span class="sub-dim-label">${benchName}</span>
               <input type="range" class="sub-dim-slider" min="0" max="100" value="${benchPct}" data-bench="${b}" data-parent-dim="${dim.key}" data-scheme-id="${scheme.id}">
@@ -3103,6 +3973,175 @@ function renderSchemesView() {
   });
 }
 
+// ===== 数据说明 VIEW =====
+function renderDocsView() {
+  const main = document.getElementById('main');
+  document.getElementById('dimension-nav').style.display = 'none';
+  if (!DATA) return;
+
+  const md = DATA.metadata || {};
+  const pv = DATA.provenance || {};
+  const cfg = DATA.config || {};
+  const models = Object.keys(DATA.models || {});
+  const coreCount = models.filter(id => isInScope(id)).length;
+  const refCount = models.length - coreCount;
+  const benchKeys = Object.keys(DATA.benchmarks || {});
+  const evalCount = benchKeys.reduce((s, k) => s + ((DATA.benchmarks[k] || []).length), 0);
+  const link = (url, text) => url
+    ? `<a class="doc-link" href="${url}" target="_blank" rel="noopener">${text || url}</a>`
+    : `<span class="doc-empty">—</span>`;
+  const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  let html = '<div class="docs-view">';
+
+  // 1. 时间口径
+  html += '<section class="doc-card"><div class="doc-card-title">数据时间口径</div>';
+  html += '<div class="doc-kv-grid">';
+  html += `<div class="doc-kv"><span class="doc-k-label">数据截止快照日</span><span class="doc-k-value mono">${esc(md.snapshot_date || '未标注')}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">采集时刻 (UTC)</span><span class="doc-k-value mono">${esc(md.collected_at || '未标注')}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">导出时刻</span><span class="doc-k-value mono">${esc(md.exported_at || '未标注')}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">schema 版本</span><span class="doc-k-value mono">${esc(md.schema_version != null ? md.schema_version : '未标注')}</span></div>`;
+  html += '</div>';
+  html += `<div class="doc-note">全站数值均标注为「${esc(md.snapshot_date || 'AA 快照')} 快照」，不是模型评测执行日期；理由见下方「日期口径说明」。</div>`;
+  html += '</section>';
+
+  // 2. 快照版本轨迹
+  html += '<section class="doc-card wide"><div class="doc-card-title">快照版本轨迹 <span class="doc-card-sub">metadata.snapshots</span></div>';
+  if (Array.isArray(md.snapshots) && md.snapshots.length > 0) {
+    html += '<table class="doc-table"><thead><tr><th>快照日</th><th>模型档位</th><th>评测数</th><th>采集时刻</th><th>页面指纹</th><th>备注</th></tr></thead><tbody>';
+    md.snapshots.forEach(s => {
+      html += `<tr>
+        <td class="mono">${esc(s.snapshot_date)}</td>
+        <td class="mono">${esc(s.model_count)}</td>
+        <td class="mono">${esc(s.eval_count)}</td>
+        <td class="mono">${esc(s.collected_at)}</td>
+        <td class="mono doc-sha" data-tooltip="${esc(s.html_sha256 || '缺失')}">${esc(s.html_sha256 ? String(s.html_sha256).slice(0, 8) : '—')}</td>
+        <td class="doc-notes" data-tooltip="${esc(s.notes || '')}">${esc(s.notes || '')}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    const cur = md.snapshots.find(s => s.snapshot_date === md.snapshot_date) || md.snapshots[0];
+    const curRaw = (md.raw_eval_count != null) ? md.raw_eval_count : md.eval_count;
+    if (cur && cur.eval_count !== curRaw) {
+      html += `<div class="doc-note">⚠️ 本批快照记为 <span class="mono">${esc(cur.eval_count)}</span> 条原始评测，但 data.json 实际含 <span class="mono">${esc(curRaw)}</span> 条 AA 原始数值，两者不一致，请重跑 scripts/collect_aa_v3.py 与导出器。</div>`;
+    } else if (md.derived_eval_count) {
+      html += `<div class="doc-note">「模型档位」与「评测数」只统计 AA 原始数值（本批 <span class="mono">${esc(curRaw)}</span> 条）；另有 <span class="mono">${esc(md.derived_eval_count)}</span> 条本站派生指标（整轮评测消耗、混合单价），不计入源指纹可核验范围。</div>`;
+    }
+  } else {
+    html += '<div class="doc-empty">metadata.snapshots 缺失，无版本轨迹</div>';
+  }
+  html += '</section>';
+
+  // 3. 来源
+  html += '<section class="doc-card"><div class="doc-card-title">数据来源</div><ul class="doc-list">';
+  html += `<li>榜单页面：${link(pv.leaderboard_url, pv.leaderboard_url ? 'artificialanalysis.ai/evaluations/omniscience' : '未提供')}</li>`;
+  html += `<li>官方题库：${link(pv.dataset_url, pv.dataset_url ? 'AA-Omniscience-Public (HuggingFace)' : '未提供')}</li>`;
+  html += `<li>论文：${link(pv.paper_url, pv.paper_url ? 'arXiv 技术报告' : '未提供')}</li>`;
+  html += `<li>授权：${esc(pv.license || '未声明')}</li>`;
+  if (md.source_url) html += `<li>本次采集入口：${link(md.source_url, md.source_url)}</li>`;
+  html += '</ul></section>';
+
+  // 4. 诚实声明
+  if (pv.caveat) {
+    html += '<section class="doc-card"><div class="doc-card-title">日期与口径声明 <span class="doc-card-sub">provenance.caveat</span></div>';
+    html += `<div class="doc-caveat">${esc(pv.caveat)}</div></section>`;
+  }
+
+  // 5. date_semantics 定义列表
+  if (pv.date_semantics && typeof pv.date_semantics === 'object') {
+    html += '<section class="doc-card"><div class="doc-card-title">字段语义 <span class="doc-card-sub">provenance.date_semantics</span></div><dl class="doc-dl">';
+    Object.keys(pv.date_semantics).forEach(k => {
+      html += `<dt class="mono">${esc(k)}</dt><dd>${esc(pv.date_semantics[k])}</dd>`;
+    });
+    html += '</dl></section>';
+  }
+
+  // 6. 页面指纹
+  html += '<section class="doc-card"><div class="doc-card-title">采集页面指纹</div>';
+  html += `<div class="doc-sha-full mono">${esc(md.html_sha256 || '未记录')}</div>`;
+  html += '<div class="doc-note">该 SHA-256 是本次抓取到的榜单 HTML 原文指纹：同一指纹对应同一批数值，指纹变化即说明源页面已改版，快照表中每一行都可回溯到自己的指纹。</div>';
+  html += '</section>';
+
+  // 7. 当前生效的权重与预设
+  html += '<section class="doc-card"><div class="doc-card-title">当前生效权重</div>';
+  const sum = DIMENSIONS.reduce((s, d) => s + (state.weights[d.key] || 0), 0);
+  html += '<div class="doc-weights">';
+  DIMENSIONS.forEach(dim => {
+    const w = (state.weights[dim.key] || 0);
+    html += `<div class="doc-weight"><span class="doc-weight-name">${esc(dim.name)}</span>
+      <span class="doc-weight-bar"><span class="doc-weight-fill" style="width:${Math.min(100, w * 100).toFixed(0)}%"></span></span>
+      <span class="doc-weight-val mono">${(w * 100).toFixed(0)}%</span></div>`;
+  });
+  html += '</div>';
+  html += `<div class="doc-note">合计 ${(sum * 100).toFixed(0)}%；权重来自 config.weights，调整后（对比视图滑块 / 我的方案）此表同步反映当前口径。</div>`;
+  if (cfg.weights_no_preference) {
+    html += `<div class="doc-note">无人类偏好数据时的口径 config.weights_no_preference：<span class="mono">${
+      DIMENSIONS.map(d => esc(d.name) + ' ' + (((cfg.weights_no_preference[d.key] || 0) * 100).toFixed(0)) + '%').join(' · ')
+    }</span></div>`;
+  }
+  if (cfg.presets && Object.keys(cfg.presets).length > 0) {
+    html += '<div class="doc-card-sub2">可选预设（config.presets）</div><div class="doc-preset-list">';
+    Object.keys(cfg.presets).forEach(name => {
+      const p = cfg.presets[name] || {};
+      const active = DIMENSIONS.every(d => Math.abs((state.weights[d.key] || 0) - ((p.weights || {})[d.key] || 0)) < 1e-6);
+      html += `<div class="doc-preset${active ? ' active' : ''}">
+        <div class="doc-preset-name">${esc(name)}${active ? ' <span class="src-badge inline">生效中</span>' : ''}</div>
+        <div class="doc-preset-desc">${esc(p.description || '')}</div>
+        <div class="doc-preset-w mono">${DIMENSIONS.map(d => esc(d.name) + ' ' + (((p.weights || {})[d.key] || 0) * 100).toFixed(0) + '%').join(' · ')}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  html += '</section>';
+
+  // 8. 归一化与覆盖口径
+  html += '<section class="doc-card"><div class="doc-card-title">归一化与缺失值口径 <span class="doc-card-sub">config.normalization</span></div>';
+  html += '<ul class="doc-list">';
+  html += `<li>方法：<span class="mono">${esc(NORMALIZATION.method || 'min-max')}</span>，输出区间 <span class="mono">${esc(NORMALIZATION.min_score)}–${esc(NORMALIZATION.max_score)}</span>，成本维度${NORMALIZATION.cost_reverse === false ? '不' : ''}反向计分</li>`;
+  const mv = NORMALIZATION.missing_value || {};
+  html += `<li>缺失值策略：<span class="mono">${esc(mv.strategy || '未声明')}</span>；覆盖率惩罚 ${mv.coverage_penalty === false ? '关闭' : '开启'}；最低覆盖率 <span class="mono">${esc(mv.min_coverage_ratio != null ? (mv.min_coverage_ratio * 100).toFixed(0) + '%' : '未设定')}</span></li>`;
+  html += `<li>只有 ≥2 个不同取值的数据源才参与归一化：单点数据源没有区分度，既不给满分也不给中位分</li>`;
+  if (NORMALIZATION.negative_cap && NORMALIZATION.negative_cap.enabled) {
+    html += `<li>负值处理：${esc(NORMALIZATION.negative_cap.note || 'index 型数据允许为负，强制走 min-max，不用比值法')}（下限 <span class="mono">${esc(NORMALIZATION.negative_cap.floor)}</span>）</li>`;
+  }
+  html += '</ul>';
+  html += '<div class="doc-card-sub2">维度构成（config.dimensions / bench_groups）</div>';
+  html += '<table class="doc-table"><thead><tr><th>维度</th><th>权重</th><th>说明</th><th>数据源</th></tr></thead><tbody>';
+  DIMENSIONS.forEach(dim => {
+    const all = BENCH_GROUPS[dim.key] || [];
+    const withData = getBenchmarksByDimension(dim.key);
+    html += `<tr><td>${esc(dim.name)}</td><td class="mono">${(((state.weights[dim.key] || 0)) * 100).toFixed(0)}%</td>
+      <td class="doc-notes" data-tooltip="${esc(dim.desc)}">${esc(dim.desc)}</td>
+      <td class="mono">${withData.length}/${all.length}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  const thin = Object.keys(DATA.benchmark_meta || {}).filter(k => benchStatus(k));
+  if (thin.length > 0) {
+    html += `<div class="doc-note">薄数据源（status ≠ production）：${thin.map(k => `${esc(benchLabel(k))}(${esc(benchStatus(k) || DATA.benchmark_meta[k].status)})`).join('、')}。这些源仍显示在榜单里，但会带状态徽标。</div>`;
+  }
+  html += '</section>';
+
+  // 9. 计数
+  html += '<section class="doc-card"><div class="doc-card-title">规模计数</div><div class="doc-kv-grid">';
+  html += `<div class="doc-kv"><span class="doc-k-label">core 模型数</span><span class="doc-k-value mono">${md.core_model_count != null ? esc(md.core_model_count) : coreCount}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">参照模型数</span><span class="doc-k-value mono">${md.reference_model_count != null ? esc(md.reference_model_count) : refCount}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">benchmark 数</span><span class="doc-k-value mono">${md.benchmark_count != null ? esc(md.benchmark_count) : benchKeys.length}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">评测条数</span><span class="doc-k-value mono">${md.eval_count != null ? esc(md.eval_count) : evalCount}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">模型条目数</span><span class="doc-k-value mono">${md.model_entry_count != null ? esc(md.model_entry_count) : '—'}</span></div>`;
+  html += `<div class="doc-kv"><span class="doc-k-label">数据源元信息数</span><span class="doc-k-value mono">${Object.keys(DATA.benchmark_meta || {}).length}</span></div>`;
+  html += '</div>';
+  html += `<div class="doc-note">「模型条目数」= 模型 × 推理档位，同一模型的 max / high / xhigh 各算一条，因此会大于模型数；「数据源元信息数」含尚无数据的占位源。</div>`;
+  html += '</section>';
+
+  html += '</div>';
+  main.innerHTML = html;
+
+  main.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.addEventListener('mouseenter', showTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
 // ===== FILTERS =====
 function renderProviderChips() {
   const container = document.getElementById('provider-chips');
@@ -3179,12 +4218,21 @@ function applyFilters(item) {
 // ===== STATS =====
 function updateStats() {
   if (!DATA) return;
-  document.getElementById('stat-models').textContent = Object.keys(DATA.models).length;
-  document.getElementById('stat-benchmarks').textContent = Object.keys(DATA.benchmark_meta).length;
-  let obsCount = 0;
-  Object.values(DATA.benchmarks).forEach(arr => { obsCount += arr.length; });
-  document.getElementById('stat-obs').textContent = obsCount;
-  document.getElementById('stat-dims').textContent = '5';
+  const md = DATA.metadata || {};
+  const benchKeys = Object.keys(DATA.benchmarks || {});
+  const evalCount = benchKeys.reduce((s, k) => s + ((DATA.benchmarks[k] || []).length), 0);
+  const coreCount = Object.keys(DATA.models || {}).filter(id => isInScope(id)).length;
+  setText('stat-models', md.model_count != null ? md.model_count : Object.keys(DATA.models || {}).length);
+  setText('stat-core-models', coreCount);
+  setText('stat-benchmarks', md.benchmark_count != null ? md.benchmark_count : benchKeys.length);
+  setText('stat-obs', md.eval_count != null ? md.eval_count : evalCount);
+  setText('stat-dims', DIMENSIONS.length);
+  setText('stat-snapshot', snapshotDate() || '未标注');
+}
+
+function setText(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = v;
 }
 
 // ===== MAIN RENDER =====
@@ -3194,12 +4242,16 @@ function renderCurrentView() {
   if (state.view === 'ranking') {
     nav.style.display = '';
     renderRankingView();
+  } else if (state.view === 'board') {
+    renderBoardView();
   } else if (state.view === 'matrix') {
     renderMatrixView();
   } else if (state.view === 'compare') {
     renderCompareView();
   } else if (state.view === 'schemes') {
     renderSchemesView();
+  } else if (state.view === 'docs') {
+    renderDocsView();
   }
 }
 
@@ -3207,6 +4259,18 @@ function renderCurrentView() {
 function renderRadar(modelId) {
   const container = document.getElementById('radar-chart');
   if (!container) return;
+  // echarts 走 CDN：离线/被墙时降级为文字版维度条，不让整个钻取面板报错
+  if (typeof echarts === 'undefined' || !echarts || typeof echarts.init !== 'function') {
+    if (radarChart) { radarChart.dispose(); radarChart = null; }
+    container.innerHTML = '<div class="radar-fallback">' + DIMENSIONS.map(dim => {
+      const score = getDimensionScore(modelId, dim.key);
+      const pct = score != null ? Math.max(0, Math.min(100, score)) : 0;
+      return `<div class="radar-fallback-row"><span>${dim.name}</span>
+        <span class="radar-fallback-bar"><span style="width:${pct}%"></span></span>
+        <span class="mono">${score != null ? score.toFixed(1) : '—'}</span></div>`;
+    }).join('') + '<div class="radar-fallback-note">雷达图需加载 echarts CDN，当前不可用</div></div>';
+    return;
+  }
   if (radarChart) radarChart.dispose();
   radarChart = echarts.init(container);
 
@@ -3299,12 +4363,57 @@ function clearCompare() {
   renderCurrentView();
 }
 
+// 权重滑块拖动中：只改写表格里的数值与高亮，不重建权重面板（列顺序在松手 change 后重建）
+function updateCompareTableOnly() {
+  const main = document.getElementById('main');
+  const table = main.querySelector('.compare-table');
+  const colIds = _compareColumns;
+  if (!table || !colIds || colIds.length === 0) return;
+  const scores = getCompareCompositeScore(colIds);
+
+  table.querySelectorAll('tr[data-bench]').forEach(tr => {
+    const b = tr.dataset.bench;
+    const isCost = isCostBench(b);
+    const ranking = getBenchRanking(b);
+    const vals = colIds.map(id => {
+      const hit = ranking.find(r => r.model_id === id);
+      return hit ? hit.score_raw : null;
+    });
+    const valid = vals.filter(v => v != null);
+    let bestIdx = -1;
+    if (valid.length > 0) {
+      const best = isCost ? Math.min(...valid) : Math.max(...valid);
+      bestIdx = vals.indexOf(best);
+    }
+    Array.from(tr.children).slice(1).forEach((td, i) => {
+      const v = vals[i];
+      td.innerHTML = v == null ? '<span class="compare-empty">—</span>' : (isCost ? formatCost(v) : formatScore(v));
+      td.classList.toggle('compare-best', i === bestIdx);
+    });
+  });
+
+  const compRow = table.querySelector('tr[data-role="composite"]');
+  if (compRow) {
+    const cs = colIds.map(id => (scores[id] ? scores[id].score : null));
+    const valid = cs.filter(v => v != null);
+    let bestIdx = -1;
+    if (valid.length > 0) bestIdx = cs.indexOf(Math.max(...valid));
+    Array.from(compRow.children).slice(1).forEach((td, i) => {
+      const v = cs[i];
+      td.innerHTML = v == null ? '<span class="compare-empty">—</span>' : v.toFixed(1);
+      td.classList.toggle('compare-best', i === bestIdx);
+    });
+  }
+}
+
 // ===== INIT =====
 async function initApp() {
   try {
     const response = await fetch('data.json');
     if (!response.ok) throw new Error('HTTP ' + response.status);
     DATA = await response.json();
+    // 先注入 config，再算缓存：常量/权重/归一化口径全部以 data.json 为准
+    hydrateConfig();
   } catch (err) {
     document.getElementById('main').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">数据加载失败，请通过 HTTP 服务器访问（如 python -m http.server）</div></div>';
     return;
@@ -3314,9 +4423,13 @@ async function initApp() {
   _dimScoresCache = computeDimScores();
   _dimRankCache = computeDimRanks();
 
-  // Set default active bench
-  const factualBenches = getBenchmarksByDimension('factual');
-  state.activeBench = factualBenches.length > 0 ? factualBenches[0] : null;
+  // Set default active bench（取第一个有数据的维度，不写死 factual）
+  const firstDim = DIMENSIONS.find(d => hasDimensionData(d.key)) || DIMENSIONS[0];
+  if (firstDim) {
+    state.activeDimension = firstDim.key;
+    const benches = getBenchmarksByDimension(firstDim.key);
+    state.activeBench = benches.length > 0 ? benches[0] : null;
+  }
 
   // Restore theme
   const savedTheme = localStorage.getItem('llm-index-theme');

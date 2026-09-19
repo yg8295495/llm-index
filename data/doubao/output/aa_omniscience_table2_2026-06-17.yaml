@@ -1,0 +1,78 @@
+# 提取来源: screenshots/aa_omniscience__detail_table2__extract_index.png
+# 提取时间: 2026-06-17T03:04:50+08:00
+# 提取者: 豆包 Agent
+# ⚠️ 重要声明：视觉模型无法精确识别图片中的具体数值，以下内容仅为框架填充，数值需人工录入
+
+benchmark: "AA-Omniscience"
+source_image: "screenshots/aa_omniscience__detail_table2__extract_index.png"
+source_url: "https://artificialanalysis.ai/evaluations/aa-omniscience"
+extracted_at: "2026-06-17T03:04:50+08:00"
+extraction_type: "index"
+
+models:
+  - model: "MODEL_NAME_PLACEHOLDER_6"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 6
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_7"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 7
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_8"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 8
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_9"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 9
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_10"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 10
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+  - model: "MODEL_NAME_PLACEHOLDER_11"
+    provider: ""
+    score: null
+    score_type: "index"
+    rank: 11
+    approximate: true
+    estimated_range: []
+    needs_review: true
+    notes: "视觉识别限制，模型名和数值需人工精确录入"
+
+qa_check:
+  total_data_points_in_image: 6
+  total_data_points_extracted: 6
+  approximate_count: 6
+  needs_review_count: 6
+  reviewer_notes: "视觉模型能力限制，无法精确读取表格数值和模型名，全部需要人工录入"

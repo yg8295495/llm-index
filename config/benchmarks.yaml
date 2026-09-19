@@ -1,0 +1,554 @@
+# Benchmark Registry v5 — 五维度数据源注册表
+#
+# 更新: 2026-09-20
+# 变更 (相对 v4, 详见 docs/changelog.md):
+#   1. 每个 AA 数据源新增 `aa_key`, 声明它在 AA payload 里的原始字段名。
+#      采集与导出都以本文件为准, 不再在 Python / JS 里各写一份映射。
+#   2. freshness 全部改为如实描述。AA 不提供逐项评测日期, 因此统一为
+#      `snapshot` (快照), 含义是"本批次采集日 AA 页面上的数值", 不假装精确。
+#   3. coverage 用本批次真实计数, 不再沿用 v4 手写的 209。
+#   4. 新增 AA 本批次带分但 v4 未注册的 11 项评测。
+#   5. 声明九家范围外的 tier=reference 模型不参与本表任何维度的综合计算。
+#
+# 字段说明:
+#   aa_key:      AA payload 里的原始字段名 (缺省表示不由 collect_aa_v3 采集)
+#   scale:       raw = 原样入库; 用于前端展示时按 direction 归一化
+#   direction:   higher | lower
+#   tier:        primary | secondary
+#   coverage:    本批次 (2026-09-20) 有非空数值的模型数
+#   confidence:  数据可信度 0-1
+#   status:      production | beta | stale | empty
+
+meta:
+  version: 5
+  updated: "2026-09-20"
+  primary_source: "Artificial Analysis — AA-Omniscience 评测页"
+  model_scope: "九家封闭厂商 (见 config/vendors.yaml tier=core)"
+
+# =========================================================================
+# 数据来源口径 — 前端"数据说明"页与每条分数的标注都引用这里
+# =========================================================================
+provenance:
+  leaderboard_url: "https://artificialanalysis.ai/evaluations/omniscience"
+  dataset_url: "https://huggingface.co/datasets/ArtificialAnalysis/AA-Omniscience-Public"
+  paper_url: "https://arxiv.org/abs/2511.13029"
+  license: "AA-Omniscience-Public 题库为 Apache-2.0; 榜单数值版权归 Artificial Analysis"
+  # 诚实声明: 这三个日期字段含义不同, 不可混用
+  date_semantics:
+    observed_at: "AA 快照日期, 即本条数值所属的 AA 页面批次日"
+    collected_at: "我们从 AA 页面取到该数值的 UTC 时间戳"
+    release_date: "模型发布日期, 来自 AA payload 的 releaseDate (AA 提供)"
+  caveat: >-
+    Artificial Analysis 未在其评测数据中公布逐项 benchmark 的评测执行日期,
+    因此本站所有分数标注为"某日 AA 快照", 不标注虚构的评测日期。
+    官方题库为总题量的 10% 子集 (600/6000 题), 域级/语言级细分不具备统计代表性,
+    本站只使用总分与官方公布的分项指标。
+
+dimensions:
+
+  # =========================================================================
+  # 维度 1: Factual — 事实准确 / 知识储备 / 幻觉控制
+  # =========================================================================
+  factual:
+    name: "事实准确"
+    description: "知识储备 + 幻觉控制 + 专业领域准确性"
+    weight: 0.25
+
+    sources:
+      aa_omniscience:
+        aa_key: omniscience
+        name: "综合知识指数 (AA-Omniscience)"
+        type: index
+        scale: index            # 可为负: 惩罚乱猜后的净得分
+        direction: higher
+        breakdown_key: omniscienceBreakdown   # accuracy / hallucinationRate / attemptRate / byDomain
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.90
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/omniscience"
+        methodology_url: "https://arxiv.org/abs/2511.13029"
+
+      gpqa:
+        aa_key: gpqa
+        name: "研究生问答 (GPQA Diamond)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 29
+        freshness: snapshot
+        confidence: 0.90
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/gpqa"
+
+      hle:
+        aa_key: hle
+        name: "人类终极考试 (Humanity's Last Exam)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/hle"
+
+      aime25:
+        aa_key: aime25
+        name: "数学邀请赛2025 (AIME 2025)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 1
+        freshness: snapshot
+        confidence: 0.85
+        status: stale          # 本批次 AA 仅在 1 个模型上给出, 不足以支撑横向比较
+        source_url: "https://artificialanalysis.ai/evaluations/aime-2025"
+
+      mmlu_pro:
+        aa_key: mmluPro
+        name: "多学科问答 Pro (MMLU-Pro)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 1
+        freshness: snapshot
+        confidence: 0.85
+        status: stale
+        source_url: "https://artificialanalysis.ai/evaluations/mmlu-pro"
+
+      global_mmlu_lite:
+        aa_key: globalMmluLiteScore
+        name: "全球知识 (Global MMLU-Lite)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 1
+        freshness: snapshot
+        confidence: 0.80
+        status: empty
+        source_url: "https://artificialanalysis.ai/evaluations/global-mmlu-lite"
+
+      mmmu_pro:
+        aa_key: mmmuPro
+        name: "多模态学科理解 (MMMU-Pro)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 19
+        freshness: snapshot
+        confidence: 0.80
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/mmmu-pro"
+
+      harvey_lab:
+        aa_key: harveyLab
+        name: "法律实务 (Harvey Lab)"
+        scale: ratio
+        direction: higher
+        breakdown_key: harveyLabBreakdown
+        tier: secondary
+        coverage: 13
+        freshness: snapshot
+        confidence: 0.75
+        status: beta
+        source_url: "https://artificialanalysis.ai/evaluations/harvey-lab"
+
+      critpt:
+        aa_key: critpt
+        name: "反事实陷阱问答 (CritPT)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.75
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/critpt"
+
+      intelligence_index:
+        aa_key: intelligenceIndex
+        name: "AA 智能指数 (Intelligence Index)"
+        scale: index
+        direction: higher
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        note: "AA 自研综合指数, 跨全部评测加权; 本站综合指数与它并列展示但不重复计入"
+
+      # v4 保留但本批次 AA 未提供数值的历史数据源
+      aime:
+        name: "数学邀请赛 (AIME)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 0
+        freshness: snapshot
+        confidence: 0.85
+        status: stale
+
+  # =========================================================================
+  # 维度 2: Workflow — 工作流 / Agent 能力 / 指令遵循
+  # =========================================================================
+  workflow:
+    name: "工作流"
+    description: "Agent 端到端执行 + 指令遵循 + 真实职业任务"
+    weight: 0.25
+
+    sources:
+      gdpval_aa:
+        aa_key: gdpval
+        name: "Agent能力Elo (GDPval-AA)"
+        scale: elo              # 人类基线 1000 的 Elo 尺度
+        direction: higher
+        breakdown_key: gdpvalBreakdown
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/gdpval-aa"
+
+      briefcase:
+        aa_key: briefcaseElo
+        name: "职场任务 Elo (Briefcase)"
+        scale: elo
+        direction: higher
+        breakdown_key: briefcaseBreakdown
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.80
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/briefcase"
+
+      gdp_pdf:
+        aa_key: gdpPdfAllPass
+        name: "专业文档任务 (GDP PDF, all-pass)"
+        scale: ratio
+        direction: higher
+        breakdown_key: gdpPdfBreakdown
+        tier: secondary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.75
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/gdp-pdf"
+
+      automation_bench:
+        aa_key: automationBenchPartialScore
+        name: "自动化任务 (AutomationBench, partial)"
+        scale: ratio
+        direction: higher
+        breakdown_key: automationBenchBreakdown
+        tier: secondary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.75
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/automationbench"
+
+      analyst_agent:
+        aa_key: analystAgent
+        name: "分析师 Agent (Analyst Agent)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 11
+        freshness: snapshot
+        confidence: 0.70
+        status: beta
+        note: "另有 pass@1 / pass@k 两项 (analystAgentPassAt1/PassAtK), 未单独计维度避免重复加权"
+
+      enterprise_ops_gym:
+        aa_key: enterpriseOpsGym
+        name: "企业运营任务 (Enterprise Ops Gym)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 18
+        freshness: snapshot
+        confidence: 0.70
+        status: beta
+
+      itbench_sre:
+        aa_key: itbenchSre
+        name: "IT 运维根因分析 (ITBench SRE)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 5
+        freshness: snapshot
+        confidence: 0.70
+        status: beta
+        note: "官方实现说明见 AA 页面: 基于离线事故快照做 Kubernetes 根因定位"
+
+      apex_agents:
+        aa_key: apexAgents
+        name: "长程 Agent 任务 (APEX Agents)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 4
+        freshness: snapshot
+        confidence: 0.70
+        status: empty
+
+      ifbench:
+        aa_key: ifbench
+        name: "指令遵循 (IFBench)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 7
+        freshness: snapshot
+        confidence: 0.85
+        status: beta           # 本批次仅 7 个模型有值, 覆盖不足
+        source_url: "https://artificialanalysis.ai/evaluations/ifbench"
+
+      tau2_banking:
+        aa_key: tau2
+        name: "银行场景Agent (Tau-2 Banking)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 7
+        freshness: snapshot
+        confidence: 0.80
+        status: beta
+        source_url: "https://artificialanalysis.ai/evaluations/tau2-banking"
+
+      tau_banking:
+        aa_key: tauBanking
+        name: "银行场景Agent旧版 (Tau Banking)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 29
+        freshness: snapshot
+        confidence: 0.70
+        status: production
+        note: "与 tau2_banking 同源不同版本, 只取其一参与加权由前端子权重控制"
+
+      agentic_index:
+        name: "Agent综合指数 (Agentic Index)"
+        type: composite
+        scale: index
+        direction: higher
+        tier: primary
+        coverage: 0
+        freshness: snapshot
+        confidence: 0.80
+        status: stale          # v4 由 AA 提供的合成指数, 本批次 payload 中不存在
+
+  # =========================================================================
+  # 维度 3: Engineering — 工程能力 / 编码
+  # =========================================================================
+  engineering:
+    name: "工程能力"
+    description: "终端操作 + 科学编程 + 实时编程 + 长上下文代码"
+    weight: 0.20
+
+    sources:
+      terminalbench_hard:
+        aa_key: terminalbenchHard
+        name: "终端任务Hard (Terminal-Bench Hard)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 7
+        freshness: snapshot
+        confidence: 0.85
+        status: beta           # 本批次仅 7 个模型有值
+        source_url: "https://artificialanalysis.ai/evaluations/terminalbench-hard"
+        official_url: "https://www.tbench.ai/"
+        note: "v4 用它派生 cost_per_task; v5 改用 canonicalEvalTokenCounts × 定价直接算"
+
+      terminalbench_v2_1:
+        aa_key: terminalBench21
+        name: "终端任务 v2.1 (Terminal-Bench 2.1)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 29
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/terminal-bench"
+
+      terminalbench_v4_0:
+        aa_key: terminalBench40
+        name: "终端任务 v4.0 (Terminal-Bench 4.0)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.80
+        status: production
+        note: "v4 未注册; 0 值需与'未测'区分, 采集时对 0 保留但标 confidence"
+
+      scicode:
+        aa_key: scicode
+        name: "科学编程 (SciCode)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/scicode"
+
+      livecodebench:
+        aa_key: livecodebench
+        name: "实时编程 (LiveCodeBench)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 1
+        freshness: snapshot
+        confidence: 0.80
+        status: stale
+        source_url: "https://artificialanalysis.ai/evaluations/livecodebench"
+
+      lcr:
+        aa_key: lcr
+        name: "长上下文代码检索 (LCR)"
+        scale: ratio
+        direction: higher
+        tier: primary
+        coverage: 31
+        freshness: snapshot
+        confidence: 0.80
+        status: production
+        source_url: "https://artificialanalysis.ai/evaluations/lcr"
+
+      mlcr_overall:
+        aa_key: mlcrOverall
+        name: "多语言长上下文代码 (MLCR, overall)"
+        scale: ratio
+        direction: higher
+        tier: secondary
+        coverage: 22
+        freshness: snapshot
+        confidence: 0.75
+        status: production
+        note: "AA 另给 accuracy/completeness/conciseness 三个分项, 只取 overall 计入维度"
+
+      coding_index:
+        name: "编程综合指数 (Coding Index)"
+        type: composite
+        scale: index
+        direction: higher
+        tier: primary
+        coverage: 0
+        freshness: snapshot
+        confidence: 0.80
+        status: stale
+
+  # =========================================================================
+  # 维度 4: Cost — 使用成本
+  # =========================================================================
+  cost:
+    name: "成本"
+    description: "跑同一评测集的实际消耗 + API 定价"
+    weight: 0.15
+
+    sources:
+      cost_per_task:
+        name: "实际消耗 (Cost per Task)"
+        type: derived
+        scale: usd
+        direction: lower        # 越便宜分越高
+        tier: primary
+        coverage: 30
+        freshness: snapshot
+        confidence: 0.85
+        status: production
+        derived_from:
+          tokens_key: canonicalEvalTokenCounts   # 每评测 input/answer/reasoning token 数
+          price_keys: [price1mInputTokens, price1mOutputTokens, cacheHitPrice]
+        note: >-
+          由 AA payload 的 canonicalEvalTokenCounts 与该模型 API 定价相乘得出,
+          口径为"跑完该评测一次的美元消耗", 比单纯定价更能反映推理型模型的真实成本。
+
+      pricing:
+        name: "定价参考 (API Pricing)"
+        type: api
+        scale: usd
+        direction: lower
+        tier: secondary
+        coverage: 30
+        freshness: snapshot
+        confidence: 0.90
+        status: production
+        derived_from:
+          price_keys: [price1mInputTokens, price1mOutputTokens, cacheHitPrice, cacheWritePrice]
+        unit: "USD / 1M tokens"
+
+  # =========================================================================
+  # 维度 5: Preference — 人类偏好
+  # =========================================================================
+  preference:
+    name: "人类偏好"
+    description: "真实用户盲测偏好 (Chatbot Arena)"
+    weight: 0.15
+
+    sources:
+      lmarena_text:
+        name: "LMArena (Chatbot Arena)"
+        scale: elo
+        direction: higher
+        tier: primary
+        coverage: 0              # 本批次未采集; 库里 69 条属 2026-06-17 快照, 全部为已下架模型
+        freshness: snapshot
+        confidence: 0.95
+        status: empty
+        source_url: "https://lmarena.ai/leaderboard"
+        note: >-
+          本批次无新模型 LMArena 数据, 综合指数按 settings.yaml 的
+          weights_no_preference 自动把这 15% 重新分配给其余四维。
+          补齐该维度需另跑 LMArena 采集, 已列入 docs/changelog.md 待办。
+
+  # =========================================================================
+  # 标签 (不参与评分)
+  # =========================================================================
+  tags:
+    accessibility:
+      name: "可访问性"
+      description: "国内可访问性 / 官方订阅门槛 / 封号风险"
+      scoring: false
+      source: config/accessibility.yaml
+    openness_index:
+      name: "开放度"
+      description: "AA Openness Index, 权重开放/协议友好度"
+      scoring: false
+      aa_key: opennessIndex
+      source_url: "https://artificialanalysis.ai/methodology/openness-index"
+    answer_speed:
+      name: "作答速度"
+      description: "AA 标准化评测下的输出速度"
+      scoring: false
+      aa_key: medianCanonicalAnswerOutputSpeed
+      unit: "tokens/s"
+
+# =========================================================================
+# 模型范围 — 九家封闭厂商 (权威定义在 config/vendors.yaml tier=core)
+# =========================================================================
+model_scope:
+  description: "九家封闭厂商, 数值来自 AA Omniscience 评测页快照"
+  authority: config/vendors.yaml
+  vendors:
+    - openai
+    - anthropic
+    - google
+    - deepseek
+    - zhipu      # AA creator.slug = zai
+    - moonshot   # AA creator.slug = kimi
+    - qwen       # AA creator.slug = alibaba
+    - xiaomi
+    - minimax

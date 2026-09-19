@@ -1,0 +1,85 @@
+# Accessibility 维度数据
+# 来源: 联网调研交叉验证 (2026-06-15)
+# 子指标权重: 国内直连可用性 50%, 封号风险 30%, 服务稳定性 20%
+#
+# 评分说明:
+# - 所有分数 raw 分 0-100, 后续由 normalizer 归一化
+# - "-1" 表示暂无客观数据, 需后续补充
+#
+# stability 说明:
+# - 海外厂商的稳定性指"国内通过中转服务访问的实际可用性", 取决于中转商质量
+# - DeepSeek 已知 2026-05 V4 发布后两次大规模宕机
+# - 其他国内厂商暂无大面积宕机报告, 但缺乏客观 uptime 数据
+
+providers:
+  openai:
+    name: "OpenAI"
+    provider_key: "openai"
+    direct_access: 30    # 需翻墙/中转, 无法直连
+    account_risk: 30     # 2026-06 封禁中国账号群组, 风险较高
+    stability: 50        # 底层稳定, 但国内依赖中转商质量
+    note: "国内无法直连, 必须通过中转服务; 封号风险持续上升"
+
+  anthropic:
+    name: "Anthropic"
+    provider_key: "anthropic"
+    direct_access: 20    # 需翻墙/中转, 2026-06 出口管制进一步收紧
+    account_risk: 10     # 极严重 — Fable5/Mythos5 被美政府限制对华, 此前已有停服记录
+    stability: 30        # 政策风险大, 国内需中转, 稳定性依赖中转商
+    note: "国内无法直连; 2026-06-13 美政府限制 Fable5/Mythos5 对华访问; 此前有过对中资停服"
+
+  google:
+    name: "Google"
+    provider_key: "google"
+    direct_access: 25    # 需翻墙/中转, 无法直连
+    account_risk: 40     # Google Cloud 风控严格, 国内卡难绑, 但非针对性封禁
+    stability: 50        # 底层稳定, 国内依赖中转商质量
+    note: "国内无法直连; Google Cloud 风控严, 国内信用卡常被拒"
+
+  deepseek:
+    name: "DeepSeek"
+    provider_key: "deepseek"
+    direct_access: 95
+    account_risk: 95
+    stability: 50        # 2026-05 V4 发布后两次大规模宕机
+    note: "国内直连可用; 但 V4 发布后用户暴增导致一个月内两次宕机"
+
+  alibaba:
+    name: "Alibaba"
+    provider_key: "qwen"
+    direct_access: 95
+    account_risk: 95
+    stability: 85
+    note: "国内直连; 服务稳定, 持续迭代"
+
+  moonshot:
+    name: "Moonshot (Kimi)"
+    provider_key: "moonshotai"
+    direct_access: 95
+    account_risk: 95
+    stability: 85
+    note: "国内直连; 调用量快速增长但未出现稳定性问题"
+
+  zhipu:
+    name: "Zhipu (GLM)"
+    provider_key: "z-ai"
+    direct_access: 95
+    account_risk: 95
+    stability: 85
+    note: "国内直连; 服务稳定, 长上下文场景表现好"
+
+  minimax:
+    name: "MiniMax"
+    provider_key: "minimax"
+    direct_access: 95
+    account_risk: 95
+    stability: 80
+    note: "国内直连; 服务稳定"
+
+  xiaomi:
+    name: "Xiaomi (MiMo)"
+    provider_key: "xiaomi"
+    direct_access: 95
+    account_risk: 95
+    stability: 75
+    note: "国内直连; 2025年底发布, 相对较新"

@@ -1,0 +1,120 @@
+# 厂商归属表 v1 — 2026-09-20
+#
+# 职责: 把 AA 页面里 creator.slug 的原始归属, 映射成本项目的厂商命名空间。
+#       这是"模型属于哪家厂商"的唯一权威。
+#
+# 为什么需要这个文件 (见 docs/changelog.md #4):
+#   旧采集器 collect_aa_v2.py 靠 slug 前缀正则猜厂商 (SLUG_PROVIDER_MAP),
+#   猜不到就写 provider='unknown'。2026-08-09 那次采集因此产生 122 个
+#   provider='unknown' 模型, 且完全没有范围过滤, 导致九家封闭范围失效。
+#   AA 新版 payload 自带 creator.slug (权威归属字段), 不再需要猜。
+#
+# 字段说明:
+#   namespace: 本项目厂商命名空间, 必须与既有 model_id 前缀一致, 否则会为
+#              同一个模型造出第二条记录 (破坏历史连续性)
+#   tier:      core      = 九家封闭范围内, 参与综合榜
+#              reference = 不进综合榜, 仅作性能参照锚点 (前端灰显并标注)
+#              excluded  = 不采集
+#   note:      需要人工确认的原因; tier=reference/excluded 或有 note 的,
+#              采集时打 needs_manual_review
+
+vendors:
+
+  # ---------- 九家核心范围 (core) ----------
+  openai:
+    namespace: openai
+    display: "OpenAI"
+    tier: core
+  anthropic:
+    namespace: anthropic
+    display: "Anthropic"
+    tier: core
+    note: "因账号封禁风险实际不可用; 按用户要求保留为性能基准而非选型候选"
+  google:
+    namespace: google
+    display: "Google"
+    tier: core
+    note: "Gemini 长期未更新, 按用户要求仅作参照, 3.5-flash-lite/3.8-flash 仍入库"
+  deepseek:
+    namespace: deepseek
+    display: "DeepSeek"
+    tier: core
+  zai:
+    namespace: zhipu
+    display: "GLM (智谱)"
+    tier: core
+    note: "AA 用 zai, 本项目历史 model_id 用 zhipu/, 二者必须统一到 zhipu"
+  kimi:
+    namespace: moonshot
+    display: "Kimi (月之暗面)"
+    tier: core
+  alibaba:
+    namespace: qwen
+    display: "Qwen (阿里)"
+    tier: core
+  xiaomi:
+    namespace: xiaomi
+    display: "MiMo (小米)"
+    tier: core
+    note: "本批次 AA payload 中无小米模型, 榜内 MiMo 将为空, 前端需如实显示"
+  minimax:
+    namespace: minimax
+    display: "MiniMax"
+    tier: core
+
+  # ---------- 参照锚点 (reference) ----------
+  # 用户 2026-09-20 指示: 严守九家白名单。但选型时字节/Grok 等常被拿来对标,
+  # 且用户点名想看 "字节 2.1-0915"。折中: 入库存档但不进综合榜。
+  xai:
+    namespace: xai
+    display: "xAI (Grok)"
+    tier: reference
+    note: "范围外; 与九家模型同期发布, 保留为能力对标"
+  spacexai:
+    namespace: xai
+    display: "xAI (Grok)"
+    tier: reference
+    note: >-
+      2026-09-20 采集时 AA 把 grok-4-6 的 creator 标为 spacexai
+      (logo 路径 /img/logos/spacexai_small.svg), 与历史 xai 同一实体,
+      统一到既有 namespace xai 以免同一模型出现两条 ID。
+  stepfun:
+    namespace: stepfun
+    display: "阶跃星辰 (Step)"
+    tier: reference
+    note: "范围外; step-5 发布于 2026-09-18, 属用户关注的近两月国产新模型"
+  meta:
+    namespace: meta
+    display: "Meta"
+    tier: reference
+  mistral:
+    namespace: mistral
+    display: "Mistral"
+    tier: reference
+  nvidia:
+    namespace: nvidia
+    display: "NVIDIA"
+    tier: reference
+  thinking-machines:
+    namespace: thinking_machines
+    display: "Thinking Machines"
+    tier: reference
+  ifm:
+    namespace: ifm
+    display: "IFM (待确认)"
+    tier: reference
+    note: "creator.slug=ifm 下挂着 k2-horizon-* 系列, 归属存疑, 需人工核对"
+
+  # ---------- 明确排除 ----------
+  ibm:
+    namespace: ibm
+    display: "IBM"
+    tier: excluded
+  cohere:
+    namespace: cohere
+    display: "Cohere"
+    tier: excluded
+  microsoft:
+    namespace: microsoft
+    display: "Microsoft"
+    tier: excluded

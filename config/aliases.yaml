@@ -1,0 +1,139 @@
+# Model Alias 配置 — 手动确认的映射
+#
+# 范围: 仅九家封闭厂商 (2026-06-17 确认)
+#   御三家: OpenAI / Anthropic / Google
+#   国内六家: DeepSeek / GLM(智谱) / Kimi(月之暗面) / Qwen(阿里) / MiMo(小米) / MiniMax
+#
+# 已移除: xAI / Meta / Mistral / Amazon / Nvidia
+#
+# 格式:
+#   canonical: OpenRouter model ID (主键, provider/model-slug)
+#   aliases: 从各 benchmark 数据源来的别名列表
+#   sources: 哪些数据源使用这些别名 (arena/swe/gpqa/lcb)
+#
+# 生成方式:
+#   1. scripts/build_alias_candidates.py 自动生成候选
+#   2. 人工审核确认
+#   3. 写入此文件
+
+aliases:
+  # ===== OpenAI =====
+  - canonical: "openai/gpt-4o"
+    aliases: ["GPT-4O", "gpt-4o", "GPT-4o"]
+    sources: [arena]
+
+  - canonical: "openai/gpt-4o-2024-08-06"
+    aliases: ["GPT-4O-2024-08-06", "gpt-4o-2024-08-06"]
+    sources: [arena, lcb]
+
+  - canonical: "openai/gpt-4o-mini"
+    aliases: ["GPT-4O-mini", "gpt-4o-mini"]
+    sources: [arena]
+
+  - canonical: "openai/gpt-4o-mini-2024-07-18"
+    aliases: ["GPT-4O-mini-2024-07-18", "gpt-4o-mini-2024-07-18"]
+    sources: [arena, lcb]
+
+  - canonical: "openai/gpt-4-turbo"
+    aliases: ["GPT-4-Turbo", "gpt-4-turbo"]
+    sources: [arena]
+
+  - canonical: "openai/gpt-4-1106-preview"
+    aliases: ["GPT-4-1106-Preview"]
+    sources: [arena]
+
+  - canonical: "openai/o3-mini"
+    aliases: ["O3-Mini", "o3-mini"]
+    sources: [arena]
+
+  - canonical: "openai/o3-mini-2025-01-31"
+    aliases: ["O3-Mini-2025-01-31 (High)", "O3-Mini-2025-01-31 (Med)", "O3-Mini-2025-01-31 (Low)"]
+    sources: [arena, lcb]
+
+  - canonical: "openai/o4-mini"
+    aliases: ["O4-Mini", "o4-mini", "O4-Mini (High)", "O4-Mini (Medium)", "O4-Mini (Low)"]
+    sources: [arena, lcb]
+
+  - canonical: "openai/o3"
+    aliases: ["O3", "o3", "O3 (High)"]
+    sources: [arena, lcb]
+
+  # ===== Anthropic =====
+  - canonical: "anthropic/claude-3-haiku"
+    aliases: ["Claude 3 Haiku", "Claude-3-Haiku", "claude-3-haiku"]
+    sources: [arena, lcb]
+
+  - canonical: "anthropic/claude-3-opus"
+    aliases: ["Claude 3 Opus", "Claude-3-Opus", "claude-3-opus"]
+    sources: [arena]
+
+  - canonical: "anthropic/claude-3.5-sonnet"
+    aliases: ["Claude 3.5 Sonnet", "Claude-3.5-Sonnet", "Claude 3.5 Sonnet (New)", "Claude-3.5-Sonnet-20241022", "claude-3-5-sonnet"]
+    sources: [arena, swe, lcb]
+
+  - canonical: "anthropic/claude-3.5-haiku"
+    aliases: ["Claude 3.5 Haiku", "Claude-3.5-Haiku", "claude-3-5-haiku"]
+    sources: [arena]
+
+  - canonical: "anthropic/claude-sonnet-4"
+    aliases: ["Claude Sonnet 4", "Claude-Sonnet-4", "claude-sonnet-4"]
+    sources: [arena, swe, lcb]
+
+  - canonical: "anthropic/claude-opus-4"
+    aliases: ["Claude Opus 4", "Claude-Opus-4", "claude-opus-4"]
+    sources: [arena, swe, lcb]
+
+  # ===== Google =====
+  - canonical: "google/gemini-2.5-pro-preview"
+    aliases: ["Gemini 2.5 Pro", "Gemini-2.5-Pro", "gemini-2-5-pro", "Gemini-2.5-Pro-05-06", "Gemini-2.5-Pro-06-05"]
+    sources: [arena, lcb]
+
+  - canonical: "google/gemini-2.5-flash-preview"
+    aliases: ["Gemini 2.5 Flash", "Gemini-2.5-Flash", "gemini-2-5-flash", "Gemini-2.5-Flash-04-17", "Gemini-2.5-Flash-05-20"]
+    sources: [arena, lcb]
+
+  - canonical: "google/gemini-2.0-flash-001"
+    aliases: ["Gemini 2.0 Flash", "Gemini-2.0-Flash"]
+    sources: [arena]
+
+  - canonical: "google/gemini-1.5-pro"
+    aliases: ["Gemini 1.5 Pro", "Gemini-1.5-Pro", "gemini-1-5-pro"]
+    sources: [arena, gpqa]
+
+  # ===== DeepSeek =====
+  - canonical: "deepseek/deepseek-chat"
+    aliases: ["DeepSeek-V3", "DeepSeek V3", "deepseek-v3", "DeepSeek-V3-0324"]
+    sources: [arena, swe, lcb, gpqa]
+
+  - canonical: "deepseek/deepseek-r1"
+    aliases: ["DeepSeek-R1", "DeepSeek R1", "deepseek-r1", "DeepSeek-R1-0528"]
+    sources: [arena, lcb, gpqa]
+
+  # ===== Qwen (阿里) =====
+  - canonical: "qwen/qwen3-235b-a22b"
+    aliases: ["Qwen3-235B-A22B", "Qwen3 235B A22B", "qwen3-235b-a22b"]
+    sources: [arena, lcb, gpqa]
+
+  - canonical: "qwen/qwen-2.5-72b-instruct"
+    aliases: ["Qwen2.5-72B-Instruct", "Qwen 2.5 72B Instruct"]
+    sources: [arena]
+
+  # ===== GLM (智谱) =====
+  # provider key 统一为 zhipu (与 accessibility.yaml 一致)
+  - canonical: "zhipu/glm-5"
+    aliases: ["GLM-5", "GLM 5", "glm-5"]
+    sources: [arena, swe]
+
+  # ===== Kimi (月之暗面) =====
+  - canonical: "moonshot/kimi-k2"
+    aliases: ["Kimi-K2", "Kimi K2", "kimi-k2"]
+    sources: [arena, swe]
+
+  # ===== MiniMax =====
+  - canonical: "minimax/m2.5"
+    aliases: ["MiniMax-M2.5", "MiniMax M2.5", "minimax-m2.5"]
+    sources: [arena, swe]
+
+  # ===== MiMo (小米) =====
+  # 待补全: MiMo 当前在 arena/swe 数据源中暂无别名记录
+  # 后续采集到 MiMo 评测数据后补全

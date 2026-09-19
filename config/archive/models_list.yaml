@@ -1,0 +1,108 @@
+# 待评测的大模型与 Agent 清单
+
+# 基础大模型
+base_models:
+  - id: "gpt-4o"
+    name: "GPT-4o"
+    provider: "OpenAI"
+    type: "model"
+    release_date: "2024-05-13"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "tool_use"
+      - "knowledge"
+      - "workflow"
+    active: true
+
+  - id: "claude-3-5-sonnet"
+    name: "Claude 3.5 Sonnet"
+    provider: "Anthropic"
+    type: "model"
+    release_date: "2024-10-22"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "tool_use"
+      - "knowledge"
+      - "workflow"
+    active: true
+
+  - id: "gemini-2-0-flash"
+    name: "Gemini 2.0 Flash"
+    provider: "Google"
+    type: "model"
+    release_date: "2024-12-10"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "tool_use"
+      - "knowledge"
+      - "workflow"
+    active: true
+
+  - id: "qwen-2.5-72b"
+    name: "Qwen 2.5 72B"
+    provider: "Alibaba"
+    type: "model"
+    release_date: "2024-09-19"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "tool_use"
+      - "knowledge"
+      - "workflow"
+    active: true
+
+  - id: "deepseek-v3"
+    name: "DeepSeek V3"
+    provider: "DeepSeek"
+    type: "model"
+    release_date: "2024-12-26"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "tool_use"
+      - "knowledge"
+      - "workflow"
+    active: true
+
+  - id: "llama-3-3-70b"
+    name: "Llama 3.3 70B"
+    provider: "Meta"
+    type: "model"
+    release_date: "2024-12-06"
+    supported_contexts:
+      - "coding"
+      - "planning"
+      - "knowledge"
+    active: true
+
+# Agent 框架
+agent_frameworks:
+  - id: "openclaw"
+    name: "OpenClaw"
+    provider: "Community"
+    type: "agent"
+    base_model: "gpt-4o"  # 可指定默认使用的底层模型
+    features:
+      - "multi_turn_dialogue"
+      - "code_execution"
+      - "task_planning"
+      - "tool_integration"
+    active: true
+
+  - id: "hermes"
+    name: "Hermes"
+    provider: "Community"
+    type: "agent"
+    base_model: "claude-3-5-sonnet"
+    features:
+      - "multi_turn_dialogue"
+      - "task_planning"
+      - "tool_integration"
+    active: true
+
+# 维度映射说明
+# base_models 的维度: coding, planning, tool_use, knowledge, cost, workflow
+# agent_frameworks 的维度: coding, planning, tool_use, knowledge, cost, workflow, multi_turn_dialogue, code_execution, task_planning, tool_integration

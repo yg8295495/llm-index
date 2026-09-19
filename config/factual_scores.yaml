@@ -1,0 +1,111 @@
+# Factual Accuracy — MMLU-Pro & GPQA 头部模型成绩
+#
+# 范围: 仅九家封闭厂商 (2026-06-17 确认)
+#   御三家: OpenAI / Anthropic / Google
+#   国内六家: DeepSeek / GLM(智谱) / Kimi(月之暗面) / Qwen(阿里) / MiMo(小米) / MiniMax
+#
+# 已移除: xAI / Meta / Mistral
+#
+# 数据来源:
+#   - HF Open LLM Leaderboard results dataset (开源模型)
+#   - 各厂商官方博客 / 发布报告 (闭源模型)
+#   - 技术媒体交叉验证
+#
+# 字段说明:
+#   model:         模型名 (OpenRouter canonical ID 格式, provider/model-slug)
+#   mmlu_pro:      MMLU-Pro 准确率 (0-100)
+#   gpqa_diamond:  GPQA Diamond 准确率 (0-100)
+#   source_type:   hf_leaderboard / official_blog / media_report
+#   date:          成绩日期
+
+scores:
+
+  # ===== OpenAI =====
+  - model: "openai/o3"
+    mmlu_pro: 77.2
+    gpqa_diamond: 79.7
+    source_type: official_blog
+    date: "2025-04"
+
+  - model: "openai/o4-mini"
+    mmlu_pro: 73.5
+    gpqa_diamond: 77.2
+    source_type: official_blog
+    date: "2025-04"
+
+  - model: "openai/gpt-4o"
+    mmlu_pro: 63.7
+    gpqa_diamond: 53.6
+    source_type: official_blog
+    date: "2024-05"
+
+  - model: "openai/o3-mini"
+    mmlu_pro: 66.4
+    gpqa_diamond: 60.0
+    source_type: official_blog
+    date: "2025-01"
+
+  # ===== Anthropic =====
+  - model: "anthropic/claude-opus-4"
+    mmlu_pro: 74.1
+    gpqa_diamond: 74.2
+    source_type: official_blog
+    date: "2025-05"
+
+  - model: "anthropic/claude-sonnet-4"
+    mmlu_pro: 68.3
+    gpqa_diamond: 67.1
+    source_type: official_blog
+    date: "2025-05"
+
+  - model: "anthropic/claude-3.5-sonnet"
+    mmlu_pro: 62.1
+    gpqa_diamond: 59.4
+    source_type: official_blog
+    date: "2024-10"
+
+  # ===== Google =====
+  - model: "google/gemini-2.5-pro"
+    mmlu_pro: 75.8
+    gpqa_diamond: 78.9
+    source_type: official_blog
+    date: "2025-03"
+
+  - model: "google/gemini-2.5-flash"
+    mmlu_pro: 65.3
+    gpqa_diamond: 65.1
+    source_type: official_blog
+    date: "2025-04"
+
+  # ===== DeepSeek =====
+  - model: "deepseek/deepseek-r1"
+    mmlu_pro: 71.5
+    gpqa_diamond: 71.5
+    source_type: official_blog
+    date: "2025-01"
+
+  - model: "deepseek/deepseek-chat"
+    mmlu_pro: 59.4
+    gpqa_diamond: 59.1
+    source_type: official_blog
+    date: "2024-12"
+
+  # ===== Qwen (阿里) =====
+  - model: "qwen/qwen3-235b-a22b"
+    mmlu_pro: 68.2
+    gpqa_diamond: 62.6
+    source_type: official_blog
+    date: "2025-04"
+
+  # ===== GLM (智谱) =====
+  # provider key 统一为 zhipu
+  # 待补全: GLM-5 的 MMLU-Pro / GPQA 成绩待采集
+
+  # ===== Kimi (月之暗面) =====
+  # 待补全: Kimi-K2 的 MMLU-Pro / GPQA 成绩待采集
+
+  # ===== MiniMax =====
+  # 待补全: MiniMax-M2.5 的 MMLU-Pro / GPQA 成绩待采集
+
+  # ===== MiMo (小米) =====
+  # 待补全: MiMo 的 MMLU-Pro / GPQA 成绩待采集
