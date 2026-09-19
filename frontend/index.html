@@ -1813,6 +1813,17 @@
   .delta-up{color:var(--positive,#4a7c59);font-variant-numeric:tabular-nums}
   .delta-down{color:var(--negative,#a8555a);font-variant-numeric:tabular-nums}
   .delta-base{color:var(--text-tertiary);font-size:11px}
+  /* 厂商自报数据块：视觉上与榜单分开，避免被误读成同口径 */
+  .official-block{margin:10px 0;padding:10px 12px;border:1px dashed var(--border);
+    border-radius:6px;background:var(--bg-secondary)}
+  .official-name{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+  .official-list{list-style:none;margin:0;padding:0;font-size:12px;line-height:1.7}
+  .official-list li{padding:3px 0;border-top:1px solid var(--border)}
+  .official-list li:first-child{border-top:0}
+  .official-list b{font-variant-numeric:tabular-nums;color:var(--text-primary)}
+  .official-unit{color:var(--text-tertiary);font-size:11px}
+  .official-note{color:var(--text-tertiary);font-size:11px;margin-top:2px}
+  .official-caveat{font-size:11px;color:var(--text-tertiary);line-height:1.6;margin-top:8px}
   @media (max-width:760px){
     .board-caption{font-size:11px}
   }
@@ -2617,6 +2628,14 @@ function renderDimensionNav() {
   }
 }
 
+// HTML 转义：任何来自 data.json 的字符串在拼 innerHTML 前都要过这里。
+// 原先只在「数据说明」视图里有个局部副本，榜单视图调用会 ReferenceError，故提到模块级。
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 // ===== 榜单视图（能力榜 / 性价比榜 / 综合榜）=====
 // 为什么拆三榜（docs/changelog.md #29）：单一综合分里"成本该占多少权重"没有客观答案。
 // 实测本批整轮评测消耗从 $7 到 $1094（156 倍），线性归一会让三个能力维都第一的
@@ -2739,6 +2758,27 @@ function renderBoardView() {
   html += `<div class="board-footnote">榜分与维度分均为 0–100 的批内相对值（min-max），`
     + `只在本批 ${DATA.metadata.core_model_count} 个核心模型之间可比，跨批次不可直接比大小。`
     + `数据截止 ${DATA.metadata.snapshot_date}，来源见「数据说明」。</div>`;
+
+  // 厂商自报数据：AA 未收录该模型时单独列出，绝不混进上面的归一化榜
+  const official = Object.values(DATA.models).filter(m => (m.official_metrics || []).length);
+  if (official.length > 0) {
+    html += '<div class="doc-card" style="margin-top:16px"><div class="doc-card-title">'
+      + '厂商自报数据 <span class="doc-card-sub">AA 未收录 · 不参与上方任何榜单计算</span></div>';
+    official.forEach(m => {
+      html += `<div class="official-block"><div class="official-name">${esc(m.display_name)}`
+        + ` <span class="src-badge inline">自报口径</span></div><ul class="official-list">`;
+      m.official_metrics.forEach(o => {
+        html += `<li><a class="src-link" href="${esc(o.source_url)}" target="_blank" rel="noopener">${esc(o.name)}</a>`
+          + ` <b>${esc(o.value)}</b> <span class="official-unit">${esc(o.unit)}</span>`
+          + (o.note ? `<div class="official-note">${esc(o.note)}</div>` : '') + '</li>';
+      });
+      html += '</ul></div>';
+    });
+    html += '<div class="official-caveat">这些数字由厂商自行发布，评测实现与采样设置'
+      + '与 Artificial Analysis 不同口径，因此本站不把它们与榜内分数放在一起比较。'
+      + '可核验的反例：腾讯官方称 Hy3 在 Terminal-Bench 2.1 得 70.8，'
+      + '而 AA 实测 Hy3 为 64.4 —— 差 6.4 分。</div></div>';
+  }
   html += '</div>';
 
   main.innerHTML = html;
@@ -3990,7 +4030,6 @@ function renderDocsView() {
   const link = (url, text) => url
     ? `<a class="doc-link" href="${url}" target="_blank" rel="noopener">${text || url}</a>`
     : `<span class="doc-empty">—</span>`;
-  const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   let html = '<div class="docs-view">';
 

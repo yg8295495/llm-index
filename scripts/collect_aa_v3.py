@@ -26,6 +26,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import yaml
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.collector import aa_omniscience as AA          # noqa: E402
@@ -103,8 +105,67 @@ def write_snapshot_files(date_str: str, page: AA.RawPage, parsed: dict, bm: dict
     return d
 
 
+def load_watchlist() -> dict:
+    p = config_path("watchlist.yaml")
+    if not p.exists():
+        return {"aa_model_page": [], "manual": []}
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    return {"aa_model_page": data.get("aa_model_page") or [],
+            "manual": data.get("manual") or []}
+
+
+def run_watchlist(conn, registry, bm, vendors, date_str, sid, base_urls, dry_run):
+    """补采: omniscience SSR 里没有、但 AA 单模型详情页有的模型。
+
+    这些行的 source_url 指向各自的详情页而不是 omniscience 页 —— 数值确实是从
+    那一页取来的, 溯源要精确到页。
+    """
+    entries = load_watchlist()["aa_model_page"]
+    results = []
+    for e in entries:
+        slug = e["aa_slug"]
+        try:
+            page = AA.fetch_model_page(slug)
+            rec = AA.find_scored_record(page, slug)
+        except AA.PayloadError as exc:
+            results.append({"aa_slug": slug, "error": str(exc)})
+            print(f"   ⚠️ 补采 {slug} 失败: {exc}")
+            continue
+        urls = {k: page.url for k in base_urls}
+        by_slug, by_base = S.load_identity_index(conn)
+        mapped, stats = M.map_records([rec], registry, bm, vendors, by_slug, by_base)
+        rep = S.write(conn, mapped, sid, date_str, urls, dry_run=dry_run)
+        results.append({"aa_slug": slug, "url": page.url, "sha256": page.sha256,
+                        "bytes": page.bytes, "reason": e.get("reason", ""),
+                        "models_new": rep.models_new, "models_updated": rep.models_updated,
+                        "evals": rep.evals_written, "tiers": stats["by_tier"],
+                        "pairs": [(m.row.aa_slug, ev.benchmark) for m in mapped
+                                  for ev in m.evals]})
+        print(f"   ✓ 补采 {slug}: {rep.evals_written} 条评测 "
+              f"(tier={list(stats['by_tier'])}) ← {page.url}")
+    return results
+
+
+def reconcile(conn, sid, expected_pairs):
+    """找出本快照里"当前页面已不再产出"的行。
+
+    同一天重跑时 AA 页面可能已经变了（2026-09-20 实测: 相隔 2 小时页面 sha 从
+    d20f0a55 变到 c5fcaf21, 并撤掉了 muse-spark-1-3 的一条 mlcr_overall）。
+    快照按日期唯一, 于是这一批会变成两个页面版本的并集, 而 html_sha256 只记最新值。
+    不删这些行（用户要求不覆盖历史），但必须把差异显式报出来, 见 changelog #33。
+    """
+    rows = conn.execute(
+        """SELECT be.benchmark, m.aa_slug, be.score_raw
+           FROM benchmark_evals be JOIN models m ON be.model_pk = m.id
+           WHERE be.snapshot_id = ? AND be.benchmark NOT LIKE '%_official'
+             AND be.source LIKE 'artificial%'""", (sid,)).fetchall()
+    stale = [(r[1], r[0], r[2]) for r in rows if (r[1], r[0]) not in expected_pairs]
+    return stale
+
+
 def render_report(date_str: str, page, parsed, mapped, stats, report: S.WriteReport,
-                  schema_changes, legacy, url_fallback, dry: bool) -> str:
+                  schema_changes, legacy, url_fallback, dry: bool,
+                  watchlist=None, stale=None) -> str:
     lines = [
         f"# Collection Report — AA Omniscience {date_str}",
         "",
@@ -153,6 +214,25 @@ def render_report(date_str: str, page, parsed, mapped, stats, report: S.WriteRep
         )
     else:
         lines.append("- 全部数据源均有独立 source_url")
+    if watchlist:
+        lines += ["", "## 补采清单 (config/watchlist.yaml → AA 单模型详情页)"]
+        for w in watchlist:
+            if w.get("error"):
+                lines.append(f"- ❌ `{w['aa_slug']}`：{w['error']}")
+                continue
+            lines.append(
+                f"- `{w['aa_slug']}` → {w['evals']} 条评测（新建 {w['models_new']} / "
+                f"更新 {w['models_updated']}），tier={w['tiers']}\n"
+                f"  - 出处: {w['url']}（{w['bytes']:,} B, sha256 `{w['sha256'][:12]}…`）\n"
+                f"  - 原因: {w['reason']}"
+            )
+    if stale:
+        lines += ["", "## ⚠️ 同日页面改版", "",
+                  f"本快照有 {len(stale)} 行已不在当前 AA 页面上（AA 在同一天内改过页面，"
+                  "快照按日期唯一，因此这批是两个页面版本的并集）。这些行**保留不删**，"
+                  "但要知道它们已无法从当前页面复现：", "",
+                  "| aa_slug | benchmark | 值 |", "|---|---|---|"]
+        lines += [f"| `{a}` | {b} | {v} |" for a, b, v in stale]
     lines += ["", "## 模型明细", "", "| tier | model_id | 档位 | 发布 | 评测数 |", "|---|---|---|---|---|"]
     for m in sorted(mapped, key=lambda x: (x.row.tier, x.row.model_id, x.row.reasoning_level)):
         lines.append(
@@ -172,6 +252,8 @@ def main() -> int:
     ap.add_argument("--from-file", default=None, help="离线模式: 读本地 HTML, 不发网络请求")
     ap.add_argument("--allow-collisions", action="store_true",
                     help="即使 model_id 身份冲突也继续 (默认中止)")
+    ap.add_argument("--no-watchlist", action="store_true",
+                    help="跳过 config/watchlist.yaml 的补采 (只跑 omniscience 主批次)")
     ap.set_defaults(dry_run=True)
     args = ap.parse_args()
 
@@ -233,6 +315,29 @@ def main() -> int:
         print(f"   评测行: {report.evals_written} (跳过已存在 {report.evals_skipped_existing},"
               f" 拒绝 {len(report.rejected)})")
         print(f"   ID 规范化 {len(report.renames)} · provider 更正 {len(report.provider_fixes)}")
+        watchlist = []
+        if not args.no_watchlist:
+            print("\n📋 补采清单 (config/watchlist.yaml):")
+            watchlist = run_watchlist(conn, parsed["registry"], bm, vendors, date_str, sid,
+                                      urls, args.dry_run)
+            if not watchlist:
+                print("   (清单为空)")
+
+        expected = {(m.row.aa_slug, e.benchmark) for m in mapped for e in m.evals}
+        for w in watchlist:
+            expected.update(w.get("pairs") or [])
+        stale = reconcile(conn, sid, expected)
+        if stale:
+            print(f"\n⚠️  本快照有 {len(stale)} 行已不在当前 AA 页面上（同日页面改版）:")
+            for slug, bench, val in stale[:10]:
+                print(f"     {slug} / {bench} = {val}")
+            if not args.dry_run:
+                conn.execute(
+                    """UPDATE snapshots SET notes = COALESCE(notes,'') || ? WHERE id = ?""",
+                    (f" | 同日重跑: {len(stale)} 行来自更早的页面版本且 AA 已不再展示"
+                     f"（{', '.join(f'{s}/{b}' for s, b, _ in stale[:5])}）", sid),
+                )
+
         if args.dry_run:
             conn.rollback()
         else:
@@ -242,9 +347,11 @@ def main() -> int:
             conn.execute(
                 """UPDATE snapshots SET
                        model_count = (SELECT COUNT(DISTINCT model_pk) FROM benchmark_evals
-                                      WHERE snapshot_id = ?),
+                                      WHERE snapshot_id = ?
+                                        AND benchmark NOT LIKE '%_official'),
                        eval_count  = (SELECT COUNT(*) FROM benchmark_evals
-                                      WHERE snapshot_id = ?)
+                                      WHERE snapshot_id = ?
+                                        AND benchmark NOT LIKE '%_official')
                    WHERE id = ?""",
                 (sid, sid, sid),
             )
@@ -254,7 +361,7 @@ def main() -> int:
 
     REPORTS_DIR.mkdir(exist_ok=True)
     txt = render_report(date_str, page, parsed, mapped, stats, report, changes, legacy,
-                        url_fallback, args.dry_run)
+                        url_fallback, args.dry_run, watchlist, stale)
     out = REPORTS_DIR / f"collection_{date_str}.md"
     out.write_text(txt, encoding="utf-8")
     print(f"   报告: {out}")

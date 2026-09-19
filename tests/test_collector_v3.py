@@ -58,6 +58,21 @@ def test_raw_page_has_sha256_and_size():
     assert len(page.sha256) == 64
 
 
+def test_find_scored_record_matches_slug_exactly():
+    """详情页会内联几百个模型对象, 前缀匹配会取错模型 (hy3 vs hy3-preview)。"""
+    payload = '{"x":[' + ",".join(
+        json.dumps({"id": f"0000000{0+i}-0000-0000-0000-000000000000",
+                    "slug": s, "name": s, "intelligenceIndex": v})
+        for i, (s, v) in enumerate([("hy3", 25.3), ("hy3-preview", 22.7),
+                                    ("hy3-non-reasoning", 11.0)])
+    ) + "]}"
+    page = AA.RawPage(url="u", http_status=200, html=_rsc_html([payload]), fetched_at="t")
+    assert AA.find_scored_record(page, "hy3")["intelligenceIndex"] == 25.3
+    assert AA.find_scored_record(page, "hy3-preview")["intelligenceIndex"] == 22.7
+    with pytest.raises(AA.PayloadError):
+        AA.find_scored_record(page, "hy4-preview")
+
+
 # ---------------------------------------------------------------------------
 # 命名与厂商归属
 # ---------------------------------------------------------------------------
@@ -302,3 +317,83 @@ def test_snapshot_records_page_fingerprint(temp_db):
     again = S.upsert_snapshot(temp_db, "2026-09-20", {
         "source": "artificial_analysis", "source_url": "u2", "fetched_at": "t2"})
     assert again == sid
+
+
+# ---------------------------------------------------------------------------
+# 厂商自报数据登记
+# ---------------------------------------------------------------------------
+
+
+def _manual_doc():
+    return {
+        "model_id": "tencent/hy4-preview", "provider": "tencent",
+        "display_name": "混元 Hy4 preview (Tencent Hunyuan)", "aa_slug": None,
+        "release_date": "2026-08-28", "context_window": 1048576,
+        "parameters_b": 770, "active_params_b": 49, "open_source": "Open",
+        "pricing_input": 0.834, "pricing_output": 2.501,
+        "sources": {"official_release": {
+            "url": "https://developer.cloud.tencent.com/article/2735118"}},
+        "metrics": [
+            {"benchmark": "terminalbench_v2_1_official", "name": "Terminal-Bench 2.1",
+             "value": 85.4, "unit": "%", "dimension": "engineering",
+             "note": "官方称 Hy3 同项 70.8; AA 实测 Hy3 为 64.4"},
+            {"benchmark": "deepswe_official", "name": "DeepSWE", "value": 64.3,
+             "unit": "%", "dimension": "engineering"},
+        ],
+        "collected_at": "2026-09-20T05:20:00+00:00",
+    }
+
+
+@pytest.fixture
+def manual_mod():
+    import importlib.util
+    from src.paths import ROOT
+    spec = importlib.util.spec_from_file_location(
+        "ingest_manual_reference", ROOT / "scripts" / "ingest_manual_reference.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_manual_ingest_is_idempotent_and_second_run_works(temp_db, manual_mod):
+    """第二次跑走 UPDATE 分支 —— 该分支曾漏绑 :__now 参数直接崩掉。"""
+    doc = _manual_doc()
+    a1, pk1, w1, tier1, sid1 = manual_mod.ingest(temp_db, doc, dry_run=False)
+    temp_db.commit()
+    assert a1 == "新建" and w1 == 2 and tier1 == "reference"
+
+    a2, pk2, w2, _t, sid2 = manual_mod.ingest(temp_db, doc, dry_run=False)
+    temp_db.commit()
+    assert a2 == "更新" and pk2 == pk1, "同一模型不应建第二条记录"
+    assert w2 == 0, "重复登记不应再插指标"
+    assert sid2 == sid1
+
+    n_models = temp_db.execute("SELECT COUNT(*) FROM models").fetchone()[0]
+    n_evals = temp_db.execute("SELECT COUNT(*) FROM benchmark_evals").fetchone()[0]
+    assert n_models == 1 and n_evals == 2
+
+
+def test_manual_metrics_are_kept_out_of_aa_namespace(temp_db, manual_mod):
+    manual_mod.ingest(temp_db, _manual_doc(), dry_run=False)
+    temp_db.commit()
+    rows = temp_db.execute("SELECT benchmark, source, confidence, source_url "
+                           "FROM benchmark_evals").fetchall()
+    for r in rows:
+        assert r[0].endswith("_official"), "自报指标必须带 _official 后缀"
+        assert r[1] == "tencent_official"
+        assert r[2] <= 0.5, "自报数据置信度要显式压低"
+        assert r[3].startswith("http")
+
+
+def test_manual_ingest_rejects_unmarked_benchmark(temp_db, manual_mod):
+    doc = _manual_doc()
+    doc["metrics"][0]["benchmark"] = "terminalbench_v2_1"   # 冒充 AA 同口径
+    with pytest.raises(SystemExit):
+        manual_mod.ingest(temp_db, doc, dry_run=False)
+
+
+def test_manual_ingest_requires_source_url(temp_db, manual_mod):
+    doc = _manual_doc()
+    doc["sources"] = {}
+    with pytest.raises(SystemExit):
+        manual_mod.ingest(temp_db, doc, dry_run=False)

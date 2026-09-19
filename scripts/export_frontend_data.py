@@ -181,6 +181,7 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
             "size_class": base["size_class"],
             "deprecated": bool(base["deprecated"]),
             "needs_manual_review": bool(base["needs_manual_review"]),
+            "official_metrics": [],
             "reasoning_levels": {},
         }
         for r in rows:
@@ -191,13 +192,15 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
 
     benchmarks: dict[str, list] = {}
     per_model_cost: dict[str, list] = {}
-    for r in conn.execute(
+    official: dict[str, list] = {}
+    evals = conn.execute(
         """SELECT be.*, m.model_id, m.reasoning_level, m.display_name
            FROM benchmark_evals be
            JOIN models m ON be.model_pk = m.id
            WHERE be.snapshot_id = ? AND m.tier IN (?, ?)
            ORDER BY be.benchmark, be.score_raw DESC""", (snapshot["id"], *tiers),
-    ).fetchall():
+    ).fetchall()
+    for r in evals:
         entry = {
             "model_id": r["model_id"],
             "reasoning_level": r["reasoning_level"] or "",
@@ -215,6 +218,22 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
             "confidence": r["confidence"],
             "observed_at": r["observed_at"],
         }
+        if r["benchmark"].endswith("_official"):
+            # 厂商自报口径: 单独挂到模型上, 绝不进 benchmarks 表 ——
+            # 否则会被 bench_groups 之外的路径误当成 AA 同分数参与归一化。
+            bd = entry["breakdown"] or {}
+            official.setdefault(r["model_id"], []).append({
+                "benchmark": r["benchmark"],
+                "name": bd.get("name") or r["benchmark"],
+                "value": entry["score_raw"],
+                "unit": entry["score_type"],
+                "note": bd.get("note"),
+                "source": r["source"],
+                "source_url": r["source_url"],
+                "confidence": r["confidence"],
+                "observed_at": r["observed_at"],
+            })
+            continue
         benchmarks.setdefault(r["benchmark"], []).append(entry)
         if entry["run_cost_usd"]:
             per_model_cost.setdefault(r["model_id"], []).append(
@@ -255,6 +274,10 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
         })
     for key in benchmarks:
         benchmarks[key].sort(key=lambda e: -(e["score_raw"] or 0))
+    for mid, items in official.items():
+        if mid in models:
+            models[mid]["official_metrics"] = sorted(
+                items, key=lambda x: -(x["value"] if isinstance(x["value"], (int, float)) else 0))
     return models, benchmarks
 
 
@@ -362,6 +385,8 @@ def main() -> int:
                                   if k not in DERIVED_KEYS),
             "derived_eval_count": sum(len(v) for k, v in benchmarks.items()
                                       if k in DERIVED_KEYS),
+            "official_metric_count": sum(len(m.get("official_metrics") or [])
+                                         for m in models.values()),
             "schema_version": 2,
             "scoring": explain,
             "snapshots": trail[:12],

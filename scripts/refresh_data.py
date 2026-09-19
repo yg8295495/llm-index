@@ -41,10 +41,13 @@ def main() -> int:
     if args.from_file:
         collect += ["--from-file", args.from_file]
 
-    steps = [("采集并入库 (AA Omniscience)", collect)]
+    steps = [("采集并入库 (AA Omniscience 主批次 + config/watchlist.yaml 补采)", collect)]
     if args.apply:
+        steps.append(("登记厂商自报数据 (AA 未收录的模型, 见 data/raw/manual/)",
+                      [py, "scripts/ingest_manual_reference.py", "--no-dry-run"]))
         steps.append(("导出 frontend/data.json", [py, "scripts/export_frontend_data.py"]))
     else:
+        steps.append(("试登记厂商自报数据", [py, "scripts/ingest_manual_reference.py"]))
         steps.append(("试导出到 /tmp", [py, "scripts/export_frontend_data.py",
                                        "--out", "/tmp/data_dryrun.json"]))
     steps.append(("契约测试 (data.json 形状 / 溯源完整性)",

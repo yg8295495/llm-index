@@ -257,6 +257,76 @@
 
 ---
 
+## 2026-09-20 (第二次更新) · 补两个常选模型
+
+用户指出榜面少了 **Qwen3.8 Flash** 和 **腾讯混元 Hy4 preview**，这两个是他常选的模型，
+缺了无法判断。逐个查来源后的处理如下。
+
+**#32 发现 AA 的单模型详情页是公开的补采路径**
+- 之前判断"AA 全量分数已加密、拿不到"只对了一半：omniscience 页的 SSR 只内嵌 31 个
+  默认对比模型，但 `https://artificialanalysis.ai/models/<slug>` 详情页里
+  **内联了该模型的同口径完整分数**（实测约 3.9MB，含数百个带分对象），不需要碰加密 blob。
+- 解决：新增 `config/watchlist.yaml` 声明补采清单，`collect_aa_v3.py` 在主批次之后
+  逐个抓详情页。补采行的 `source_url` 指向各自的详情页而非 omniscience 页 ——
+  溯源精确到页。
+- 结果：`qwen3-8-flash-next`（阿里，**属九家核心**）拿到 14 条同口径评测，
+  直接进榜并冲到**性价比榜第 2（97.1，$0.23/1M）**；`hy3` 拿到 13 条，作参照。
+- 顺带发现详情页里有 `contextWindowTokens` 和 AA 官方的 `price1mBlended0To3To1`
+  （正是 3:1 混合单价）。后者可替代本站的估算混合单价，前者可补上一直缺失的上下文
+  窗口 —— 列入待办，本次未接。
+- 回归测试 `test_find_scored_record_matches_slug_exactly` 锁住"必须精确匹配 slug"：
+  详情页内联几百个对象，前缀匹配会让 `hy3` 命中 `hy3-preview`。
+
+**#33 混元 Hy4 preview：AA 未收录，只能用官方自报口径，且必须物理隔离**
+- 核实：AA 确实没有它 —— `/models/hy4`、`/models/hy4-preview`、`/models/hunyuan-4`
+  全部 404，653 条注册表里只有 `hy3` / `hy3-preview` / `hy3-non-reasoning`。
+  Hy4 preview 于 2026-08-28 发布开源（770B 总参 / 49B 激活 / 1M 上下文 / Apache-2.0）。
+- 采用数据：腾讯官方发布文的 Terminal-Bench 2.1 = 85.4、DeepSWE = 64.3、
+  专家盲测 2.99/4（官方称 GLM-5.3 为 2.92、Kimi K3 为 2.94）、CodeArena WebDev 第 6；
+  价格与上下文取自 OpenRouter（$0.834 / $2.501 每百万 token）。
+- **不混算的理由是可核验的**：官方称 Hy3 在 Terminal-Bench 2.1 得 70.8，
+  而 AA 实测 Hy3 是 64.42 —— 差 6.4 分，说明评测实现/版本/采样不同。
+  所以自报指标一律带 `_official` 后缀（天然不会被 `bench_groups` 捞进归一化）、
+  `source = tencent_official`、`confidence = 0.45`，前端在榜单下方单列一个
+  「厂商自报数据」块并写明不可比。
+- 新增 `scripts/ingest_manual_reference.py` + `data/raw/manual/*.yaml` 登记通道，
+  默认干跑。回归测试：`test_vendor_official_metrics_never_enter_benchmarks`、
+  `test_official_only_model_is_not_scored_as_aa_data`。
+- 腾讯在 `config/vendors.yaml` 里登记为 `tier: reference`（遵守用户"严守九家"的决定）。
+  若要把混元当选型候选而非参照，把该条改成 `core` 重跑导出即可 —— 一处改动。
+
+**#34 同一天内 AA 页面改版，快照变成两个版本的并集**
+- 现象：相隔约 2 小时两次抓取，页面 sha256 从 `d20f0a55…` 变成 `c5fcaf21…`，
+  字节数 1,232,493 → 1,232,321，且 AA 撤掉了 `muse-spark-1-3` 的一条 `mlcr_overall`。
+  主批次因此从 545 条变成 544 条。
+- 风险：快照按日期唯一，同日重跑会把两版数据并在一起，而 `html_sha256` 只记最新值 ——
+  别人拿指纹去复现会发现少一条，这恰恰破坏"可核验"。
+- 解决：新增 `reconcile()`，每次跑完比对"快照内的行"与"当前页面能产出的行"，
+  差异**保留不删**（遵守不覆盖历史），但打印出来、写进 Collection Report 的
+  「同日页面改版」段、并追加到快照 notes。
+- 另修两处健壮性：`collect_scored_models` 的扫描正则原先要求 `{"id":"` 之间无空格，
+  AA 一旦改用格式化 JSON 就会静默产出零记录 —— 放宽为 `\s*`；
+  前端 `esc()` 原本是「数据说明」视图里的局部函数，榜单视图调用会 ReferenceError，
+  提到模块级。
+
+**#35 自报行挂进批次快照后，把两处统计污染了（我自己引入，被契约测试拦下）**
+- 现象：`refresh_data.py --apply` 在契约测试步骤非零退出。快照表记 `eval_count=576`，
+  导出的 `raw_eval_count=572`；同时「同日页面改版」误报 5 行（真实漂移只有 1 行）。
+- 原因：#33 决定把厂商自报行挂到同一天的批次快照上（避免造出 `2026-09-20-tencent-official`
+  这种非日期值把导出器的"取最新快照"逻辑带偏），但快照计数和改版比对都没有按来源分开，
+  于是 4 条自报行既被算进 AA 行数、又被当成"AA 已撤掉的脏数据"。
+- 解决：快照 `model_count` / `eval_count` 与 `reconcile()` 都只统计
+  `benchmark NOT LIKE '%_official' AND source LIKE 'artificial%'` 的行；
+  导出器新增 `metadata.official_metric_count` 让自报行数单独可见。
+- 修完实测：快照 572 = raw 572，改版告警回到正确的 1 行，`refresh_data.py` exit=0。
+- 这条留在日志里是因为它证明了 #30 那条测试断言不是摆设 —— 它拦下的正是我新写的代码。
+
+**本批数据（第二次更新后）**：29 个模型（核心 19 + 参照 10）/ 34 个推理档位 /
+30 项 benchmark / 572 条 AA 评测 + 53 条派生指标 + 4 条厂商自报指标；
+`pytest` 101 passed，`ruff` 零告警，`refresh_data.py --apply` exit=0。
+
+---
+
 ## 待办与已知不足（如实记录，不粉饰）
 
 | 项 | 说明 | 影响 |
@@ -264,19 +334,23 @@
 | 九家中 MiMo（小米）无数据 | 本批 AA payload 里没有任何小米模型 | 榜单 18 个核心模型只覆盖 8 家，前端需明示 |
 | 用户点名的"字节 2.1-0915"不存在于 AA | 九家范围外，且该页 653 条注册表里也没有 | 无法纳入，需另找来源 |
 | LMArena 维度为空 | 见 #24 | 综合指数实际按四维归一计算 |
+| AA 详情页还有两个字段没接 | `contextWindowTokens` 与官方 `price1mBlended0To3To1`（正好是 3:1 混合单价）已在 #32 发现但未接入 | 上下文窗口仍为空；混合单价仍是本站估算而非 AA 官方值 |
+| 混元 Hy4 preview 无同口径分数 | AA 未收录，只有厂商自报数据（见 #33） | 它不进任何榜，只能看自报指标；等 AA 收录后走 watchlist 自动补上 |
+| 腾讯的榜面身份待定 | `config/vendors.yaml` 里 `tencent: tier: reference`（遵守"严守九家"） | 若要把混元当选型候选，改这一行为 `core` 重跑导出即可 |
 | 库里残留 137 行 `provider='unknown'` | 8 月泄漏的范围外模型，不属本批快照，前端不可见 | 不影响榜面；若要彻底清理需单独一次带审计的归档迁移，未做 |
 | `scripts/fetch_openrouter_meta.py`、`load_accessibility.py` 未接入 v3 | 上下文窗口、可访问性标签仍是旧数据或空 | 上下文窗口在新 payload 里不存在，如需补应走 OpenRouter |
 | AA 不提供逐项评测日期 | 全 payload 唯一日期是 `releaseDate` | 分数只能标"某日 AA 快照"，已按用户要求如实标注 |
 | 无自动调度 | `settings.yaml: ingestion.schedule` 无代码读取；AA 加密化后全自动不可靠 | 采集节奏人工触发 |
 | mypy 未安装 | `project_rules.md §4.1` 要求 ruff/mypy/pytest 三道闸门，只跑了 ruff+pytest | 类型检查缺位 |
 | 发布仍是手动 | CI 只发布静态 `frontend/`，不跑 Python | 见 docs/deploy.md |
-| 前端「榜单」视图为本次新增 | 由本次会话补完，只做过本机浏览器验证（四个视图 + 三榜切换 + 零 console 错误） | 上线后需在真机再看一遍 |
+| 前端「榜单」视图为本次新增 | 本机浏览器实测过四个视图 + 三榜切换 + 零 console 错误；最后一轮数据刷新后浏览器工具超时，改用不依赖 DOM 的字段契约校验（node 脚本核对前端实际访问的每个字段路径）代替 | 上线后需在真机再看一遍榜单视图与自报数据块 |
 
 ## 本次数据批次
 
 - 快照日 **2026-09-20**，抓取时刻 2026-09-19T20:23Z，页面 1,232,493 B，
   sha256 `d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e`
 - 带分模型 31 条 → 入库 26 个模型（**核心 18** + 参照 8）/ 31 个推理档位
+  （随后第二次更新补到 29 / 34，见上一节 #32–#35）
 - benchmark 30 项，评测 **545 条 AA 原始数值** + 50 条本站派生指标 = 595 条
 - 核心 18 个：Anthropic 3（Claude Fable 5 / 5.1 / Opus 5）、OpenAI 4
   （GPT-6 Astra、GPT-5.6 Sol/Terra/Luna，另 gpt-oss-120b）、DeepSeek 2（V4 Pro、

@@ -2,11 +2,11 @@
  "snapshot_date": "2026-09-20",
  "tool": "collect_aa_v3",
  "source": {
-  "url": "file:///tmp/aa_cached.html",
-  "http_status": 0,
-  "fetched_at": "2026-09-19T21:06:36+00:00",
-  "html_sha256": "d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e",
-  "html_bytes": 1232493,
+  "url": "https://artificialanalysis.ai/evaluations/omniscience",
+  "http_status": 200,
+  "fetched_at": "2026-09-19T22:47:41+00:00",
+  "html_sha256": "c5fcaf21b3999630fb258f58b5d9abf8cf22449f3c3e9576cfdc4280ee8a18b3",
+  "html_bytes": 1232321,
   "rsc_chunks": 118
  },
  "counts": {

@@ -205,3 +205,28 @@ def test_reference_models_are_never_ranked(data):
         if m["in_scope"]:
             continue
         assert m["scores"]["ranked"] is False, f"参照模型 {mid} 不应参与排名"
+
+
+def test_vendor_official_metrics_never_enter_benchmarks(data):
+    """厂商自报数据必须与 AA 同口径数据物理隔离。
+
+    证据: 腾讯官方称 Hy3 在 Terminal-Bench 2.1 得 70.8, AA 实测 64.4。
+    若把自报值混进 benchmarks, 归一化就会拿两种口径一起算, 榜面数字即失真。
+    """
+    official_keys = [k for k in data["benchmarks"] if k.endswith("_official")]
+    assert not official_keys, f"自报指标混入了 AA 数据表: {official_keys}"
+    with_official = [m for m in data["models"].values() if m.get("official_metrics")]
+    for m in with_official:
+        for o in m["official_metrics"]:
+            assert o["benchmark"].endswith("_official")
+            assert (o["source_url"] or "").startswith("http"), "自报数据同样要有来源"
+            assert "official" in o["source"]
+            assert o["confidence"] <= 0.5, "自报数据置信度必须显式压低"
+
+
+def test_official_only_model_is_not_scored_as_aa_data(data):
+    """只有自报数据、没有 AA 分数的模型: 不得凭空长出能力分。"""
+    for mid, m in data["models"].items():
+        if m.get("official_metrics") and not m["scores"].get("dims"):
+            assert m["scores"].get("capability") is None, f"{mid} 用自报数据算出了榜分"
+            assert m["in_scope"] is False, f"{mid} 自报数据模型不应进核心榜"

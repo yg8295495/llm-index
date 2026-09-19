@@ -39,9 +39,9 @@
 ## 当前数据批次
 
 - 快照日 **2026-09-20**，来源 Artificial Analysis 评测页
-- **18 个核心模型**（覆盖九家中的 8 家，MiMo 本批 AA 无数据）+ 8 个参照模型，
-  共 31 个推理档位；30 项 benchmark；595 条评测记录
-- 发布物 `frontend/data.json` 约 620KB
+- **19 个核心模型**（覆盖九家中的 8 家，MiMo 本批 AA 无数据）+ 10 个参照模型，
+  共 34 个推理档位；30 项 benchmark；572 条 AA 评测 + 4 条厂商自报指标
+- 发布物 `frontend/data.json` 约 650KB
 - 库内累计 4 个快照、7611 条评测记录，历史批次从不删除
 
 ## 快速开始
@@ -71,19 +71,30 @@ python3 scripts/refresh_data.py --apply    # 实际写入
 分步：
 
 ```bash
-python3 scripts/collect_aa_v3.py                        # 干跑
-python3 scripts/collect_aa_v3.py --no-dry-run           # 采集并追加为新快照
-python3 scripts/export_frontend_data.py                 # 导出 data.json
+python3 scripts/collect_aa_v3.py                    # 干跑（含 watchlist 补采）
+python3 scripts/collect_aa_v3.py --no-dry-run       # 采集并追加为新快照
+python3 scripts/ingest_manual_reference.py          # 登记 AA 未收录模型的厂商自报数据
+python3 scripts/export_frontend_data.py             # 导出 data.json
 ```
+
+**两条数据来源**（口径不同，绝不混算）：
+
+- `config/watchlist.yaml → aa_model_page`：AA 收录但不在 omniscience 默认对比集里的
+  模型，走 `/models/<slug>` 详情页取**同口径**分数（Qwen3.8-Flash-Next、Hy3）。
+- `config/watchlist.yaml → manual` + `data/raw/manual/*.yaml`：AA 完全没收录的模型
+  （混元 Hy4 preview），只能用厂商自报数据。这类指标一律带 `_official` 后缀、
+  置信度压到 0.45、前端单独成块，**不参与任何榜单计算** ——
+  因为官方称 Hy3 在 Terminal-Bench 2.1 得 70.8，而 AA 实测是 64.4，口径明显不同。
 
 采集器只做**追加**：每个快照一批行，重复跑同一快照会跳过而不是覆盖。
 每次采集把页面 HTML（gzip）、解析产物与页面 sha256 落到
 `data/raw/snapshots/<快照日>/`，报告落到 `reports/collection_<快照日>.md`。
+同一天内 AA 若改版，会显式报出"哪些行已无法从当前页面复现"而不静默合并。
 
 ### 运行测试
 
 ```bash
-python3 -m pytest -q                                  # 78 passed
+python3 -m pytest -q                                  # 101 passed
 python3 -m ruff check src scripts tests --select F,E9
 ```
 

@@ -99,6 +99,15 @@ vendors:
     namespace: thinking_machines
     display: "Thinking Machines"
     tier: reference
+  tencent:
+    namespace: tencent
+    display: "腾讯混元 (Hunyuan)"
+    tier: reference
+    note: >-
+      范围外, 但用户 2026-09-20 明确这是他常选的模型之一, 缺了无法判断。
+      AA 收录 Hy3 但未收录 2026-08-28 发布的 Hy4 preview,
+      因此 Hy3 走 AA 同口径、Hy4 preview 走官方自报口径分开呈现。
+      若要让它进综合榜, 把本条 tier 改成 core 并重跑导出即可。
   ifm:
     namespace: ifm
     display: "IFM (待确认)"

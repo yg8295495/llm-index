@@ -14,11 +14,12 @@
    "pricing_input": 10.0,
    "pricing_output": 50.0,
    "pricing_cache_input": 1.0,
-   "answer_speed": 97.8219154626808,
+   "answer_speed": 97.87127948256,
    "openness_index": null,
    "size_class": "large",
    "deprecated": true,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "adaptive-max": {
      "aa_slug": "claude-fable-5",
@@ -70,11 +71,12 @@
    "pricing_input": 10.0,
    "pricing_output": 50.0,
    "pricing_cache_input": 0.25,
-   "answer_speed": 107.863851491074,
+   "answer_speed": 105.982513113423,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "claude-fable-5-1-high",
@@ -136,11 +138,12 @@
    "pricing_input": 5.0,
    "pricing_output": 25.0,
    "pricing_cache_input": 0.5,
-   "answer_speed": 82.0213667948646,
+   "answer_speed": 83.0189581032451,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "adaptive-max": {
      "aa_slug": "claude-opus-5",
@@ -153,7 +156,7 @@
      "factual": 89.65,
      "workflow": 85.48,
      "engineering": 81.59,
-     "cost": 50.6
+     "cost": 50.58
     },
     "coverage": {
      "factual": {
@@ -170,8 +173,8 @@
      }
     },
     "capability": 85.86,
-    "cost": 50.6,
-    "composite": 79.48,
+    "cost": 50.58,
+    "composite": 79.47,
     "blended_price": 10.0,
     "value_raw": 8.586,
     "ranked": true,
@@ -192,11 +195,12 @@
    "pricing_input": 1.32,
    "pricing_output": 3.96,
    "pricing_cache_input": 0.044,
-   "answer_speed": 102.646342193787,
+   "answer_speed": 106.107237724723,
    "openness_index": 44.44444444444444,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "reasoning": {
      "aa_slug": "deepseek-v4-pro",
@@ -209,7 +213,7 @@
      "factual": 60.8,
      "workflow": 70.91,
      "engineering": 52.77,
-     "cost": 91.18
+     "cost": 91.15
     },
     "coverage": {
      "factual": {
@@ -226,7 +230,7 @@
      }
     },
     "capability": 62.12,
-    "cost": 91.18,
+    "cost": 91.15,
     "composite": 67.27,
     "blended_price": 1.98,
     "value_raw": 31.3737,
@@ -248,11 +252,12 @@
    "pricing_input": 0.3,
    "pricing_output": 1.2,
    "pricing_cache_input": 0.006,
-   "answer_speed": 282.185415196861,
+   "answer_speed": 273.283920756669,
    "openness_index": 44.44444444444444,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "deepseek-v4-1-flash",
@@ -265,7 +270,7 @@
      "factual": 43.01,
      "workflow": 76.54,
      "engineering": 64.51,
-     "cost": 98.55
+     "cost": 98.51
     },
     "coverage": {
      "factual": {
@@ -282,8 +287,8 @@
      }
     },
     "capability": 61.13,
-    "cost": 98.55,
-    "composite": 67.89,
+    "cost": 98.51,
+    "composite": 67.88,
     "blended_price": 0.525,
     "value_raw": 116.4381,
     "ranked": true,
@@ -304,11 +309,12 @@
    "pricing_input": 0.3,
    "pricing_output": 2.5,
    "pricing_cache_input": 0.03,
-   "answer_speed": 355.410385093466,
+   "answer_speed": 377.905991089564,
    "openness_index": null,
    "size_class": "medium",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "gemini-3-5-flash-lite",
@@ -321,7 +327,7 @@
      "factual": 23.45,
      "workflow": 36.57,
      "engineering": 28.59,
-     "cost": 96.9
+     "cost": 96.86
     },
     "coverage": {
      "factual": {
@@ -338,8 +344,8 @@
      }
     },
     "capability": 29.6,
-    "cost": 96.9,
-    "composite": 41.71,
+    "cost": 96.86,
+    "composite": 41.7,
     "blended_price": 0.85,
     "value_raw": 34.8235,
     "ranked": true,
@@ -360,11 +366,12 @@
    "pricing_input": 0.75,
    "pricing_output": 3.75,
    "pricing_cache_input": 0.075,
-   "answer_speed": 298.459587535738,
+   "answer_speed": 313.839432468971,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "gemini-3-8-flash",
@@ -377,7 +384,7 @@
      "factual": 77.67,
      "workflow": 75.53,
      "engineering": 62.87,
-     "cost": 93.61
+     "cost": 93.58
     },
     "coverage": {
      "factual": {
@@ -394,8 +401,8 @@
      }
     },
     "capability": 72.68,
-    "cost": 93.61,
-    "composite": 76.37,
+    "cost": 93.58,
+    "composite": 76.36,
     "blended_price": 1.5,
     "value_raw": 48.4533,
     "ranked": true,
@@ -421,6 +428,7 @@
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "k2-horizon-375b-a23b",
@@ -454,11 +462,12 @@
    "pricing_input": 0.35,
    "pricing_output": 1.5,
    "pricing_cache_input": 0.04,
-   "answer_speed": 90.8774772092399,
+   "answer_speed": 91.2223787609439,
    "openness_index": 44.44444444444444,
    "size_class": "small",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "muse-glimmer",
@@ -492,11 +501,12 @@
    "pricing_input": 1.25,
    "pricing_output": 4.25,
    "pricing_cache_input": 0.15,
-   "answer_speed": 187.408949221449,
+   "answer_speed": 199.934344810783,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "muse-spark-1-3",
@@ -530,11 +540,12 @@
    "pricing_input": 0.3,
    "pricing_output": 1.2,
    "pricing_cache_input": 0.06,
-   "answer_speed": 182.653799527486,
+   "answer_speed": 195.048092609393,
    "openness_index": 33.333333333333336,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "minimax-m3",
@@ -547,7 +558,7 @@
      "factual": 50.45,
      "workflow": 41.81,
      "engineering": 43.4,
-     "cost": 98.55
+     "cost": 98.51
     },
     "coverage": {
      "factual": {
@@ -564,8 +575,8 @@
      }
     },
     "capability": 45.35,
-    "cost": 98.55,
-    "composite": 54.91,
+    "cost": 98.51,
+    "composite": 54.9,
     "blended_price": 0.525,
     "value_raw": 86.381,
     "ranked": true,
@@ -586,11 +597,12 @@
    "pricing_input": 1.5,
    "pricing_output": 7.5,
    "pricing_cache_input": 0.15,
-   "answer_speed": 148.079603272958,
+   "answer_speed": 151.40823354892,
    "openness_index": 33.333333333333336,
    "size_class": "medium",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "mistral-medium-3-5",
@@ -624,11 +636,12 @@
    "pricing_input": 3.0,
    "pricing_output": 15.0,
    "pricing_cache_input": 0.3,
-   "answer_speed": 41.7099825948937,
+   "answer_speed": 42.7177727153843,
    "openness_index": 38.888888888888886,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "kimi-k3",
@@ -641,7 +654,7 @@
      "factual": 73.97,
      "workflow": 80.92,
      "engineering": 70.45,
-     "cost": 70.84
+     "cost": 70.81
     },
     "coverage": {
      "factual": {
@@ -658,8 +671,8 @@
      }
     },
     "capability": 75.45,
-    "cost": 70.84,
-    "composite": 74.58,
+    "cost": 70.81,
+    "composite": 74.57,
     "blended_price": 6.0,
     "value_raw": 12.575,
     "ranked": true,
@@ -680,11 +693,12 @@
    "pricing_input": 0.6,
    "pricing_output": 2.4,
    "pricing_cache_input": 0.2,
-   "answer_speed": 172.939058059187,
+   "answer_speed": 170.090296182098,
    "openness_index": 83.33333333333333,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "reasoning": {
      "aa_slug": "nvidia-nemotron-3-ultra-550b-a55b",
@@ -718,11 +732,12 @@
    "pricing_input": 0.2,
    "pricing_output": 1.2,
    "pricing_cache_input": 0.02,
-   "answer_speed": 128.320539900481,
+   "answer_speed": 162.563541815825,
    "openness_index": null,
    "size_class": "medium",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "gpt-5-6-luna",
@@ -735,7 +750,7 @@
      "factual": 57.52,
      "workflow": 69.81,
      "engineering": 56.66,
-     "cost": 98.92
+     "cost": 98.89
     },
     "coverage": {
      "factual": {
@@ -752,8 +767,8 @@
      }
     },
     "capability": 61.66,
-    "cost": 98.92,
-    "composite": 68.33,
+    "cost": 98.89,
+    "composite": 68.32,
     "blended_price": 0.45,
     "value_raw": 137.0222,
     "ranked": true,
@@ -774,11 +789,12 @@
    "pricing_input": 4.0,
    "pricing_output": 20.0,
    "pricing_cache_input": 0.4,
-   "answer_speed": 61.0249658337045,
+   "answer_speed": 61.6001801354574,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "gpt-5-6-sol",
@@ -791,7 +807,7 @@
      "factual": 83.36,
      "workflow": 77.95,
      "engineering": 77.34,
-     "cost": 60.72
+     "cost": 60.7
     },
     "coverage": {
      "factual": {
@@ -808,7 +824,7 @@
      }
     },
     "capability": 79.71,
-    "cost": 60.72,
+    "cost": 60.7,
     "composite": 76.27,
     "blended_price": 8.0,
     "value_raw": 9.9637,
@@ -830,11 +846,12 @@
    "pricing_input": 2.0,
    "pricing_output": 12.0,
    "pricing_cache_input": 0.2,
-   "answer_speed": 82.5263279065539,
+   "answer_speed": 93.8948919804078,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "gpt-5-6-terra",
@@ -847,7 +864,7 @@
      "factual": 69.68,
      "workflow": 72.11,
      "engineering": 72.47,
-     "cost": 78.43
+     "cost": 78.4
     },
     "coverage": {
      "factual": {
@@ -864,8 +881,8 @@
      }
     },
     "capability": 71.35,
-    "cost": 78.43,
-    "composite": 72.63,
+    "cost": 78.4,
+    "composite": 72.62,
     "blended_price": 4.5,
     "value_raw": 15.8556,
     "ranked": true,
@@ -886,11 +903,12 @@
    "pricing_input": 10.0,
    "pricing_output": 50.0,
    "pricing_cache_input": 1.0,
-   "answer_speed": 58.0406225026809,
+   "answer_speed": 59.6397805665908,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "gpt-6-astra-high",
@@ -957,11 +975,12 @@
    "pricing_input": 0.15,
    "pricing_output": 0.595,
    "pricing_cache_input": 0.125,
-   "answer_speed": 185.175407594182,
+   "answer_speed": 191.276415266558,
    "openness_index": 38.888888888888886,
    "size_class": "medium",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "gpt-oss-120b",
@@ -974,7 +993,7 @@
      "factual": 17.28,
      "workflow": 2.84,
      "engineering": 7.14,
-     "cost": 99.88
+     "cost": 99.84
     },
     "coverage": {
      "factual": {
@@ -991,8 +1010,8 @@
      }
     },
     "capability": 9.23,
-    "cost": 99.88,
-    "composite": 25.53,
+    "cost": 99.84,
+    "composite": 25.52,
     "blended_price": 0.2612,
     "value_raw": 35.3369,
     "ranked": true,
@@ -1013,11 +1032,12 @@
    "pricing_input": 0.5,
    "pricing_output": 3.0,
    "pricing_cache_input": 0.05,
-   "answer_speed": 51.9697880393718,
+   "answer_speed": 50.5945374009985,
    "openness_index": 38.888888888888886,
    "size_class": "small",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "xhigh": {
      "aa_slug": "qwen3-8-27b",
@@ -1030,7 +1050,7 @@
      "factual": 36.2,
      "workflow": 72.91,
      "engineering": 49.22,
-     "cost": 95.51
+     "cost": 95.47
     },
     "coverage": {
      "factual": {
@@ -1047,12 +1067,69 @@
      }
     },
     "capability": 53.03,
-    "cost": 95.51,
-    "composite": 60.65,
+    "cost": 95.47,
+    "composite": 60.64,
     "blended_price": 1.125,
     "value_raw": 47.1378,
     "ranked": true,
     "value": 15.34
+   }
+  },
+  "qwen/qwen3.8-flash-next": {
+   "id": "qwen/qwen3.8-flash-next",
+   "provider": "qwen",
+   "display_name": "Qwen3.8-Flash-Next",
+   "tier": "core",
+   "in_scope": true,
+   "release_date": "2026-08-26",
+   "is_reasoning": true,
+   "open_source": "Open",
+   "supports_vision": true,
+   "supports_audio": false,
+   "pricing_input": 0.15,
+   "pricing_output": 0.47,
+   "pricing_cache_input": 0.016,
+   "answer_speed": null,
+   "openness_index": null,
+   "size_class": "large",
+   "deprecated": false,
+   "needs_manual_review": false,
+   "official_metrics": [],
+   "reasoning_levels": {
+    "": {
+     "aa_slug": "qwen3-8-flash-next",
+     "pk": 685,
+     "display_name": "Qwen3.8-Flash-Next"
+    }
+   },
+   "scores": {
+    "dims": {
+     "factual": 50.45,
+     "workflow": 73.93,
+     "engineering": 66.69,
+     "cost": 100.0
+    },
+    "coverage": {
+     "factual": {
+      "n": 6,
+      "of": 10
+     },
+     "workflow": {
+      "n": 4,
+      "of": 11
+     },
+     "engineering": {
+      "n": 4,
+      "of": 7
+     }
+    },
+    "capability": 63.48,
+    "cost": 100.0,
+    "composite": 70.08,
+    "blended_price": 0.23,
+    "value_raw": 276.0,
+    "ranked": true,
+    "value": 97.14
    }
   },
   "qwen/qwen3.8-max-0902": {
@@ -1069,11 +1146,12 @@
    "pricing_input": 2.0,
    "pricing_output": 6.0,
    "pricing_cache_input": 0.25,
-   "answer_speed": 46.6910551962427,
+   "answer_speed": 44.8523153977718,
    "openness_index": null,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "qwen3-8-max",
@@ -1086,7 +1164,7 @@
      "factual": 67.3,
      "workflow": 86.21,
      "engineering": 75.16,
-     "cost": 86.02
+     "cost": 85.99
     },
     "coverage": {
      "factual": {
@@ -1103,8 +1181,8 @@
      }
     },
     "capability": 76.3,
-    "cost": 86.02,
-    "composite": 78.04,
+    "cost": 85.99,
+    "composite": 78.03,
     "blended_price": 3.0,
     "value_raw": 25.4333,
     "ranked": true,
@@ -1130,11 +1208,135 @@
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "": {
      "aa_slug": "step-5",
      "pk": 678,
      "display_name": "Step 5 Preview"
+    }
+   },
+   "scores": {
+    "dims": {},
+    "coverage": {},
+    "capability": null,
+    "cost": null,
+    "composite": null,
+    "blended_price": null,
+    "value_raw": null,
+    "ranked": false,
+    "value": null
+   }
+  },
+  "tencent/hy3": {
+   "id": "tencent/hy3",
+   "provider": "tencent",
+   "display_name": "Hy3",
+   "tier": "reference",
+   "in_scope": false,
+   "release_date": "2026-07-06",
+   "is_reasoning": true,
+   "open_source": "Open",
+   "supports_vision": false,
+   "supports_audio": false,
+   "pricing_input": 0.14,
+   "pricing_output": 0.58,
+   "pricing_cache_input": 0.035,
+   "answer_speed": null,
+   "openness_index": null,
+   "size_class": "large",
+   "deprecated": false,
+   "needs_manual_review": true,
+   "official_metrics": [],
+   "reasoning_levels": {
+    "": {
+     "aa_slug": "hy3",
+     "pk": 463,
+     "display_name": "Hy3"
+    }
+   },
+   "scores": {
+    "dims": {},
+    "coverage": {},
+    "capability": null,
+    "cost": null,
+    "composite": null,
+    "blended_price": null,
+    "value_raw": null,
+    "ranked": false,
+    "value": null
+   }
+  },
+  "tencent/hy4-preview": {
+   "id": "tencent/hy4-preview",
+   "provider": "tencent",
+   "display_name": "混元 Hy4 preview (Tencent Hunyuan)",
+   "tier": "reference",
+   "in_scope": false,
+   "release_date": "2026-08-28",
+   "is_reasoning": null,
+   "open_source": "Open",
+   "supports_vision": null,
+   "supports_audio": null,
+   "pricing_input": 0.834,
+   "pricing_output": 2.501,
+   "pricing_cache_input": null,
+   "answer_speed": null,
+   "openness_index": null,
+   "size_class": null,
+   "deprecated": false,
+   "needs_manual_review": true,
+   "official_metrics": [
+    {
+     "benchmark": "terminalbench_v2_1_official",
+     "name": "Terminal-Bench 2.1（官方自报）",
+     "value": 85.4,
+     "unit": "%",
+     "note": "官方称 Hy3 同项为 70.8; AA 实测 Hy3 为 64.42 —— 两者不可混用",
+     "source": "tencent_official",
+     "source_url": "https://developer.cloud.tencent.com/article/2735118",
+     "confidence": 0.45,
+     "observed_at": "2026-09-20"
+    },
+    {
+     "benchmark": "deepswe_official",
+     "name": "DeepSWE 软件工程基准（官方自报）",
+     "value": 64.3,
+     "unit": "%",
+     "note": "AA 无此评测项, 站内无同口径对照; 官方称 Hy3 为 28.0",
+     "source": "tencent_official",
+     "source_url": "https://developer.cloud.tencent.com/article/2735118",
+     "confidence": 0.45,
+     "observed_at": "2026-09-20"
+    },
+    {
+     "benchmark": "codearena_webdev_rank_official",
+     "name": "CodeArena WebDev 名次（官方自报）",
+     "value": 6.0,
+     "unit": "rank",
+     "note": "是名次不是得分, 不参与任何归一化",
+     "source": "tencent_official",
+     "source_url": "https://developer.cloud.tencent.com/article/2735118",
+     "confidence": 0.45,
+     "observed_at": "2026-09-20"
+    },
+    {
+     "benchmark": "expert_blind_eval_official",
+     "name": "专家盲测平均分（官方自报，满分 4）",
+     "value": 2.99,
+     "unit": "score/4",
+     "note": "官方口径: 略高于 GLM-5.3 的 2.92 与 Kimi K3 的 2.94; 盲测评分标准由腾讯定义",
+     "source": "tencent_official",
+     "source_url": "https://developer.cloud.tencent.com/article/2735118",
+     "confidence": 0.45,
+     "observed_at": "2026-09-20"
+    }
+   ],
+   "reasoning_levels": {
+    "": {
+     "aa_slug": null,
+     "pk": 686,
+     "display_name": "混元 Hy4 preview (Tencent Hunyuan)"
     }
    },
    "scores": {
@@ -1163,11 +1365,12 @@
    "pricing_input": 1.0,
    "pricing_output": 4.05,
    "pricing_cache_input": 0.17,
-   "answer_speed": 82.1276422243961,
+   "answer_speed": 82.8639997544414,
    "openness_index": 38.888888888888886,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "xhigh": {
      "aa_slug": "inkling",
@@ -1206,6 +1409,7 @@
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": true,
+   "official_metrics": [],
    "reasoning_levels": {
     "high": {
      "aa_slug": "grok-4-6",
@@ -1239,11 +1443,12 @@
    "pricing_input": 1.4,
    "pricing_output": 4.4,
    "pricing_cache_input": 0.26,
-   "answer_speed": 87.4797425292423,
+   "answer_speed": 82.1017133420489,
    "openness_index": 33.333333333333336,
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "glm-5-3",
@@ -1256,7 +1461,7 @@
      "factual": 67.98,
      "workflow": 73.07,
      "engineering": 77.56,
-     "cost": 90.32
+     "cost": 90.29
     },
     "coverage": {
      "factual": {
@@ -1273,8 +1478,8 @@
      }
     },
     "capability": 72.53,
-    "cost": 90.32,
-    "composite": 75.78,
+    "cost": 90.29,
+    "composite": 75.77,
     "blended_price": 2.15,
     "value_raw": 33.7349,
     "ranked": true,
@@ -1300,6 +1505,7 @@
    "size_class": "large",
    "deprecated": false,
    "needs_manual_review": false,
+   "official_metrics": [],
    "reasoning_levels": {
     "max": {
      "aa_slug": "glm-5-3-flash",
@@ -1312,7 +1518,7 @@
      "factual": 61.02,
      "workflow": 71.43,
      "engineering": 70.5,
-     "cost": 100.0
+     "cost": 99.96
     },
     "coverage": {
      "factual": {
@@ -1329,8 +1535,8 @@
      }
     },
     "capability": 67.45,
-    "cost": 100.0,
-    "composite": 73.33,
+    "cost": 99.96,
+    "composite": 73.32,
     "blended_price": 0.2375,
     "value_raw": 284.0,
     "ranked": true,
@@ -2511,6 +2717,26 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": -9.716666666666667,
+    "score_type": "index",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": {
+     "accuracy": 0.245,
+     "hallucinationRate": 0.4532008830022075
+    },
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "qwen/qwen3.8-27b",
     "reasoning_level": "xhigh",
     "display_name": "Qwen3.8 27B (xhigh)",
@@ -2597,6 +2823,26 @@
     },
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": -18.466666666666665,
+    "score_type": "index",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": {
+     "accuracy": 0.31966666666666665,
+     "hallucinationRate": 0.7413032827045566
+    },
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.9,
     "observed_at": "2026-09-20"
    },
@@ -6040,6 +6286,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.559083218951688,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "anthropic/claude-fable-5.1",
     "reasoning_level": "high",
     "display_name": "Claude Fable 5.1 (Adaptive Reasoning, High Effort, Default Fallback)",
@@ -7380,6 +7643,23 @@
     },
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/automationbench",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.18409128371172395,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.75,
     "observed_at": "2026-09-20"
    },
@@ -11609,6 +11889,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.111428571428571,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "qwen/qwen3.8-27b",
     "reasoning_level": "xhigh",
     "display_name": "Qwen3.8 27B (xhigh)",
@@ -11639,6 +11936,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/critpt",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.0485714285714286,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.75,
     "observed_at": "2026-09-20"
    },
@@ -12648,6 +12962,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.156,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "zhipu/glm-5.3-flash",
     "reasoning_level": "max",
     "display_name": "GLM 5.3 Flash",
@@ -12868,6 +13199,23 @@
     },
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/gdp-pdf",
+    "confidence": 0.75,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.112,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.75,
     "observed_at": "2026-09-20"
    },
@@ -13297,6 +13645,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 1611.97,
+    "score_type": "elo",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "openai/gpt-5.6-sol",
     "reasoning_level": "max",
     "display_name": "GPT-5.6 Sol (max)",
@@ -13650,6 +14015,23 @@
     },
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/gdpval-aa",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 1044.74,
+    "score_type": "elo",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.85,
     "observed_at": "2026-09-20"
    },
@@ -14027,6 +14409,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.923232323232323,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "zhipu/glm-5.3",
     "reasoning_level": "max",
     "display_name": "GLM-5.3 (max)",
@@ -14108,6 +14507,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/gpqa",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.896969696969697,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.9,
     "observed_at": "2026-09-20"
    },
@@ -15952,6 +16368,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.380444856348471,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "qwen/qwen3.8-27b",
     "reasoning_level": "xhigh",
     "display_name": "Qwen3.8 27B (xhigh)",
@@ -15965,6 +16398,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/hle",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.334569045412419,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.85,
     "observed_at": "2026-09-20"
    },
@@ -16534,6 +16984,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 39.8223021864741,
+    "score_type": "index",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "deepseek/deepseek-v4.1-flash",
     "reasoning_level": "max",
     "display_name": "DeepSeek V4.1 Flash (Reasoning, Max Effort)",
@@ -16649,6 +17116,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 25.2972775731571,
+    "score_type": "index",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.85,
     "observed_at": "2026-09-20"
    },
@@ -17252,6 +17736,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.796666666666667,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.8,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "anthropic/claude-opus-5",
     "reasoning_level": "adaptive-max",
     "display_name": "Claude Opus 5 (Adaptive Reasoning, Max Effort)",
@@ -17282,6 +17783,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/lcr",
+    "confidence": 0.8,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.79,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.8,
     "observed_at": "2026-09-20"
    },
@@ -17940,6 +18458,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.797687861271676,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.8,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "google/gemini-3.5-flash-lite",
     "reasoning_level": "",
     "display_name": "Gemini 3.5 Flash-Lite",
@@ -18469,6 +19004,40 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.505787037037037,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.486111111111111,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "minimax/minimax-m3",
     "reasoning_level": "",
     "display_name": "MiniMax-M3",
@@ -18898,6 +19467,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.45360824742268,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.7,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "google/gemini-3.8-flash",
     "reasoning_level": "high",
     "display_name": "Gemini 3.8 Flash (high)",
@@ -19149,6 +19735,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.7,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.228865979381443,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.7,
     "observed_at": "2026-09-20"
    },
@@ -19582,6 +20185,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.861423220973783,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "moonshot/kimi-k3",
     "reasoning_level": "max",
     "display_name": "Kimi K3 (max)",
@@ -19748,6 +20368,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/terminal-bench",
+    "confidence": 0.85,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.644194756554307,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.85,
     "observed_at": "2026-09-20"
    },
@@ -20145,6 +20782,23 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.252525252525253,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/qwen3-8-flash-next",
+    "confidence": 0.8,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "xai/grok-4.6",
     "reasoning_level": "high",
     "display_name": "Grok 4.6 (high)",
@@ -20345,6 +20999,23 @@
     "breakdown": null,
     "source": "artificial_analysis",
     "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.8,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.00505050505050505,
+    "score_type": "ratio",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "run_cost_usd": null,
+    "breakdown": null,
+    "source": "artificial_analysis",
+    "source_url": "https://artificialanalysis.ai/models/hy3",
     "confidence": 0.8,
     "observed_at": "2026-09-20"
    },
@@ -22784,6 +23455,28 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "tencent/hy4-preview",
+    "reasoning_level": "",
+    "display_name": "混元 Hy4 preview (Tencent Hunyuan)",
+    "score_raw": 1.2508,
+    "score_type": "usd",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": 1.2508,
+    "run_cost_usd": null,
+    "breakdown": {
+     "input_per_1m": 0.834,
+     "output_per_1m": 2.501,
+     "cache_input_per_1m": null,
+     "assumption": "input:output = 3:1"
+    },
+    "source": "artificial_analysis_pricing",
+    "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "qwen/qwen3.8-27b",
     "reasoning_level": "",
     "display_name": "Qwen3.8 27B (xhigh)",
@@ -22960,6 +23653,28 @@
     "observed_at": "2026-09-20"
    },
    {
+    "model_id": "tencent/hy3",
+    "reasoning_level": "",
+    "display_name": "Hy3",
+    "score_raw": 0.25,
+    "score_type": "usd",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": 0.25,
+    "run_cost_usd": null,
+    "breakdown": {
+     "input_per_1m": 0.14,
+     "output_per_1m": 0.58,
+     "cache_input_per_1m": 0.035,
+     "assumption": "input:output = 3:1"
+    },
+    "source": "artificial_analysis_pricing",
+    "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
     "model_id": "zhipu/glm-5.3-flash",
     "reasoning_level": "",
     "display_name": "GLM 5.3 Flash",
@@ -22974,6 +23689,28 @@
      "input_per_1m": 0.15,
      "output_per_1m": 0.5,
      "cache_input_per_1m": 0.026,
+     "assumption": "input:output = 3:1"
+    },
+    "source": "artificial_analysis_pricing",
+    "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "confidence": 0.9,
+    "observed_at": "2026-09-20"
+   },
+   {
+    "model_id": "qwen/qwen3.8-flash-next",
+    "reasoning_level": "",
+    "display_name": "Qwen3.8-Flash-Next",
+    "score_raw": 0.23,
+    "score_type": "usd",
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": 0.23,
+    "run_cost_usd": null,
+    "breakdown": {
+     "input_per_1m": 0.15,
+     "output_per_1m": 0.47,
+     "cache_input_per_1m": 0.016,
      "assumption": "input:output = 3:1"
     },
     "source": "artificial_analysis_pricing",
@@ -23712,6 +24449,10 @@
     "display": "阶跃星辰 (Step)",
     "tier": "reference"
    },
+   "tencent": {
+    "display": "腾讯混元 (Hunyuan)",
+    "tier": "reference"
+   },
    "thinking_machines": {
     "display": "Thinking Machines",
     "tier": "reference"
@@ -23856,22 +24597,23 @@
  },
  "metadata": {
   "snapshot_date": "2026-09-20",
-  "collected_at": "2026-09-19T21:06:36+00:00",
-  "html_sha256": "d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e",
-  "source_url": "file:///tmp/aa_cached.html",
-  "exported_at": "2026-09-19T21:11:17+00:00",
-  "model_count": 26,
-  "model_entry_count": 31,
-  "core_model_count": 18,
-  "reference_model_count": 8,
+  "collected_at": "2026-09-19T22:47:41+00:00",
+  "html_sha256": "c5fcaf21b3999630fb258f58b5d9abf8cf22449f3c3e9576cfdc4280ee8a18b3",
+  "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+  "exported_at": "2026-09-19T22:48:22+00:00",
+  "model_count": 29,
+  "model_entry_count": 34,
+  "core_model_count": 19,
+  "reference_model_count": 10,
   "benchmark_count": 30,
-  "eval_count": 595,
-  "raw_eval_count": 545,
-  "derived_eval_count": 50,
+  "eval_count": 625,
+  "raw_eval_count": 572,
+  "derived_eval_count": 53,
+  "official_metric_count": 4,
   "schema_version": 2,
   "scoring": {
    "universe": "core_only",
-   "universe_size": 18,
+   "universe_size": 19,
    "normalization": {
     "method": "min-max",
     "min_score": 0,
@@ -23906,12 +24648,12 @@
   "snapshots": [
    {
     "snapshot_date": "2026-09-20",
-    "model_count": 31,
-    "eval_count": 545,
-    "collected_at": "2026-09-19T21:06:36+00:00",
-    "source_url": "file:///tmp/aa_cached.html",
-    "html_sha256": "d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e",
-    "notes": "collect_aa_v3; RSC chunks=118"
+    "model_count": 33,
+    "eval_count": 572,
+    "collected_at": "2026-09-19T22:47:41+00:00",
+    "source_url": "https://artificialanalysis.ai/evaluations/omniscience",
+    "html_sha256": "c5fcaf21b3999630fb258f58b5d9abf8cf22449f3c3e9576cfdc4280ee8a18b3",
+    "notes": "collect_aa_v3; RSC chunks=118 | 同日重跑: 1 行来自更早的页面版本且 AA 已不再展示（muse-spark-1-3/mlcr_overall） | 含厂商自报指标（不参与排名）"
    },
    {
     "snapshot_date": "2026-08-09",

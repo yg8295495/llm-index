@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 SOURCE_URL = "https://artificialanalysis.ai/evaluations/omniscience"
+MODEL_URL = "https://artificialanalysis.ai/models/{slug}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) llm-index-collector/3.0"
 
 _CHUNK_RE = re.compile(r'self\.__next_f\.push\(\[\d+,"((?:[^"\\]|\\.)*)"\]')
@@ -156,7 +157,9 @@ def collect_scored_models(text: str) -> list[dict[str, Any]]:
     """
     found: dict[str, dict[str, Any]] = {}
     decoder = json.JSONDecoder()
-    for m in re.finditer(r'\{"id":"[0-9a-f]{8}-', text):
+    # \s* 是刻意的: 当前 AA 输出的是无空格压缩 JSON, 但只要对方换成带空格的
+    # 格式化输出, 严格匹配就会静默漏掉全部模型（采集看起来成功、其实零记录）。
+    for m in re.finditer(r'\{"id":\s*"[0-9a-f]{8}-', text):
         try:
             obj, _ = decoder.raw_decode(text, m.start())
         except ValueError:
@@ -191,3 +194,29 @@ def parse_page(page: RawPage) -> dict[str, Any]:
         "registry": registry,
         "counts": {"scored": len(scored), "registry": len(registry)},
     }
+
+
+def fetch_model_page(slug: str, timeout: int = 90) -> RawPage:
+    """抓取 AA 的单模型详情页 /models/<slug>。
+
+    omniscience 页的 SSR 只带 31 个默认对比模型, 但详情页里内联了该模型的
+    同口径完整分数 (实测约 3.9MB, 含数百个带分对象)。这是补采单个模型的
+    正规路径 —— 不需要碰那个加密 blob。
+    """
+    page = fetch_page(MODEL_URL.format(slug=slug), timeout=timeout)
+    if page.http_status != 200:
+        raise PayloadError(f"{slug}: HTTP {page.http_status}")
+    return page
+
+
+def find_scored_record(page: RawPage, slug: str) -> dict[str, Any]:
+    """从详情页里取出指定 slug 的带分记录。
+
+    只认 slug 完全匹配的那一条, 不做前缀匹配 —— 详情页同时内联了其它模型的
+    对象, 前缀匹配会取错 (例如 hy3 命中 hy3-preview)。
+    """
+    text = decode_rsc(page.html)
+    for rec in collect_scored_models(text):
+        if rec.get("slug") == slug:
+            return rec
+    raise PayloadError(f"详情页里没有 {slug} 的带分记录 (AA 可能未收录该模型)")

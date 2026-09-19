@@ -1,0 +1,31 @@
+# 补采清单 v1 — 2026-09-20
+#
+# 用途: omniscience 页面 SSR 只内嵌 31 个"当前默认对比"模型, 但 AA 为几乎每个
+# 模型都提供了单模型详情页 /models/<slug>, 里面内联了同口径的完整分数。
+# 本清单列出需要额外单独取页的 AA slug, 由 collect_aa_v3.py 在主批次之后逐个抓取。
+#
+# 为什么需要: 用户 2026-09-20 指出榜面少了两个他常选的模型 ——
+#   qwen3-8-flash-next (Qwen3.8-Flash-Next, 阿里, 属九家核心) 在注册表里有,
+#   但不在 omniscience 的 31 条 SSR 里, 因此之前完全没进榜。
+#
+# 字段:
+#   aa_slug:  AA 的模型 slug
+#   reason:   为什么要补采 (会写进 Collection Report)
+#   source:   aa_model_page = 走 AA 详情页, 与榜内其他分数同口径
+#             manual        = AA 未收录, 用 data/raw/manual/ 下的人工登记文件
+
+aa_model_page:
+  - aa_slug: qwen3-8-flash-next
+    reason: "用户常选; 阿里系, 属九家核心范围, 但不在 omniscience SSR 的 31 条内"
+  - aa_slug: hy3
+    reason: "腾讯混元当前版本; AA 已收录但未进 omniscience 默认对比集, 作参照锚点"
+
+# AA 完全没有收录的模型, 走人工登记 (见 data/raw/manual/*.yaml)
+manual:
+  - model_id: tencent/hy4-preview
+    file: hy4_preview_2026-09-20.yaml
+    reason: >-
+      混元 Hy4 preview 于 2026-08-28 发布并开源, AA 尚未收录
+      (实测 /models/hy4、/models/hy4-preview、/models/hunyuan-4 均 404,
+      注册表 653 条里只有 hy3 系列)。用户明确表示这是他常选的模型,
+      因此采用官方发布数据 + OpenRouter 定价, 并与 AA 同口径分数分开展示。

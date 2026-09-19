@@ -1,15 +1,15 @@
 # Collection Report — AA Omniscience 2026-09-20
 
 - 工具: `collect_aa_v3`  模式: 已写入
-- 来源: file:///tmp/aa_cached.html
-- 抓取时刻: 2026-09-19T21:06:36+00:00  HTTP 0  1,232,493 B
-- 页面指纹 sha256: `d20f0a55bc5129b36e27a29c8226463e4045d4516ca09cd314574282173f176e`
+- 来源: https://artificialanalysis.ai/evaluations/omniscience
+- 抓取时刻: 2026-09-19T22:47:41+00:00  HTTP 200  1,232,321 B
+- 页面指纹 sha256: `c5fcaf21b3999630fb258f58b5d9abf8cf22449f3c3e9576cfdc4280ee8a18b3`
 - RSC 分片数: 118
 - 解析: 带分模型 31 / 注册表 653
 
 ## 范围与归属
 - 入库模型: core 23 + reference 8 + unclassified 0; 范围外排除 0
-- 评测行: 写 0, 已存在跳过 545, 因缺 source_url 拒绝 0
+- 评测行: 写 0, 已存在跳过 544, 因缺 source_url 拒绝 0
 - 新建模型行 0 / 更新既有行 31
 
 ## 需要人工确认 (needs_manual_review)
@@ -21,6 +21,22 @@
 ## 来源 URL 口径
 - 以下 13 个数据源在 config/benchmarks.yaml 未写独立 source_url, 统一回退为 AA omniscience 页面 URL (本批次数值的确切出处):
   `agentic_index`, `aime`, `analyst_agent`, `apex_agents`, `coding_index`, `cost_per_task`, `enterprise_ops_gym`, `intelligence_index`, `itbench_sre`, `mlcr_overall`, `pricing`, `tau_banking`, `terminalbench_v4_0`
+
+## 补采清单 (config/watchlist.yaml → AA 单模型详情页)
+- `qwen3-8-flash-next` → 0 条评测（新建 0 / 更新 1），tier={'core': 1}
+  - 出处: https://artificialanalysis.ai/models/qwen3-8-flash-next（3,941,693 B, sha256 `46f88f88ff4e…`）
+  - 原因: 用户常选; 阿里系, 属九家核心范围, 但不在 omniscience SSR 的 31 条内
+- `hy3` → 0 条评测（新建 0 / 更新 1），tier={'reference': 1}
+  - 出处: https://artificialanalysis.ai/models/hy3（3,924,889 B, sha256 `50fd94efc91e…`）
+  - 原因: 腾讯混元当前版本; AA 已收录但未进 omniscience 默认对比集, 作参照锚点
+
+## ⚠️ 同日页面改版
+
+本快照有 1 行已不在当前 AA 页面上（AA 在同一天内改过页面，快照按日期唯一，因此这批是两个页面版本的并集）。这些行**保留不删**，但要知道它们已无法从当前页面复现：
+
+| aa_slug | benchmark | 值 |
+|---|---|---|
+| `muse-spark-1-3` | mlcr_overall | 0.411111111111111 |
 
 ## 模型明细
 
@@ -51,7 +67,7 @@
 | core | `zhipu/glm-5.3-flash` | max | 2026-08-26 | 16 |
 | reference | `ifm/k2-horizon-375b-a23b` | — | 2026-09-03 | 14 |
 | reference | `meta/muse-glimmer` | high | 2026-08-10 | 17 |
-| reference | `meta/muse-spark-1.3` | max | 2026-09-02 | 15 |
+| reference | `meta/muse-spark-1.3` | max | 2026-09-02 | 14 |
 | reference | `mistral/mistral-medium-3.5` | high | 2026-04-29 | 22 |
 | reference | `nvidia/nemotron-3-ultra-550b-a55b` | — | 2026-06-04 | 21 |
 | reference | `stepfun/step-5-preview` | — | 2026-09-18 | 12 |

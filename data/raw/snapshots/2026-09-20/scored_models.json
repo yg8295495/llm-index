@@ -20,7 +20,7 @@
    "color": "#cc785c",
    "logo": "/img/logos/anthropic_small.svg"
   },
-  "intelligenceIndex": 53.3737509623252,
+  "intelligenceIndex": 53.3549259623252,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.575,
@@ -182,20 +182,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1646.09,
+  "briefcaseElo": 1678.37,
   "briefcaseBreakdown": {
-   "elo": 1646.09,
-   "lower95ci": 1638.45,
-   "upper95ci": 1654.36,
+   "elo": 1678.37,
+   "lower95ci": 1668.51,
+   "upper95ci": 1688.34,
    "analyticalQuality": {
-    "elo": 1925.62,
-    "lower95ci": 1910.92,
-    "upper95ci": 1940.95
+    "elo": 1999.27,
+    "lower95ci": 1978.44,
+    "upper95ci": 2018.14
    },
    "presentation": {
-    "elo": 1459.61,
-    "lower95ci": 1447.25,
-    "upper95ci": 1473.07
+    "elo": 1485.84,
+    "lower95ci": 1469.91,
+    "upper95ci": 1503.32
    },
    "rubricPassRate": 0.6151515151515151,
    "turns": {
@@ -265,10 +265,10 @@
    }
   },
   "critpt": 0.297142857142857,
-  "gdpval": 1723.58,
+  "gdpval": 1734.67,
   "gdpvalBreakdown": {
-   "lower95ci": 1707.16,
-   "upper95ci": 1739.99,
+   "lower95ci": 1710.09,
+   "upper95ci": 1759.25,
    "avgTurns": 60.3926940639269
   },
   "gdpPdfAllPass": 0.262,
@@ -533,7 +533,7 @@
   "cacheHitRate": 0.994524976,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 107.863851491074
+  "medianCanonicalAnswerOutputSpeed": 105.982513113423
  },
  {
   "id": "9b166bf3-42db-4f63-8338-1c4a1244ffe8",
@@ -556,7 +556,7 @@
    "color": "#cc785c",
    "logo": "/img/logos/anthropic_small.svg"
   },
-  "intelligenceIndex": 53.1840337538944,
+  "intelligenceIndex": 53.2032587538944,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -718,20 +718,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1650.01,
+  "briefcaseElo": 1668.97,
   "briefcaseBreakdown": {
-   "elo": 1650.01,
-   "lower95ci": 1640.57,
-   "upper95ci": 1659.19,
+   "elo": 1668.97,
+   "lower95ci": 1660.13,
+   "upper95ci": 1678.98,
    "analyticalQuality": {
-    "elo": 1930,
-    "lower95ci": 1912.87,
-    "upper95ci": 1947.38
+    "elo": 1970.64,
+    "lower95ci": 1951.76,
+    "upper95ci": 1990.33
    },
    "presentation": {
-    "elo": 1456.91,
-    "lower95ci": 1443.21,
-    "upper95ci": 1471.87
+    "elo": 1473.3,
+    "lower95ci": 1457.48,
+    "upper95ci": 1490.06
    },
    "rubricPassRate": 0.6060606060606061,
    "turns": {
@@ -801,10 +801,10 @@
    }
   },
   "critpt": 0.311428571428571,
-  "gdpval": 1745.29,
+  "gdpval": 1720.92,
   "gdpvalBreakdown": {
-   "lower95ci": 1725.87,
-   "upper95ci": 1764.71,
+   "lower95ci": 1695.77,
+   "upper95ci": 1746.08,
    "avgTurns": 50.7397260273973
   },
   "gdpPdfAllPass": 0.262,
@@ -1077,7 +1077,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 52.814069395513,
+  "intelligenceIndex": 52.673669395513,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.5125,
@@ -1239,20 +1239,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1562.01,
+  "briefcaseElo": 1568.86,
   "briefcaseBreakdown": {
-   "elo": 1562.01,
-   "lower95ci": 1553.49,
-   "upper95ci": 1571.75,
+   "elo": 1568.86,
+   "lower95ci": 1558.69,
+   "upper95ci": 1579.61,
    "analyticalQuality": {
-    "elo": 1753.18,
-    "lower95ci": 1736.58,
-    "upper95ci": 1772.26
+    "elo": 1776.98,
+    "lower95ci": 1756.74,
+    "upper95ci": 1797.77
    },
    "presentation": {
-    "elo": 1536.38,
-    "lower95ci": 1520.16,
-    "upper95ci": 1553.41
+    "elo": 1535.47,
+    "lower95ci": 1517.05,
+    "upper95ci": 1556.97
    },
    "rubricPassRate": 0.5202020202020202,
    "turns": {
@@ -1322,10 +1322,10 @@
    }
   },
   "critpt": 0.317142857142857,
-  "gdpval": 1580.2,
+  "gdpval": 1541.89,
   "gdpvalBreakdown": {
-   "lower95ci": 1560.27,
-   "upper95ci": 1600.12,
+   "lower95ci": 1516.58,
+   "upper95ci": 1567.2,
    "avgTurns": 24.1863636363636
   },
   "gdpPdfAllPass": 0.31,
@@ -1504,7 +1504,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 58.0406225026809
+  "medianCanonicalAnswerOutputSpeed": 59.6397805665908
  },
  {
   "id": "1f541ef3-913f-4eb2-9d07-0e93c7a9a5e3",
@@ -1527,7 +1527,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 52.5059027108782,
+  "intelligenceIndex": 52.3863277108782,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -1689,20 +1689,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1533.73,
+  "briefcaseElo": 1543.68,
   "briefcaseBreakdown": {
-   "elo": 1533.73,
-   "lower95ci": 1524.83,
-   "upper95ci": 1543.92,
+   "elo": 1543.68,
+   "lower95ci": 1533.48,
+   "upper95ci": 1554.82,
    "analyticalQuality": {
-    "elo": 1702.08,
-    "lower95ci": 1685.93,
-    "upper95ci": 1719.61
+    "elo": 1723.93,
+    "lower95ci": 1705.45,
+    "upper95ci": 1744.72
    },
    "presentation": {
-    "elo": 1491.7,
-    "lower95ci": 1475.54,
-    "upper95ci": 1508.83
+    "elo": 1502.88,
+    "lower95ci": 1484.24,
+    "upper95ci": 1520.79
    },
    "rubricPassRate": 0.5232323232323233,
    "turns": {
@@ -1772,10 +1772,10 @@
    }
   },
   "critpt": 0.314285714285714,
-  "gdpval": 1555.23,
+  "gdpval": 1516.48,
   "gdpvalBreakdown": {
-   "lower95ci": 1535.25,
-   "upper95ci": 1575.2,
+   "lower95ci": 1490.9,
+   "upper95ci": 1542.06,
    "avgTurns": 22.9045454545455
   },
   "gdpPdfAllPass": 0.322,
@@ -1939,7 +1939,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 51.393506694255
+  "medianCanonicalAnswerOutputSpeed": 54.0097201822061
  },
  {
   "id": "9d7d72cd-d95d-45a0-b109-4ad292c9aabd",
@@ -1962,7 +1962,7 @@
    "color": "#cc785c",
    "logo": "/img/logos/anthropic_small.svg"
   },
-  "intelligenceIndex": 51.2094958852237,
+  "intelligenceIndex": 51.1515708852237,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -2124,20 +2124,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1578.19,
+  "briefcaseElo": 1592.21,
   "briefcaseBreakdown": {
-   "elo": 1578.19,
-   "lower95ci": 1569.93,
-   "upper95ci": 1587.02,
+   "elo": 1592.21,
+   "lower95ci": 1583.15,
+   "upper95ci": 1602.38,
    "analyticalQuality": {
-    "elo": 1846.32,
-    "lower95ci": 1830.95,
-    "upper95ci": 1863.68
+    "elo": 1881.37,
+    "lower95ci": 1863.61,
+    "upper95ci": 1900.61
    },
    "presentation": {
-    "elo": 1392.53,
-    "lower95ci": 1377,
-    "upper95ci": 1408.06
+    "elo": 1402.21,
+    "lower95ci": 1387.55,
+    "upper95ci": 1420.12
    },
    "rubricPassRate": 0.5717171717171717,
    "turns": {
@@ -2207,10 +2207,10 @@
    }
   },
   "critpt": 0.302857142857143,
-  "gdpval": 1649.77,
+  "gdpval": 1617.29,
   "gdpvalBreakdown": {
-   "lower95ci": 1631.45,
-   "upper95ci": 1668.09,
+   "lower95ci": 1593.07,
+   "upper95ci": 1641.5,
    "avgTurns": 30.4383561643836
   },
   "gdpPdfAllPass": 0.268,
@@ -2483,7 +2483,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 51.0480721636152,
+  "intelligenceIndex": 50.9191471636152,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -2645,20 +2645,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1493.87,
+  "briefcaseElo": 1506.86,
   "briefcaseBreakdown": {
-   "elo": 1493.87,
-   "lower95ci": 1485.18,
-   "upper95ci": 1504.23,
+   "elo": 1506.86,
+   "lower95ci": 1497.09,
+   "upper95ci": 1517.05,
    "analyticalQuality": {
-    "elo": 1670.47,
-    "lower95ci": 1654.52,
-    "upper95ci": 1687.23
+    "elo": 1703.1,
+    "lower95ci": 1685.2,
+    "upper95ci": 1724.38
    },
    "presentation": {
-    "elo": 1438.35,
-    "lower95ci": 1421.43,
-    "upper95ci": 1454.19
+    "elo": 1445.55,
+    "lower95ci": 1427.64,
+    "upper95ci": 1462.97
    },
    "rubricPassRate": 0.5080808080808081,
    "turns": {
@@ -2728,10 +2728,10 @@
    }
   },
   "critpt": 0.288571428571429,
-  "gdpval": 1529.7,
+  "gdpval": 1484.52,
   "gdpvalBreakdown": {
-   "lower95ci": 1509.63,
-   "upper95ci": 1549.76,
+   "lower95ci": 1458.76,
+   "upper95ci": 1510.27,
    "avgTurns": 20.6772727272727
   },
   "gdpPdfAllPass": 0.31,
@@ -2846,10 +2846,10 @@
     "cacheableInput": null
    },
    "gdpval": {
-    "input": 176326978,
-    "answer": 2686802,
-    "reasoning": 1381971,
-    "cacheableInput": 164639977
+    "input": 180623051,
+    "answer": 2716096,
+    "reasoning": 1392168,
+    "cacheableInput": 168777920
    },
    "tauBanking": {
     "input": 92643839,
@@ -2895,7 +2895,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 49.467474369868
+  "medianCanonicalAnswerOutputSpeed": 52.6809764269837
  },
  {
   "id": "b8fc61f7-5e9a-49e6-8547-6ac56db24627",
@@ -2918,7 +2918,7 @@
    "color": "#cc785c",
    "logo": "/img/logos/anthropic_small.svg"
   },
-  "intelligenceIndex": 50.7001865797629,
+  "intelligenceIndex": 50.7771115797629,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.5375,
@@ -3090,20 +3090,20 @@
    "drive": 0.6,
    "hybrid": 0.3572984749455338
   },
-  "briefcaseElo": 1633.44,
+  "briefcaseElo": 1673.33,
   "briefcaseBreakdown": {
-   "elo": 1633.44,
-   "lower95ci": 1627.51,
-   "upper95ci": 1639.96,
+   "elo": 1673.33,
+   "lower95ci": 1663.51,
+   "upper95ci": 1684.09,
    "analyticalQuality": {
-    "elo": 1880.61,
-    "lower95ci": 1869.23,
-    "upper95ci": 1892.8
+    "elo": 1965.3,
+    "lower95ci": 1945.57,
+    "upper95ci": 1985.89
    },
    "presentation": {
-    "elo": 1534.47,
-    "lower95ci": 1524.42,
-    "upper95ci": 1546.35
+    "elo": 1559.57,
+    "lower95ci": 1543.54,
+    "upper95ci": 1576.35
    },
    "rubricPassRate": 0.5717171717171717,
    "turns": {
@@ -3173,10 +3173,10 @@
    }
   },
   "critpt": 0.291428571428571,
-  "gdpval": 1735.09,
+  "gdpval": 1707.92,
   "gdpvalBreakdown": {
-   "lower95ci": 1719.11,
-   "upper95ci": 1751.07,
+   "lower95ci": 1682.9,
+   "upper95ci": 1732.95,
    "avgTurns": 60.4703196347032
   },
   "gdpPdfAllPass": 0.216,
@@ -3453,7 +3453,7 @@
   "cacheHitRate": 0.996663404781368,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 82.0213667948646
+  "medianCanonicalAnswerOutputSpeed": 83.0189581032451
  },
  {
   "id": "cd55210d-358e-4df1-ba9c-9acb5f186cc9",
@@ -3476,7 +3476,7 @@
    "color": "#cc785c",
    "logo": "/img/logos/anthropic_small.svg"
   },
-  "intelligenceIndex": 49.6994452733378,
+  "intelligenceIndex": 49.6258202733378,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.4875,
@@ -3648,20 +3648,20 @@
    "drive": 0.6285714285714286,
    "hybrid": 0.39869281045751637
   },
-  "briefcaseElo": 1529.62,
+  "briefcaseElo": 1544.04,
   "briefcaseBreakdown": {
-   "elo": 1529.62,
-   "lower95ci": 1523.91,
-   "upper95ci": 1535.94,
+   "elo": 1544.04,
+   "lower95ci": 1536.15,
+   "upper95ci": 1552.8,
    "analyticalQuality": {
-    "elo": 1669.7,
-    "lower95ci": 1658.1,
-    "upper95ci": 1682.36
+    "elo": 1690.45,
+    "lower95ci": 1675.84,
+    "upper95ci": 1705.05
    },
    "presentation": {
-    "elo": 1452.29,
-    "lower95ci": 1441.52,
-    "upper95ci": 1463.2
+    "elo": 1468.7,
+    "lower95ci": 1453.87,
+    "upper95ci": 1483.42
    },
    "rubricPassRate": 0.5595959595959596,
    "turns": {
@@ -3731,10 +3731,10 @@
    }
   },
   "critpt": 0.2857142857,
-  "gdpval": 1631.46,
+  "gdpval": 1595.24,
   "gdpvalBreakdown": {
-   "lower95ci": 1617.65,
-   "upper95ci": 1645.28,
+   "lower95ci": 1574.02,
+   "upper95ci": 1616.46,
    "avgTurns": 32.8396226415094
   },
   "gdpPdfAllPass": 0.24,
@@ -4023,7 +4023,7 @@
   "cacheHitRate": 0.994524976,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 97.8219154626808
+  "medianCanonicalAnswerOutputSpeed": 97.87127948256
  },
  {
   "id": "e97a4ef5-e817-480e-9595-12f81dc4974f",
@@ -4046,7 +4046,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 49.6685363034369,
+  "intelligenceIndex": 49.5704363034369,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -4208,20 +4208,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1450.6,
+  "briefcaseElo": 1459.22,
   "briefcaseBreakdown": {
-   "elo": 1450.6,
-   "lower95ci": 1441.48,
-   "upper95ci": 1459.45,
+   "elo": 1459.22,
+   "lower95ci": 1449.62,
+   "upper95ci": 1471.1,
    "analyticalQuality": {
-    "elo": 1641.21,
-    "lower95ci": 1623.99,
-    "upper95ci": 1658.24
+    "elo": 1663.08,
+    "lower95ci": 1643.35,
+    "upper95ci": 1683.72
    },
    "presentation": {
-    "elo": 1389.68,
-    "lower95ci": 1374.27,
-    "upper95ci": 1405.72
+    "elo": 1395.87,
+    "lower95ci": 1377.64,
+    "upper95ci": 1412.94
    },
    "rubricPassRate": 0.47474747474747475,
    "turns": {
@@ -4291,10 +4291,10 @@
    }
   },
   "critpt": 0.291428571428571,
-  "gdpval": 1500.67,
+  "gdpval": 1467.88,
   "gdpvalBreakdown": {
-   "lower95ci": 1480.68,
-   "upper95ci": 1520.65,
+   "lower95ci": 1444.11,
+   "upper95ci": 1491.66,
    "avgTurns": 18.5181818181818
   },
   "gdpPdfAllPass": 0.304,
@@ -4458,7 +4458,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 49.1230391237212
+  "medianCanonicalAnswerOutputSpeed": 53.4408705282613
  },
  {
   "id": "9999672c-b687-4026-9c15-5cef02ff53bb",
@@ -4481,7 +4481,7 @@
    "color": "#0089f4",
    "logo": "/img/logos/meta_small.svg"
   },
-  "intelligenceIndex": 48.1690107719685,
+  "intelligenceIndex": 48.0923107719685,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -4643,20 +4643,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1589.18,
+  "briefcaseElo": 1598.64,
   "briefcaseBreakdown": {
-   "elo": 1589.18,
-   "lower95ci": 1578.27,
-   "upper95ci": 1600.32,
+   "elo": 1598.64,
+   "lower95ci": 1587.96,
+   "upper95ci": 1610.72,
    "analyticalQuality": {
-    "elo": 1725.44,
-    "lower95ci": 1705.53,
-    "upper95ci": 1743.72
+    "elo": 1748.14,
+    "lower95ci": 1729.48,
+    "upper95ci": 1769.02
    },
    "presentation": {
-    "elo": 1518.64,
-    "lower95ci": 1499.29,
-    "upper95ci": 1537.42
+    "elo": 1528.79,
+    "lower95ci": 1508.59,
+    "upper95ci": 1552.3
    },
    "rubricPassRate": 0.5868686868686869,
    "turns": {
@@ -4726,10 +4726,10 @@
    }
   },
   "critpt": 0.248571428571429,
-  "gdpval": 1703.34,
+  "gdpval": 1673.91,
   "gdpvalBreakdown": {
-   "lower95ci": 1684.56,
-   "upper95ci": 1722.13,
+   "lower95ci": 1649.83,
+   "upper95ci": 1697.99,
    "avgTurns": 74.4861111111111
   },
   "gdpPdfAllPass": 0.266,
@@ -4760,10 +4760,7 @@
   "lcr": 0.83,
   "math500": null,
   "cweBench": null,
-  "mlcrOverall": 0.411111111111111,
-  "mlcrAccuracy": 0.8284023668639053,
-  "mlcrCompleteness": 0.47337278106508873,
-  "mlcrConciseness": 0.9388888888888889,
+  "mlcrOverall": null,
   "mmluPro": null,
   "mmmuPro": null,
   "omniscience": 25,
@@ -4870,12 +4867,6 @@
     "reasoning": 1705561,
     "cacheableInput": 1449701742
    },
-   "mlcr": {
-    "input": 2369959,
-    "answer": 61015,
-    "reasoning": 216747,
-    "cacheableInput": null
-   },
    "automationBench": {
     "input": 570018788,
     "answer": 7893166,
@@ -4896,7 +4887,7 @@
   "cacheHitRate": 0.95,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 187.408949221449
+  "medianCanonicalAnswerOutputSpeed": 199.934344810783
  },
  {
   "id": "d93edfe8-bf35-49ad-b56e-b18116142a1c",
@@ -4919,7 +4910,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 47.0613568915036,
+  "intelligenceIndex": 46.9727068915036,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.475,
@@ -5091,20 +5082,20 @@
    "drive": 0.546031746031746,
    "hybrid": 0.32679738562091504
   },
-  "briefcaseElo": 1463.44,
+  "briefcaseElo": 1487.42,
   "briefcaseBreakdown": {
-   "elo": 1463.44,
-   "lower95ci": 1457.75,
-   "upper95ci": 1470.41,
+   "elo": 1487.42,
+   "lower95ci": 1479.13,
+   "upper95ci": 1496.83,
    "analyticalQuality": {
-    "elo": 1519.45,
-    "lower95ci": 1510.05,
-    "upper95ci": 1530.51
+    "elo": 1558.97,
+    "lower95ci": 1544.69,
+    "upper95ci": 1574.52
    },
    "presentation": {
-    "elo": 1626.75,
-    "lower95ci": 1615.14,
-    "upper95ci": 1639.53
+    "elo": 1652.53,
+    "lower95ci": 1636.7,
+    "upper95ci": 1670.69
    },
    "rubricPassRate": 0.4184839044652129,
    "turns": {
@@ -5174,10 +5165,10 @@
    }
   },
   "critpt": 0.322857142857143,
-  "gdpval": 1586.78,
+  "gdpval": 1587.9,
   "gdpvalBreakdown": {
-   "lower95ci": 1574.18,
-   "upper95ci": 1599.38,
+   "lower95ci": 1566.68,
+   "upper95ci": 1609.12,
    "avgTurns": 45.2054794520548
   },
   "gdpPdfAllPass": 0.272,
@@ -5478,7 +5469,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 61.0249658337045
+  "medianCanonicalAnswerOutputSpeed": 61.6001801354574
  },
  {
   "id": "b112af07-3bd5-4647-b09f-b23204361bb2",
@@ -5501,7 +5492,7 @@
    "color": "#ff7018",
    "logo": "/img/logos/alibaba_small.svg"
   },
-  "intelligenceIndex": 45.4354834980521,
+  "intelligenceIndex": 45.4152084980521,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -5663,20 +5654,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1609.69,
+  "briefcaseElo": 1642.2,
   "briefcaseBreakdown": {
-   "elo": 1609.69,
-   "lower95ci": 1599.95,
-   "upper95ci": 1619.91,
+   "elo": 1642.2,
+   "lower95ci": 1630.39,
+   "upper95ci": 1654.48,
    "analyticalQuality": {
-    "elo": 1958.33,
-    "lower95ci": 1939.54,
-    "upper95ci": 1978.55
+    "elo": 2035.47,
+    "lower95ci": 2012.64,
+    "upper95ci": 2057.49
    },
    "presentation": {
-    "elo": 1379.72,
-    "lower95ci": 1362.91,
-    "upper95ci": 1397.71
+    "elo": 1402.07,
+    "lower95ci": 1382.45,
+    "upper95ci": 1423.37
    },
    "rubricPassRate": 0.5795574288724974,
    "turns": {
@@ -5746,10 +5737,10 @@
    }
   },
   "critpt": 0.177142857142857,
-  "gdpval": 1664.28,
+  "gdpval": 1667.56,
   "gdpvalBreakdown": {
-   "lower95ci": 1644.89,
-   "upper95ci": 1683.67,
+   "lower95ci": 1641.23,
+   "upper95ci": 1693.88,
    "avgTurns": 79.4227272727273
   },
   "gdpPdfAllPass": 0.228,
@@ -5913,7 +5904,7 @@
   "cacheHitRate": 0.941514998920941,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 46.6910551962427
+  "medianCanonicalAnswerOutputSpeed": 44.8523153977718
  },
  {
   "id": "cd684ea4-b475-4269-b001-d469d06d8a7a",
@@ -5936,7 +5927,7 @@
    "color": "#1c7ff8",
    "logo": "/img/logos/zai_small.svg"
   },
-  "intelligenceIndex": 44.855717385614,
+  "intelligenceIndex": 44.777392385614,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -6108,20 +6099,20 @@
    "drive": 0.580952380952381,
    "hybrid": 0.2679738562091503
   },
-  "briefcaseElo": 1504.38,
+  "briefcaseElo": 1525.96,
   "briefcaseBreakdown": {
-   "elo": 1504.38,
-   "lower95ci": 1497.23,
-   "upper95ci": 1512.36,
+   "elo": 1525.96,
+   "lower95ci": 1516.42,
+   "upper95ci": 1537.03,
    "analyticalQuality": {
-    "elo": 1762.24,
-    "lower95ci": 1748.36,
-    "upper95ci": 1777.43
+    "elo": 1819.59,
+    "lower95ci": 1799.64,
+    "upper95ci": 1839.65
    },
    "presentation": {
-    "elo": 1348.39,
-    "lower95ci": 1335.62,
-    "upper95ci": 1361.93
+    "elo": 1357.82,
+    "lower95ci": 1342.29,
+    "upper95ci": 1375.23
    },
    "rubricPassRate": 0.5134854771784232,
    "turns": {
@@ -6191,10 +6182,10 @@
    }
   },
   "critpt": 0.191428571428571,
-  "gdpval": 1633.8,
+  "gdpval": 1645.36,
   "gdpvalBreakdown": {
-   "lower95ci": 1619.84,
-   "upper95ci": 1647.77,
+   "lower95ci": 1620.47,
+   "upper95ci": 1670.25,
    "avgTurns": 69.9862385321101
   },
   "gdpPdfAllPass": 0.112,
@@ -6378,7 +6369,7 @@
   "cacheHitRate": 0.9953,
   "activeParams": 40,
   "parameters": 753,
-  "medianCanonicalAnswerOutputSpeed": 87.4797425292423
+  "medianCanonicalAnswerOutputSpeed": 82.1017133420489
  },
  {
   "id": "c8adc5cf-fd5a-407b-af51-dc3bede3e49c",
@@ -6401,7 +6392,7 @@
    "color": "#736cd3",
    "logo": "/img/logos/spacexai.svg"
   },
-  "intelligenceIndex": 44.4050073012592,
+  "intelligenceIndex": 44.3113073012592,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.4125,
@@ -6573,20 +6564,20 @@
    "drive": 0.5428571428571428,
    "hybrid": 0.39869281045751637
   },
-  "briefcaseElo": 1534.13,
+  "briefcaseElo": 1523.2,
   "briefcaseBreakdown": {
-   "elo": 1534.13,
-   "lower95ci": 1527.89,
-   "upper95ci": 1540.96,
+   "elo": 1523.2,
+   "lower95ci": 1517.53,
+   "upper95ci": 1529.47,
    "analyticalQuality": {
-    "elo": 1668.79,
-    "lower95ci": 1656.92,
-    "upper95ci": 1681.28
+    "elo": 1643.08,
+    "lower95ci": 1633.75,
+    "upper95ci": 1653.51
    },
    "presentation": {
-    "elo": 1501.89,
-    "lower95ci": 1490.25,
-    "upper95ci": 1514.15
+    "elo": 1498.19,
+    "lower95ci": 1486.67,
+    "upper95ci": 1509.38
    },
    "rubricPassRate": 0.5282828282828282,
    "turns": {
@@ -6656,10 +6647,10 @@
    }
   },
   "critpt": 0.171428571428571,
-  "gdpval": 1642.96,
+  "gdpval": 1605.32,
   "gdpvalBreakdown": {
-   "lower95ci": 1628.89,
-   "upper95ci": 1657.03,
+   "lower95ci": 1583.76,
+   "upper95ci": 1626.88,
    "avgTurns": 37.0090909090909
   },
   "gdpPdfAllPass": 0.17,
@@ -6841,6 +6832,423 @@
   "medianCanonicalAnswerOutputSpeed": 58.4296937497494
  },
  {
+  "id": "094ea3e3-ce41-419e-8bd1-723389663158",
+  "slug": "step-5",
+  "name": "Step 5 Preview",
+  "shortName": "Step 5 Preview",
+  "chartDefaultSelected": true,
+  "releaseDate": "2026-09-18",
+  "deprecated": false,
+  "isReasoning": true,
+  "isOpenWeights": false,
+  "sizeClass": "large",
+  "inputModalityImage": true,
+  "inputModalitySpeech": false,
+  "inputModalityVideo": false,
+  "creator": {
+   "id": "ce2e2e8b-7a22-4020-98ec-8ef71000dd42",
+   "slug": "stepfun",
+   "name": "StepFun",
+   "color": "#00F5E7",
+   "logo": "/img/logos/stepfun_small.svg"
+  },
+  "intelligenceIndex": 43.7343049141614,
+  "intelligenceIndexIsEstimated": false,
+  "aime25": null,
+  "analystAgent": null,
+  "analystAgentPassAt1": null,
+  "analystAgentPassAtK": null,
+  "apexAgents": null,
+  "automationBenchPartialScore": 0.5095659419096288,
+  "automationBenchBreakdown": {
+   "strictScore": 0.1765601217656012,
+   "completion": 0.7851634387871352,
+   "violationsTotal": 506,
+   "violationsPerTask": 0.7701674277016742,
+   "objectives": 22822,
+   "observedTaskCount": 657,
+   "llmTurnCount": 15435,
+   "toolCallCount": 43972,
+   "fallbackServedTurnCount": 0,
+   "fallbackServedTaskCount": 0,
+   "byDomain": {
+    "finance": {
+     "completion": 0.8202660628361166,
+     "violations": 123,
+     "observedTaskCount": 120,
+     "fallbackServedTaskCount": 0
+    },
+    "hr": {
+     "completion": 0.69234404536862,
+     "violations": 110,
+     "observedTaskCount": 120,
+     "fallbackServedTaskCount": 0
+    },
+    "marketing": {
+     "completion": 0.7819477434679335,
+     "violations": 51,
+     "observedTaskCount": 100,
+     "fallbackServedTaskCount": 0
+    },
+    "operations": {
+     "completion": 0.8542439024390244,
+     "violations": 50,
+     "observedTaskCount": 100,
+     "fallbackServedTaskCount": 0
+    },
+    "sales": {
+     "completion": 0.7058314087759815,
+     "violations": 70,
+     "observedTaskCount": 117,
+     "fallbackServedTaskCount": 0
+    },
+    "support": {
+     "completion": 0.7866941015089163,
+     "violations": 102,
+     "observedTaskCount": 100,
+     "fallbackServedTaskCount": 0
+    }
+   },
+   "byApp": {
+    "gmail": {
+     "completion": 0.7665685416500915,
+     "violations": 234,
+     "guardrails": 10767
+    },
+    "google_sheets": {
+     "completion": 0.7995158450704225,
+     "violations": 86,
+     "guardrails": 2884
+    },
+    "slack": {
+     "completion": 0.7983383685800605,
+     "violations": 89,
+     "guardrails": 3646
+    },
+    "salesforce": {
+     "completion": 0.7373737373737373,
+     "violations": 23,
+     "guardrails": 673
+    },
+    "zendesk": {
+     "completion": 0.7947976878612717,
+     "violations": 4,
+     "guardrails": 475
+    },
+    "helpcrunch": {
+     "completion": 0.9575289575289575,
+     "violations": 1,
+     "guardrails": 479
+    },
+    "intercom": {
+     "completion": 0.8389261744966443,
+     "violations": 6,
+     "guardrails": 350
+    },
+    "helpscout": {
+     "completion": 0.8736842105263158,
+     "violations": 1,
+     "guardrails": 135
+    },
+    "jira": {
+     "completion": 0.8797814207650273,
+     "violations": 9,
+     "guardrails": 425
+    },
+    "hubspot": {
+     "completion": 0.9346153846153846,
+     "violations": 4,
+     "guardrails": 149
+    },
+    "freshdesk": {
+     "completion": 0.6882352941176471,
+     "violations": 6,
+     "guardrails": 189
+    },
+    "gorgias": {
+     "completion": 0.8144329896907216,
+     "violations": 6,
+     "guardrails": 356
+    },
+    "docusign": {
+     "completion": 0.8238095238095238,
+     "violations": 3,
+     "guardrails": 167
+    },
+    "zoho_desk": {
+     "completion": 0.828125,
+     "violations": 1,
+     "guardrails": 104
+    },
+    "reamaze": {
+     "completion": 0.6972477064220184,
+     "violations": 2,
+     "guardrails": 88
+    },
+    "google_calendar": {
+     "completion": 0.8344827586206897,
+     "violations": 8,
+     "guardrails": 96
+    },
+    "quickbooks": {
+     "completion": 0.9238095238095239,
+     "violations": 3,
+     "guardrails": 215
+    },
+    "xero": {
+     "completion": 0.78125,
+     "violations": 10,
+     "guardrails": 223
+    },
+    "asana": {
+     "completion": 0.6766917293233082,
+     "violations": 4,
+     "guardrails": 95
+    },
+    "calendly": {
+     "completion": 0.75,
+     "violations": 0,
+     "guardrails": 86
+    }
+   }
+  },
+  "enterpriseOpsGym": null,
+  "enterpriseOpsGymAvgConversationTurns": null,
+  "briefcaseElo": 1433.26,
+  "briefcaseBreakdown": {
+   "elo": 1433.26,
+   "lower95ci": 1419.28,
+   "upper95ci": 1448.82,
+   "analyticalQuality": {
+    "elo": 1575.18,
+    "lower95ci": 1545.81,
+    "upper95ci": 1605.73
+   },
+   "presentation": {
+    "elo": 1390.46,
+    "lower95ci": 1364.44,
+    "upper95ci": 1416.03
+   },
+   "rubricPassRate": 0.4777777777777778,
+   "turns": {
+    "total": 9192,
+    "avgPerTask": 101.01098901098901
+   },
+   "totalToolCalls": 10620,
+   "toolCallsByBucket": {
+    "explore": 901,
+    "viewImage": 1632,
+    "read": 6027,
+    "compute": 6082,
+    "write": 4357,
+    "other": 2255
+   },
+   "tokensByFileType": {
+    "xlsx": {
+     "input": 653134642,
+     "reasoning": 2821649,
+     "answer": 2750930,
+     "total": 658707221,
+     "numTasks": 38
+    },
+    "pptx": {
+     "input": 302302325,
+     "reasoning": 1061703,
+     "answer": 1215382,
+     "total": 304579410,
+     "numTasks": 22
+    },
+    "pdf": {
+     "input": 197555573,
+     "reasoning": 535176,
+     "answer": 763647,
+     "total": 198854396,
+     "numTasks": 12
+    },
+    "docx": {
+     "input": 228061297,
+     "reasoning": 578913,
+     "answer": 1046526,
+     "total": 229686736,
+     "numTasks": 17
+    },
+    "other": {
+     "input": 18436515,
+     "reasoning": 84214,
+     "answer": 100880,
+     "total": 18621609,
+     "numTasks": 2
+    }
+   },
+   "rubricByFileType": {
+    "xlsx": 0.475,
+    "pptx": 0.4448979591836735,
+    "pdf": 0.5431034482758621,
+    "docx": 0.4437869822485207,
+    "other": 0.85
+   },
+   "totalToolMs": 35043924,
+   "turnsPerTaskPercentiles": {
+    "p5": 56.5,
+    "p25": 76,
+    "p50": 97,
+    "p75": 117,
+    "p95": 173
+   }
+  },
+  "critpt": 0.208571428571429,
+  "gdpval": 1565.95,
+  "gdpvalBreakdown": {
+   "lower95ci": 1534.58,
+   "upper95ci": 1597.31,
+   "avgTurns": 63.7045454545455
+  },
+  "gdpPdfAllPass": 0.148,
+  "gdpPdfBreakdown": {
+   "allPass": 0.148,
+   "macroCriterionPassRate": 0.6720288935101957,
+   "byDomain": {
+    "HR": 0.7536507936507936,
+    "Legal": 0.849255117251579,
+    "Insurance": 0.6914994297450439,
+    "Healthcare": 0.7472234484882706,
+    "Engineering": 0.5077421198364402,
+    "Real Estate": 0.626047619047619,
+    "Construction": 0.5898942364824717,
+    "STEM/Research": 0.6386168029501362,
+    "Finance/Investing": 0.7511965811965812,
+    "Manufacturing/Supply Chains": 0.645543255763844
+   }
+  },
+  "globalMmluLiteScore": null,
+  "gpqa": null,
+  "harveyLab": null,
+  "hle": 0.464782205746061,
+  "ifbench": null,
+  "itbenchSre": null,
+  "itbenchAvgTurnsPerTask": null,
+  "livecodebench": null,
+  "lcr": 0.883333333333333,
+  "math500": null,
+  "cweBench": null,
+  "mlcrOverall": null,
+  "mmluPro": null,
+  "mmmuPro": 0.763583815028902,
+  "omniscience": 16.3833333333333,
+  "omniscienceBreakdown": {
+   "accuracy": 0.41533333333333333,
+   "hallucinationRate": 0.4301596351197263,
+   "attemptRate": 0.6798333333333333,
+   "byDomain": {
+    "Business": 12.4,
+    "Health": -0.4,
+    "Humanities & Social Sciences": 13.1,
+    "Law": 13.9,
+    "Science, Engineering & Mathematics": 13.6,
+    "Software Engineering (SWE)": 45.7
+   },
+   "bySweLanguage": {
+    "C": 61,
+    "R": 14,
+    "Go": 32,
+    "PHP": 58,
+    "Dart": 34,
+    "HTML": 58,
+    "Java": 30,
+    "Rust": 62,
+    "Julia": 20,
+    "Swift": 60,
+    "Kotlin": 38,
+    "Python": 52,
+    "JavaScript": 43.63636363636363,
+    "TypeScript": 51.111111111111114
+   }
+  },
+  "opennessIndex": null,
+  "scicode": 0.58912037037037,
+  "tau2": null,
+  "tauBanking": null,
+  "terminalbenchHard": null,
+  "terminalBench21": null,
+  "terminalBench40": 0.333333333333333,
+  "canonicalEvalTokenCounts": {
+   "hle": {
+    "input": 676680,
+    "answer": 611389,
+    "reasoning": 50978156,
+    "cacheableInput": null
+   },
+   "lcr": {
+    "input": 9540944,
+    "answer": 10769,
+    "reasoning": 177704,
+    "cacheableInput": null
+   },
+   "critpt": {
+    "input": 203688,
+    "answer": 82444,
+    "reasoning": 3928695,
+    "cacheableInput": null
+   },
+   "scicode": {
+    "input": 709771,
+    "answer": 170362,
+    "reasoning": 1733322,
+    "cacheableInput": null
+   },
+   "mmmuPro": {
+    "input": 979804,
+    "answer": 176329,
+    "reasoning": 9193724,
+    "cacheableInput": null
+   },
+   "omniscience": {
+    "input": 769989,
+    "answer": 625867,
+    "reasoning": 32620267,
+    "cacheableInput": null
+   },
+   "gdpval": {
+    "input": 1172860188,
+    "answer": 7946526,
+    "reasoning": 8126982,
+    "cacheableInput": 1146923061
+   },
+   "terminalBench40": {
+    "input": 2305655855,
+    "answer": 4267799,
+    "reasoning": 12914707,
+    "cacheableInput": 2283174589
+   },
+   "briefcase": {
+    "input": 1399490352,
+    "answer": 5877365,
+    "reasoning": 5081655,
+    "cacheableInput": 1377703104
+   },
+   "automationBench": {
+    "input": 511570976,
+    "answer": 6927811,
+    "reasoning": 12553048,
+    "cacheableInput": 472973002
+   },
+   "gdpPdf": {
+    "input": 8643187,
+    "answer": 111638,
+    "reasoning": 1212667,
+    "cacheableInput": null
+   }
+  },
+  "price1mInputTokens": 1,
+  "price1mOutputTokens": 2.7,
+  "cacheHitPrice": 0.05,
+  "cacheWritePrice": null,
+  "cacheHitRate": 0.9784,
+  "activeParams": 27,
+  "parameters": 600,
+  "medianCanonicalAnswerOutputSpeed": 87.5170764971444
+ },
+ {
   "id": "f7d2fc3e-1f7b-405f-818c-07952a4af78f",
   "slug": "kimi-k3",
   "name": "Kimi K3 (max)",
@@ -6861,7 +7269,7 @@
    "color": "#047AFE",
    "logo": "/img/logos/kimi.jpg"
   },
-  "intelligenceIndex": 43.7841729518782,
+  "intelligenceIndex": 43.5938229518782,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.3875,
@@ -7033,20 +7441,20 @@
    "drive": 0.5904761904761905,
    "hybrid": 0.4117647058823529
   },
-  "briefcaseElo": 1488.1,
+  "briefcaseElo": 1511.36,
   "briefcaseBreakdown": {
-   "elo": 1488.1,
-   "lower95ci": 1482.93,
-   "upper95ci": 1494.46,
+   "elo": 1511.36,
+   "lower95ci": 1503.86,
+   "upper95ci": 1520.05,
    "analyticalQuality": {
-    "elo": 1651.95,
-    "lower95ci": 1642.16,
-    "upper95ci": 1663.52
+    "elo": 1694.98,
+    "lower95ci": 1679.44,
+    "upper95ci": 1710.96
    },
    "presentation": {
-    "elo": 1428.74,
-    "lower95ci": 1418.46,
-    "upper95ci": 1439.25
+    "elo": 1449.53,
+    "lower95ci": 1435.16,
+    "upper95ci": 1465.18
    },
    "rubricPassRate": 0.5097236438075742,
    "turns": {
@@ -7116,10 +7524,10 @@
    }
   },
   "critpt": 0.234285714285714,
-  "gdpval": 1547.63,
+  "gdpval": 1523.8,
   "gdpvalBreakdown": {
-   "lower95ci": 1534.07,
-   "upper95ci": 1561.2,
+   "lower95ci": 1499.91,
+   "upper95ci": 1547.7,
    "avgTurns": 37.5114155251142
   },
   "gdpPdfAllPass": 0.22,
@@ -7419,424 +7827,7 @@
   "cacheHitRate": 0.974396108357006,
   "activeParams": 104,
   "parameters": 2800,
-  "medianCanonicalAnswerOutputSpeed": 41.7099825948937
- },
- {
-  "id": "094ea3e3-ce41-419e-8bd1-723389663158",
-  "slug": "step-5",
-  "name": "Step 5 Preview",
-  "shortName": "Step 5 Preview",
-  "chartDefaultSelected": true,
-  "releaseDate": "2026-09-18",
-  "deprecated": false,
-  "isReasoning": true,
-  "isOpenWeights": false,
-  "sizeClass": "large",
-  "inputModalityImage": true,
-  "inputModalitySpeech": false,
-  "inputModalityVideo": false,
-  "creator": {
-   "id": "ce2e2e8b-7a22-4020-98ec-8ef71000dd42",
-   "slug": "stepfun",
-   "name": "StepFun",
-   "color": "#00F5E7",
-   "logo": "/img/logos/stepfun_small.svg"
-  },
-  "intelligenceIndex": 43.6394799141614,
-  "intelligenceIndexIsEstimated": false,
-  "aime25": null,
-  "analystAgent": null,
-  "analystAgentPassAt1": null,
-  "analystAgentPassAtK": null,
-  "apexAgents": null,
-  "automationBenchPartialScore": 0.5095659419096288,
-  "automationBenchBreakdown": {
-   "strictScore": 0.1765601217656012,
-   "completion": 0.7851634387871352,
-   "violationsTotal": 506,
-   "violationsPerTask": 0.7701674277016742,
-   "objectives": 22822,
-   "observedTaskCount": 657,
-   "llmTurnCount": 15435,
-   "toolCallCount": 43972,
-   "fallbackServedTurnCount": 0,
-   "fallbackServedTaskCount": 0,
-   "byDomain": {
-    "finance": {
-     "completion": 0.8202660628361166,
-     "violations": 123,
-     "observedTaskCount": 120,
-     "fallbackServedTaskCount": 0
-    },
-    "hr": {
-     "completion": 0.69234404536862,
-     "violations": 110,
-     "observedTaskCount": 120,
-     "fallbackServedTaskCount": 0
-    },
-    "marketing": {
-     "completion": 0.7819477434679335,
-     "violations": 51,
-     "observedTaskCount": 100,
-     "fallbackServedTaskCount": 0
-    },
-    "operations": {
-     "completion": 0.8542439024390244,
-     "violations": 50,
-     "observedTaskCount": 100,
-     "fallbackServedTaskCount": 0
-    },
-    "sales": {
-     "completion": 0.7058314087759815,
-     "violations": 70,
-     "observedTaskCount": 117,
-     "fallbackServedTaskCount": 0
-    },
-    "support": {
-     "completion": 0.7866941015089163,
-     "violations": 102,
-     "observedTaskCount": 100,
-     "fallbackServedTaskCount": 0
-    }
-   },
-   "byApp": {
-    "gmail": {
-     "completion": 0.7665685416500915,
-     "violations": 234,
-     "guardrails": 10767
-    },
-    "google_sheets": {
-     "completion": 0.7995158450704225,
-     "violations": 86,
-     "guardrails": 2884
-    },
-    "slack": {
-     "completion": 0.7983383685800605,
-     "violations": 89,
-     "guardrails": 3646
-    },
-    "salesforce": {
-     "completion": 0.7373737373737373,
-     "violations": 23,
-     "guardrails": 673
-    },
-    "zendesk": {
-     "completion": 0.7947976878612717,
-     "violations": 4,
-     "guardrails": 475
-    },
-    "helpcrunch": {
-     "completion": 0.9575289575289575,
-     "violations": 1,
-     "guardrails": 479
-    },
-    "intercom": {
-     "completion": 0.8389261744966443,
-     "violations": 6,
-     "guardrails": 350
-    },
-    "helpscout": {
-     "completion": 0.8736842105263158,
-     "violations": 1,
-     "guardrails": 135
-    },
-    "jira": {
-     "completion": 0.8797814207650273,
-     "violations": 9,
-     "guardrails": 425
-    },
-    "hubspot": {
-     "completion": 0.9346153846153846,
-     "violations": 4,
-     "guardrails": 149
-    },
-    "freshdesk": {
-     "completion": 0.6882352941176471,
-     "violations": 6,
-     "guardrails": 189
-    },
-    "gorgias": {
-     "completion": 0.8144329896907216,
-     "violations": 6,
-     "guardrails": 356
-    },
-    "docusign": {
-     "completion": 0.8238095238095238,
-     "violations": 3,
-     "guardrails": 167
-    },
-    "zoho_desk": {
-     "completion": 0.828125,
-     "violations": 1,
-     "guardrails": 104
-    },
-    "reamaze": {
-     "completion": 0.6972477064220184,
-     "violations": 2,
-     "guardrails": 88
-    },
-    "google_calendar": {
-     "completion": 0.8344827586206897,
-     "violations": 8,
-     "guardrails": 96
-    },
-    "quickbooks": {
-     "completion": 0.9238095238095239,
-     "violations": 3,
-     "guardrails": 215
-    },
-    "xero": {
-     "completion": 0.78125,
-     "violations": 10,
-     "guardrails": 223
-    },
-    "asana": {
-     "completion": 0.6766917293233082,
-     "violations": 4,
-     "guardrails": 95
-    },
-    "calendly": {
-     "completion": 0.75,
-     "violations": 0,
-     "guardrails": 86
-    }
-   }
-  },
-  "enterpriseOpsGym": null,
-  "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1417.09,
-  "briefcaseBreakdown": {
-   "elo": 1417.09,
-   "lower95ci": 1403.51,
-   "upper95ci": 1430.16,
-   "analyticalQuality": {
-    "elo": 1541.07,
-    "lower95ci": 1514.62,
-    "upper95ci": 1569.21
-   },
-   "presentation": {
-    "elo": 1376.41,
-    "lower95ci": 1352.35,
-    "upper95ci": 1402.06
-   },
-   "rubricPassRate": 0.4777777777777778,
-   "turns": {
-    "total": 9192,
-    "avgPerTask": 101.01098901098901
-   },
-   "totalToolCalls": 10620,
-   "toolCallsByBucket": {
-    "explore": 901,
-    "viewImage": 1632,
-    "read": 6027,
-    "compute": 6082,
-    "write": 4357,
-    "other": 2255
-   },
-   "tokensByFileType": {
-    "xlsx": {
-     "input": 653134642,
-     "reasoning": 2821649,
-     "answer": 2750930,
-     "total": 658707221,
-     "numTasks": 38
-    },
-    "pptx": {
-     "input": 302302325,
-     "reasoning": 1061703,
-     "answer": 1215382,
-     "total": 304579410,
-     "numTasks": 22
-    },
-    "pdf": {
-     "input": 197555573,
-     "reasoning": 535176,
-     "answer": 763647,
-     "total": 198854396,
-     "numTasks": 12
-    },
-    "docx": {
-     "input": 228061297,
-     "reasoning": 578913,
-     "answer": 1046526,
-     "total": 229686736,
-     "numTasks": 17
-    },
-    "other": {
-     "input": 18436515,
-     "reasoning": 84214,
-     "answer": 100880,
-     "total": 18621609,
-     "numTasks": 2
-    }
-   },
-   "rubricByFileType": {
-    "xlsx": 0.475,
-    "pptx": 0.4448979591836735,
-    "pdf": 0.5431034482758621,
-    "docx": 0.4437869822485207,
-    "other": 0.85
-   },
-   "totalToolMs": 35043924,
-   "turnsPerTaskPercentiles": {
-    "p5": 56.5,
-    "p25": 76,
-    "p50": 97,
-    "p75": 117,
-    "p95": 173
-   }
-  },
-  "critpt": 0.208571428571429,
-  "gdpval": 1571.24,
-  "gdpvalBreakdown": {
-   "lower95ci": 1545.57,
-   "upper95ci": 1596.91,
-   "avgTurns": 62.0829493087558
-  },
-  "gdpPdfAllPass": 0.148,
-  "gdpPdfBreakdown": {
-   "allPass": 0.148,
-   "macroCriterionPassRate": 0.6720288935101957,
-   "byDomain": {
-    "HR": 0.7536507936507936,
-    "Legal": 0.849255117251579,
-    "Insurance": 0.6914994297450439,
-    "Healthcare": 0.7472234484882706,
-    "Engineering": 0.5077421198364402,
-    "Real Estate": 0.626047619047619,
-    "Construction": 0.5898942364824717,
-    "STEM/Research": 0.6386168029501362,
-    "Finance/Investing": 0.7511965811965812,
-    "Manufacturing/Supply Chains": 0.645543255763844
-   }
-  },
-  "globalMmluLiteScore": null,
-  "gpqa": null,
-  "harveyLab": null,
-  "hle": 0.464782205746061,
-  "ifbench": null,
-  "itbenchSre": null,
-  "itbenchAvgTurnsPerTask": null,
-  "livecodebench": null,
-  "lcr": 0.883333333333333,
-  "math500": null,
-  "cweBench": null,
-  "mlcrOverall": null,
-  "mmluPro": null,
-  "mmmuPro": 0.763583815028902,
-  "omniscience": 16.3833333333333,
-  "omniscienceBreakdown": {
-   "accuracy": 0.41533333333333333,
-   "hallucinationRate": 0.4301596351197263,
-   "attemptRate": 0.6798333333333333,
-   "byDomain": {
-    "Business": 12.4,
-    "Health": -0.4,
-    "Humanities & Social Sciences": 13.1,
-    "Law": 13.9,
-    "Science, Engineering & Mathematics": 13.6,
-    "Software Engineering (SWE)": 45.7
-   },
-   "bySweLanguage": {
-    "C": 61,
-    "R": 14,
-    "Go": 32,
-    "PHP": 58,
-    "Dart": 34,
-    "HTML": 58,
-    "Java": 30,
-    "Rust": 62,
-    "Julia": 20,
-    "Swift": 60,
-    "Kotlin": 38,
-    "Python": 52,
-    "JavaScript": 43.63636363636363,
-    "TypeScript": 51.111111111111114
-   }
-  },
-  "opennessIndex": null,
-  "scicode": 0.58912037037037,
-  "tau2": null,
-  "tauBanking": null,
-  "terminalbenchHard": null,
-  "terminalBench21": null,
-  "terminalBench40": 0.333333333333333,
-  "canonicalEvalTokenCounts": {
-   "hle": {
-    "input": 676680,
-    "answer": 611389,
-    "reasoning": 50978156,
-    "cacheableInput": null
-   },
-   "lcr": {
-    "input": 9540944,
-    "answer": 10769,
-    "reasoning": 177704,
-    "cacheableInput": null
-   },
-   "critpt": {
-    "input": 203688,
-    "answer": 82444,
-    "reasoning": 3928695,
-    "cacheableInput": null
-   },
-   "scicode": {
-    "input": 709771,
-    "answer": 170362,
-    "reasoning": 1733322,
-    "cacheableInput": null
-   },
-   "mmmuPro": {
-    "input": 979804,
-    "answer": 176329,
-    "reasoning": 9193724,
-    "cacheableInput": null
-   },
-   "omniscience": {
-    "input": 769989,
-    "answer": 625867,
-    "reasoning": 32620267,
-    "cacheableInput": null
-   },
-   "gdpval": {
-    "input": 1131526866,
-    "answer": 7821567,
-    "reasoning": 7883185,
-    "cacheableInput": 1106222632
-   },
-   "terminalBench40": {
-    "input": 2305655855,
-    "answer": 4267799,
-    "reasoning": 12914707,
-    "cacheableInput": 2283174589
-   },
-   "briefcase": {
-    "input": 1399490352,
-    "answer": 5877365,
-    "reasoning": 5081655,
-    "cacheableInput": 1377703104
-   },
-   "automationBench": {
-    "input": 511570976,
-    "answer": 6927811,
-    "reasoning": 12553048,
-    "cacheableInput": 472973002
-   },
-   "gdpPdf": {
-    "input": 8643187,
-    "answer": 111638,
-    "reasoning": 1212667,
-    "cacheableInput": null
-   }
-  },
-  "price1mInputTokens": 1,
-  "price1mOutputTokens": 2.7,
-  "cacheHitPrice": 0.05,
-  "cacheWritePrice": null,
-  "cacheHitRate": 0.9784,
-  "activeParams": 27,
-  "parameters": 600,
-  "medianCanonicalAnswerOutputSpeed": 87.5170764971444
+  "medianCanonicalAnswerOutputSpeed": 42.7177727153843
  },
  {
   "id": "bcf8db0a-3bb6-4d82-9516-0f57370c85a6",
@@ -7859,7 +7850,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 42.2514998239494,
+  "intelligenceIndex": 42.0829248239494,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -8031,20 +8022,20 @@
    "drive": 0.4857142857142857,
    "hybrid": 0.3137254901960784
   },
-  "briefcaseElo": 1330,
+  "briefcaseElo": 1337.29,
   "briefcaseBreakdown": {
-   "elo": 1330,
-   "lower95ci": 1322.99,
-   "upper95ci": 1337.13,
+   "elo": 1337.29,
+   "lower95ci": 1327.99,
+   "upper95ci": 1346.16,
    "analyticalQuality": {
-    "elo": 1341.06,
-    "lower95ci": 1325.63,
-    "upper95ci": 1354.86
+    "elo": 1358.01,
+    "lower95ci": 1340.3,
+    "upper95ci": 1374.63
    },
    "presentation": {
-    "elo": 1520.25,
-    "lower95ci": 1507.79,
-    "upper95ci": 1533.03
+    "elo": 1525.59,
+    "lower95ci": 1510.19,
+    "upper95ci": 1542.14
    },
    "rubricPassRate": 0.3414141414141414,
    "turns": {
@@ -8114,10 +8105,10 @@
    }
   },
   "critpt": 0.3,
-  "gdpval": 1476.96,
+  "gdpval": 1432.1,
   "gdpvalBreakdown": {
-   "lower95ci": 1463.06,
-   "upper95ci": 1490.86,
+   "lower95ci": 1410.12,
+   "upper95ci": 1454.08,
    "avgTurns": 36.9497716894977
   },
   "gdpPdfAllPass": 0.24,
@@ -8418,7 +8409,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 82.5263279065539
+  "medianCanonicalAnswerOutputSpeed": 93.8948919804078
  },
  {
   "id": "19496b81-9f41-4214-a77a-1df803b3c5ae",
@@ -8441,7 +8432,7 @@
    "color": "#1c7ff8",
    "logo": "/img/logos/zai_small.svg"
   },
-  "intelligenceIndex": 41.907366113455,
+  "intelligenceIndex": 41.807466113455,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -8613,20 +8604,20 @@
    "drive": 0.580952380952381,
    "hybrid": 0.24183006535947713
   },
-  "briefcaseElo": 1448.95,
+  "briefcaseElo": 1460.62,
   "briefcaseBreakdown": {
-   "elo": 1448.95,
-   "lower95ci": 1440.3,
-   "upper95ci": 1457.86,
+   "elo": 1460.62,
+   "lower95ci": 1450.73,
+   "upper95ci": 1470.01,
    "analyticalQuality": {
-    "elo": 1634.74,
-    "lower95ci": 1618.4,
-    "upper95ci": 1651.74
+    "elo": 1660.43,
+    "lower95ci": 1639.77,
+    "upper95ci": 1680.16
    },
    "presentation": {
-    "elo": 1397.98,
-    "lower95ci": 1385.86,
-    "upper95ci": 1410.97
+    "elo": 1410.04,
+    "lower95ci": 1394.39,
+    "upper95ci": 1425.52
    },
    "rubricPassRate": 0.4635897435897436,
    "turns": {
@@ -8696,10 +8687,10 @@
    }
   },
   "critpt": 0.154285714285714,
-  "gdpval": 1654.95,
+  "gdpval": 1640.62,
   "gdpvalBreakdown": {
-   "lower95ci": 1639.93,
-   "upper95ci": 1669.98,
+   "lower95ci": 1617.89,
+   "upper95ci": 1663.34,
    "avgTurns": 80.9305555555556
   },
   "gdpPdfAllPass": 0.154,
@@ -8906,7 +8897,7 @@
    "color": "#34A853",
    "logo": "/img/logos/google_small.svg"
   },
-  "intelligenceIndex": 41.1863571765904,
+  "intelligenceIndex": 40.9262321765904,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -9071,17 +9062,17 @@
   "briefcaseElo": 1201.59,
   "briefcaseBreakdown": {
    "elo": 1201.59,
-   "lower95ci": 1193.68,
-   "upper95ci": 1210.26,
+   "lower95ci": 1192.42,
+   "upper95ci": 1211.68,
    "analyticalQuality": {
-    "elo": 1150.86,
-    "lower95ci": 1135.65,
-    "upper95ci": 1167.69
+    "elo": 1151.08,
+    "lower95ci": 1134.79,
+    "upper95ci": 1168.04
    },
    "presentation": {
-    "elo": 1198.44,
-    "lower95ci": 1183.21,
-    "upper95ci": 1213.35
+    "elo": 1200.08,
+    "lower95ci": 1182.96,
+    "upper95ci": 1216.96
    },
    "rubricPassRate": 0.4212121212121212,
    "turns": {
@@ -9151,10 +9142,10 @@
    }
   },
   "critpt": 0.182857142857143,
-  "gdpval": 1463.81,
+  "gdpval": 1411.95,
   "gdpvalBreakdown": {
-   "lower95ci": 1444.36,
-   "upper95ci": 1483.26,
+   "lower95ci": 1386.5,
+   "upper95ci": 1437.4,
    "avgTurns": 78.2374429223744
   },
   "gdpPdfAllPass": 0.21,
@@ -9327,7 +9318,7 @@
   "cacheHitRate": 0.892089776686994,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 298.459587535738
+  "medianCanonicalAnswerOutputSpeed": 313.839432468971
  },
  {
   "id": "dbe7c625-3100-4463-b479-a228c41f75dd",
@@ -9350,7 +9341,7 @@
    "color": "#2243e6",
    "logo": "/img/logos/deepseek_small.svg"
   },
-  "intelligenceIndex": 39.545442472527,
+  "intelligenceIndex": 39.456167472527,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -9512,20 +9503,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1423.72,
+  "briefcaseElo": 1433.19,
   "briefcaseBreakdown": {
-   "elo": 1423.72,
-   "lower95ci": 1414.08,
-   "upper95ci": 1433.7,
+   "elo": 1433.19,
+   "lower95ci": 1422.83,
+   "upper95ci": 1443.99,
    "analyticalQuality": {
-    "elo": 1630.22,
-    "lower95ci": 1614.6,
-    "upper95ci": 1646.26
+    "elo": 1654.56,
+    "lower95ci": 1635.64,
+    "upper95ci": 1674.42
    },
    "presentation": {
-    "elo": 1335.57,
-    "lower95ci": 1315.86,
-    "upper95ci": 1355.9
+    "elo": 1340.5,
+    "lower95ci": 1320.68,
+    "upper95ci": 1361.43
    },
    "rubricPassRate": 0.45194274028629855,
    "turns": {
@@ -9595,10 +9586,10 @@
    }
   },
   "critpt": 0.142857142857143,
-  "gdpval": 1632.06,
+  "gdpval": 1600,
   "gdpvalBreakdown": {
-   "lower95ci": 1611.08,
-   "upper95ci": 1653.04,
+   "lower95ci": 1600,
+   "upper95ci": 1600,
    "avgTurns": 72.1324200913242
   },
   "gdpPdfAllPass": 0.128,
@@ -9755,7 +9746,7 @@
   "cacheHitRate": 0.979423513175092,
   "activeParams": 16,
   "parameters": 552,
-  "medianCanonicalAnswerOutputSpeed": 282.185415196861
+  "medianCanonicalAnswerOutputSpeed": 273.283920756669
  },
  {
   "id": "426d24c8-49ae-482a-b4a8-20f1c53f21c1",
@@ -9778,7 +9769,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 37.5048489690841,
+  "intelligenceIndex": 37.3244239690841,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -9950,20 +9941,20 @@
    "drive": 0.580952380952381,
    "hybrid": 0.3202614379084967
   },
-  "briefcaseElo": 1332.9,
+  "briefcaseElo": 1346.1,
   "briefcaseBreakdown": {
-   "elo": 1332.9,
-   "lower95ci": 1327.21,
-   "upper95ci": 1339.18,
+   "elo": 1346.1,
+   "lower95ci": 1337.97,
+   "upper95ci": 1354.63,
    "analyticalQuality": {
-    "elo": 1343.64,
-    "lower95ci": 1331.4,
-    "upper95ci": 1355.58
+    "elo": 1369.82,
+    "lower95ci": 1354.2,
+    "upper95ci": 1386.11
    },
    "presentation": {
-    "elo": 1463.13,
-    "lower95ci": 1452.33,
-    "upper95ci": 1474.48
+    "elo": 1477.16,
+    "lower95ci": 1461.86,
+    "upper95ci": 1492.71
    },
    "rubricPassRate": 0.3797979797979798,
    "turns": {
@@ -10033,10 +10024,10 @@
    }
   },
   "critpt": 0.205714285714286,
-  "gdpval": 1455.6,
+  "gdpval": 1442.97,
   "gdpvalBreakdown": {
-   "lower95ci": 1442.99,
-   "upper95ci": 1468.2,
+   "lower95ci": 1421.02,
+   "upper95ci": 1464.91,
    "avgTurns": 35.0272727272727
   },
   "gdpPdfAllPass": 0.24,
@@ -10319,7 +10310,7 @@
   "cacheHitRate": 0.99339067738,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 128.320539900481
+  "medianCanonicalAnswerOutputSpeed": 162.563541815825
  },
  {
   "id": "83173329-c09a-41f1-a028-a282a5f908d7",
@@ -10342,7 +10333,7 @@
    "color": "#2243e6",
    "logo": "/img/logos/deepseek_small.svg"
   },
-  "intelligenceIndex": 36.2828791278402,
+  "intelligenceIndex": 35.9967791278402,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -10514,20 +10505,20 @@
    "drive": 0.6666666666666666,
    "hybrid": 0.45751633986928103
   },
-  "briefcaseElo": 1264.67,
+  "briefcaseElo": 1261.37,
   "briefcaseBreakdown": {
-   "elo": 1264.67,
-   "lower95ci": 1258.2,
-   "upper95ci": 1272.12,
+   "elo": 1261.37,
+   "lower95ci": 1253.01,
+   "upper95ci": 1269.86,
    "analyticalQuality": {
-    "elo": 1395.67,
-    "lower95ci": 1383.17,
-    "upper95ci": 1409.88
+    "elo": 1404.15,
+    "lower95ci": 1387.9,
+    "upper95ci": 1420
    },
    "presentation": {
-    "elo": 1123.33,
-    "lower95ci": 1110.31,
-    "upper95ci": 1136.17
+    "elo": 1114.47,
+    "lower95ci": 1099.19,
+    "upper95ci": 1129.97
    },
    "rubricPassRate": 0.4351851851851852,
    "turns": {
@@ -10597,10 +10588,10 @@
    }
   },
   "critpt": 0.18,
-  "gdpval": 1493.31,
+  "gdpval": 1441.25,
   "gdpvalBreakdown": {
-   "lower95ci": 1478.17,
-   "upper95ci": 1508.44,
+   "lower95ci": 1416.03,
+   "upper95ci": 1466.48,
    "avgTurns": 38.8949771689498
   },
   "gdpPdfAllPass": 0.114,
@@ -10784,7 +10775,7 @@
   "cacheHitRate": 0.990800220652348,
   "activeParams": 49,
   "parameters": 1600,
-  "medianCanonicalAnswerOutputSpeed": 102.646342193787
+  "medianCanonicalAnswerOutputSpeed": 106.107237724723
  },
  {
   "id": "b01dee41-c62b-48ed-8d16-984adc405e5c",
@@ -10807,7 +10798,7 @@
    "color": "#ff7018",
    "logo": "/img/logos/alibaba_small.svg"
   },
-  "intelligenceIndex": 33.9015108057476,
+  "intelligenceIndex": 33.6962858057476,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -10979,20 +10970,20 @@
    "drive": 0.5714285714285714,
    "hybrid": 0.38562091503267976
   },
-  "briefcaseElo": 1397.82,
+  "briefcaseElo": 1404.2,
   "briefcaseBreakdown": {
-   "elo": 1397.82,
-   "lower95ci": 1391.1,
-   "upper95ci": 1404.61,
+   "elo": 1404.2,
+   "lower95ci": 1396.54,
+   "upper95ci": 1412.53,
    "analyticalQuality": {
-    "elo": 1581.31,
-    "lower95ci": 1567.95,
-    "upper95ci": 1593.95
+    "elo": 1596.51,
+    "lower95ci": 1581.72,
+    "upper95ci": 1612.77
    },
    "presentation": {
-    "elo": 1278.57,
-    "lower95ci": 1266.26,
-    "upper95ci": 1290.48
+    "elo": 1283.05,
+    "lower95ci": 1267.43,
+    "upper95ci": 1299.06
    },
    "rubricPassRate": 0.4780388151174668,
    "turns": {
@@ -11062,27 +11053,27 @@
    }
   },
   "critpt": 0.0542857142857143,
-  "gdpval": 1463.25,
+  "gdpval": 1408.77,
   "gdpvalBreakdown": {
-   "lower95ci": 1447.68,
-   "upper95ci": 1478.82,
+   "lower95ci": 1382.45,
+   "upper95ci": 1435.09,
    "avgTurns": 57.9908256880734
   },
-  "gdpPdfAllPass": 0.164,
+  "gdpPdfAllPass": 0.166,
   "gdpPdfBreakdown": {
-   "allPass": 0.164,
-   "macroCriterionPassRate": 0.691102269260047,
+   "allPass": 0.166,
+   "macroCriterionPassRate": 0.6712955252847165,
    "byDomain": {
-    "HR": 0.757941317941318,
-    "Legal": 0.749952823234557,
-    "Insurance": 0.734643579292702,
-    "Healthcare": 0.747233800455144,
-    "Engineering": 0.584114427380148,
-    "Real Estate": 0.666190931875142,
-    "Construction": 0.650849673202614,
-    "STEM/Research": 0.673103094436428,
-    "Finance/Investing": 0.793789173789174,
-    "Manufacturing/Supply Chains": 0.595552197802198
+    "HR": 0.6817027417027417,
+    "Legal": 0.6733621869800552,
+    "Insurance": 0.7097989264363533,
+    "Healthcare": 0.7429462039936349,
+    "Engineering": 0.6037097942625326,
+    "Real Estate": 0.6713488266119845,
+    "Construction": 0.6452178253119429,
+    "STEM/Research": 0.6404906204906204,
+    "Finance/Investing": 0.7832003798670466,
+    "Manufacturing/Supply Chains": 0.5861166774402069
    }
   },
   "globalMmluLiteScore": null,
@@ -11242,9 +11233,9 @@
     "cacheableInput": 485834193
    },
    "gdpPdf": {
-    "input": 12521073,
-    "answer": 148522,
-    "reasoning": 973778,
+    "input": 12086146,
+    "answer": 143469,
+    "reasoning": 993072,
     "cacheableInput": null
    }
   },
@@ -11255,7 +11246,7 @@
   "cacheHitRate": 0.83,
   "activeParams": 27,
   "parameters": 27,
-  "medianCanonicalAnswerOutputSpeed": 51.9697880393718
+  "medianCanonicalAnswerOutputSpeed": 50.5945374009985
  },
  {
   "id": "bb3d7e75-8e22-4082-b9d6-1db0803e042f",
@@ -11278,7 +11269,7 @@
    "color": "#1521a9",
    "logo": "/img/logos/ifm_small.svg"
   },
-  "intelligenceIndex": 30.7949302696723,
+  "intelligenceIndex": 30.5015302696723,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -11440,20 +11431,20 @@
   },
   "enterpriseOpsGym": null,
   "enterpriseOpsGymAvgConversationTurns": null,
-  "briefcaseElo": 1298.34,
+  "briefcaseElo": 1304.03,
   "briefcaseBreakdown": {
-   "elo": 1298.34,
-   "lower95ci": 1289.86,
-   "upper95ci": 1306.75,
+   "elo": 1304.03,
+   "lower95ci": 1294.76,
+   "upper95ci": 1313.73,
    "analyticalQuality": {
-    "elo": 1395.34,
-    "lower95ci": 1379.59,
-    "upper95ci": 1411.95
+    "elo": 1409.36,
+    "lower95ci": 1391.49,
+    "upper95ci": 1429.26
    },
    "presentation": {
-    "elo": 1250.22,
-    "lower95ci": 1238.27,
-    "upper95ci": 1263.7
+    "elo": 1257.48,
+    "lower95ci": 1243.25,
+    "upper95ci": 1272.11
    },
    "rubricPassRate": 0.4164926931106472,
    "turns": {
@@ -11523,10 +11514,10 @@
    }
   },
   "critpt": 0.0457142857142857,
-  "gdpval": 1400,
+  "gdpval": 1349.01,
   "gdpvalBreakdown": {
-   "lower95ci": 1381.22,
-   "upper95ci": 1418.78,
+   "lower95ci": 1323.43,
+   "upper95ci": 1374.6,
    "avgTurns": 44.9909090909091
   },
   "gdpPdfAllPass": 0.074,
@@ -11707,7 +11698,7 @@
    "color": "#EB3568",
    "logo": "/img/logos/minimax_small.svg"
   },
-  "intelligenceIndex": 29.6125932236316,
+  "intelligenceIndex": 29.2202932236316,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.1,
@@ -11879,20 +11870,20 @@
    "drive": 0.45714285714285713,
    "hybrid": 0.30501089324618735
   },
-  "briefcaseElo": 1096.03,
+  "briefcaseElo": 1093.13,
   "briefcaseBreakdown": {
-   "elo": 1096.03,
-   "lower95ci": 1089.75,
-   "upper95ci": 1102.54,
+   "elo": 1093.13,
+   "lower95ci": 1085.82,
+   "upper95ci": 1099.86,
    "analyticalQuality": {
-    "elo": 1055.51,
-    "lower95ci": 1043.38,
-    "upper95ci": 1067.59
+    "elo": 1052.17,
+    "lower95ci": 1039.19,
+    "upper95ci": 1065.33
    },
    "presentation": {
-    "elo": 1177.57,
-    "lower95ci": 1166.95,
-    "upper95ci": 1187.85
+    "elo": 1172.77,
+    "lower95ci": 1158.68,
+    "upper95ci": 1186.16
    },
    "rubricPassRate": 0.30303030303030304,
    "turns": {
@@ -11962,10 +11953,10 @@
    }
   },
   "critpt": 0.0371428571428571,
-  "gdpval": 1303.96,
+  "gdpval": 1229.88,
   "gdpvalBreakdown": {
-   "lower95ci": 1290.46,
-   "upper95ci": 1317.46,
+   "lower95ci": 1208.51,
+   "upper95ci": 1251.26,
    "avgTurns": 54.1590909090909
   },
   "gdpPdfAllPass": 0.098,
@@ -12271,7 +12262,7 @@
   "cacheHitRate": 0.972844718040998,
   "activeParams": 23,
   "parameters": 428,
-  "medianCanonicalAnswerOutputSpeed": 182.653799527486
+  "medianCanonicalAnswerOutputSpeed": 195.048092609393
  },
  {
   "id": "0de09623-2b1a-4c8d-86ef-7f5245d4e24b",
@@ -12294,7 +12285,7 @@
    "color": "#676767",
    "logo": "/img/logos/thinking_machines.svg"
   },
-  "intelligenceIndex": 25.5423060999384,
+  "intelligenceIndex": 24.9847810999384,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.2375,
@@ -12466,20 +12457,20 @@
    "drive": 0.580952380952381,
    "hybrid": 0.3660130718954248
   },
-  "briefcaseElo": 835.63,
+  "briefcaseElo": 829.33,
   "briefcaseBreakdown": {
-   "elo": 835.63,
-   "lower95ci": 828.03,
-   "upper95ci": 842.94,
+   "elo": 829.33,
+   "lower95ci": 820.41,
+   "upper95ci": 838.37,
    "analyticalQuality": {
-    "elo": 751.43,
-    "lower95ci": 737.07,
-    "upper95ci": 764.58
+    "elo": 743.87,
+    "lower95ci": 727.64,
+    "upper95ci": 760.06
    },
    "presentation": {
-    "elo": 873.11,
-    "lower95ci": 859.43,
-    "upper95ci": 886.79
+    "elo": 863.76,
+    "lower95ci": 846,
+    "upper95ci": 879.84
    },
    "rubricPassRate": 0.19292929292929292,
    "turns": {
@@ -12549,10 +12540,10 @@
    }
   },
   "critpt": 0.0542857142857143,
-  "gdpval": 1165.19,
+  "gdpval": 1063.21,
   "gdpvalBreakdown": {
-   "lower95ci": 1148.58,
-   "upper95ci": 1181.79,
+   "lower95ci": 1036.12,
+   "upper95ci": 1090.3,
    "avgTurns": 43.1045454545455
   },
   "gdpPdfAllPass": 0.128,
@@ -12748,7 +12739,7 @@
   "cacheHitRate": 0.980941578291172,
   "activeParams": 41,
   "parameters": 975,
-  "medianCanonicalAnswerOutputSpeed": 82.1276422243961
+  "medianCanonicalAnswerOutputSpeed": 82.8639997544414
  },
  {
   "id": "5b52def2-ac9b-4465-ad80-91ea8079e253",
@@ -12771,7 +12762,7 @@
    "color": "#76b900",
    "logo": "/img/logos/nvidia_small.svg"
   },
-  "intelligenceIndex": 23.4145123422858,
+  "intelligenceIndex": 22.9279123422858,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.0625,
@@ -12943,20 +12934,20 @@
    "drive": 0.4666666666666667,
    "hybrid": 0.3333333333333333
   },
-  "briefcaseElo": 878.22,
+  "briefcaseElo": 873.67,
   "briefcaseBreakdown": {
-   "elo": 878.22,
-   "lower95ci": 871.64,
-   "upper95ci": 885.37,
+   "elo": 873.67,
+   "lower95ci": 866.11,
+   "upper95ci": 881.26,
    "analyticalQuality": {
-    "elo": 833.68,
-    "lower95ci": 821.8,
-    "upper95ci": 846.41
+    "elo": 831.38,
+    "lower95ci": 817.36,
+    "upper95ci": 845.15
    },
    "presentation": {
-    "elo": 881.57,
-    "lower95ci": 868.68,
-    "upper95ci": 894.19
+    "elo": 872.16,
+    "lower95ci": 856.22,
+    "upper95ci": 886.9
    },
    "rubricPassRate": 0.2202020202020202,
    "turns": {
@@ -13026,10 +13017,10 @@
    }
   },
   "critpt": 0.0314285714285714,
-  "gdpval": 1090.88,
+  "gdpval": 1000.46,
   "gdpvalBreakdown": {
-   "lower95ci": 1076.71,
-   "upper95ci": 1105.06,
+   "lower95ci": 978.01,
+   "upper95ci": 1022.91,
    "avgTurns": 21.5772727272727
   },
   "gdpPdfAllPass": 0.05,
@@ -13329,7 +13320,7 @@
   "cacheHitRate": 0.328126251702315,
   "activeParams": 55,
   "parameters": 550,
-  "medianCanonicalAnswerOutputSpeed": 172.939058059187
+  "medianCanonicalAnswerOutputSpeed": 170.090296182098
  },
  {
   "id": "093b9df2-ebee-4309-943f-5a7e88360adf",
@@ -13352,7 +13343,7 @@
    "color": "#34A853",
    "logo": "/img/logos/google_small.svg"
   },
-  "intelligenceIndex": 22.6606674839812,
+  "intelligenceIndex": 22.1685424839812,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -13524,20 +13515,20 @@
    "drive": 0.6095238095238096,
    "hybrid": 0.4117647058823529
   },
-  "briefcaseElo": 645.32,
+  "briefcaseElo": 642.12,
   "briefcaseBreakdown": {
-   "elo": 645.32,
-   "lower95ci": 637.26,
-   "upper95ci": 653.71,
+   "elo": 642.12,
+   "lower95ci": 633.21,
+   "upper95ci": 651.62,
    "analyticalQuality": {
-    "elo": 389.97,
-    "lower95ci": 374.81,
-    "upper95ci": 405.23
+    "elo": 384.06,
+    "lower95ci": 364.77,
+    "upper95ci": 401.76
    },
    "presentation": {
-    "elo": 757.45,
-    "lower95ci": 741.84,
-    "upper95ci": 773.84
+    "elo": 749.62,
+    "lower95ci": 732.66,
+    "upper95ci": 766.43
    },
    "rubricPassRate": 0.1484848484848485,
    "turns": {
@@ -13607,10 +13598,10 @@
    }
   },
   "critpt": 0,
-  "gdpval": 1063.25,
+  "gdpval": 969.79,
   "gdpvalBreakdown": {
-   "lower95ci": 1046.65,
-   "upper95ci": 1079.84,
+   "lower95ci": 943.16,
+   "upper95ci": 996.41,
    "avgTurns": 21.3454545454545
   },
   "gdpPdfAllPass": 0.136,
@@ -13789,7 +13780,7 @@
   "cacheHitRate": 0.8188520111359,
   "activeParams": null,
   "parameters": null,
-  "medianCanonicalAnswerOutputSpeed": 355.410385093466
+  "medianCanonicalAnswerOutputSpeed": 377.905991089564
  },
  {
   "id": "583f98fb-c4b8-4df3-8d40-60ac0ed69882",
@@ -13812,7 +13803,7 @@
    "color": "#0089f4",
    "logo": "/img/logos/meta_small.svg"
   },
-  "intelligenceIndex": 18.0678176089465,
+  "intelligenceIndex": 17.4754176089465,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": null,
@@ -13984,20 +13975,20 @@
    "drive": 0.5333333333333333,
    "hybrid": 0.3333333333333333
   },
-  "briefcaseElo": 481.02,
+  "briefcaseElo": 490.19,
   "briefcaseBreakdown": {
-   "elo": 481.02,
-   "lower95ci": 472.05,
-   "upper95ci": 489.21,
+   "elo": 490.19,
+   "lower95ci": 481.65,
+   "upper95ci": 497.25,
    "analyticalQuality": {
-    "elo": 370.61,
-    "lower95ci": 353.64,
-    "upper95ci": 387.12
+    "elo": 383.25,
+    "lower95ci": 367.77,
+    "upper95ci": 397.9
    },
    "presentation": {
-    "elo": 356.08,
-    "lower95ci": 339.38,
-    "upper95ci": 372.75
+    "elo": 369.43,
+    "lower95ci": 352.44,
+    "upper95ci": 382.99
    },
    "rubricPassRate": 0.11514522821576763,
    "turns": {
@@ -14067,10 +14058,10 @@
    }
   },
   "critpt": 0.0257142857142857,
-  "gdpval": 892.72,
+  "gdpval": 774.24,
   "gdpvalBreakdown": {
-   "lower95ci": 873.49,
-   "upper95ci": 911.96,
+   "lower95ci": 746.44,
+   "upper95ci": 802.05,
    "avgTurns": 25.5409090909091
   },
   "gdpPdfAllPass": 0.1,
@@ -14260,7 +14251,7 @@
   "cacheHitRate": 1,
   "activeParams": 30,
   "parameters": 30,
-  "medianCanonicalAnswerOutputSpeed": 90.8774772092399
+  "medianCanonicalAnswerOutputSpeed": 91.2223787609439
  },
  {
   "id": "dd059b25-d82a-4ead-82a4-4adceaaec48b",
@@ -14283,7 +14274,7 @@
    "color": "#fd6f00",
    "logo": "/img/logos/mistral_small.png"
   },
-  "intelligenceIndex": 14.8946727802691,
+  "intelligenceIndex": 14.1889227802691,
   "intelligenceIndexIsEstimated": false,
   "aime25": null,
   "analystAgent": 0.125,
@@ -14455,20 +14446,20 @@
    "drive": 0.5492063492063493,
    "hybrid": 0.39433551198257083
   },
-  "briefcaseElo": 523.63,
+  "briefcaseElo": 514.91,
   "briefcaseBreakdown": {
-   "elo": 523.63,
-   "lower95ci": 515.55,
-   "upper95ci": 530.83,
+   "elo": 514.91,
+   "lower95ci": 505.88,
+   "upper95ci": 522.85,
    "analyticalQuality": {
-    "elo": 353.89,
-    "lower95ci": 339.11,
-    "upper95ci": 367.53
+    "elo": 343.24,
+    "lower95ci": 326.78,
+    "upper95ci": 358.94
    },
    "presentation": {
-    "elo": 484.38,
-    "lower95ci": 468.83,
-    "upper95ci": 498.8
+    "elo": 468.6,
+    "lower95ci": 452.07,
+    "upper95ci": 484.92
    },
    "rubricPassRate": 0.12424242424242424,
    "turns": {
@@ -14538,10 +14529,10 @@
    }
   },
   "critpt": 0,
-  "gdpval": 875.14,
+  "gdpval": 747.19,
   "gdpvalBreakdown": {
-   "lower95ci": 860.12,
-   "upper95ci": 890.16,
+   "lower95ci": 723.29,
+   "upper95ci": 771.09,
    "avgTurns": 27.5909090909091
   },
   "gdpPdfAllPass": 0.028,
@@ -14847,7 +14838,7 @@
   "cacheHitRate": 0.956078639904196,
   "activeParams": 128,
   "parameters": 128,
-  "medianCanonicalAnswerOutputSpeed": 148.079603272958
+  "medianCanonicalAnswerOutputSpeed": 151.40823354892
  },
  {
   "id": "f0083258-8646-45b8-8082-7aaf6c2ea82a",
@@ -14870,7 +14861,7 @@
    "color": "#1f1f1f",
    "logo": "/img/logos/openai_small.svg"
   },
-  "intelligenceIndex": 12.3483931512592,
+  "intelligenceIndex": 11.6028431512592,
   "intelligenceIndexIsEstimated": false,
   "aime25": 0.934416666666667,
   "analystAgent": null,
@@ -15125,10 +15116,10 @@
    }
   },
   "critpt": 0.0114285714285714,
-  "gdpval": 744.74,
+  "gdpval": 595.63,
   "gdpvalBreakdown": {
-   "lower95ci": 729.26,
-   "upper95ci": 760.22,
+   "lower95ci": 571.43,
+   "upper95ci": 619.83,
    "avgTurns": 29.0454545454545
   },
   "gdpPdfAllPass": 0.04,
@@ -15453,6 +15444,6 @@
   "cacheHitRate": 0,
   "activeParams": 5.1,
   "parameters": 117,
-  "medianCanonicalAnswerOutputSpeed": 185.175407594182
+  "medianCanonicalAnswerOutputSpeed": 191.276415266558
  }
 ]
