@@ -129,7 +129,6 @@ def build_scores(models: dict, benchmarks: dict, meta: dict, settings: dict
         lo, hi = _bench_bounds(scale)
         for mid, p in prices_all.items():
             dims["cost"][mid] = _clamp(50.0 if hi == lo else (hi - p) / (hi - lo) * 100.0)
-    prices = {k: v for k, v in prices_all.items() if k in universe} or prices_all
 
     pref_empty = not dims["preference"]
     weights = active_weights(settings, dims, prefer_no_pref=pref_empty)
