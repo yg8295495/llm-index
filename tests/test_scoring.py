@@ -117,6 +117,18 @@ def test_reference_model_does_not_set_the_scale():
     assert scores["xai/ref"]["ranked"] is False
 
 
+def test_reference_model_is_still_scored_on_the_core_scale():
+    """参照模型不是空壳: 它要在核心模型定的同一把尺子上拿到可比的分,
+    只是不占名次。否则前端「含参照模型」开关打开后全是破折号, 用户无法判断。"""
+    scores, _ = build_scores(_models(), _benchmarks(), META, _settings())
+    ref = scores["xai/ref"]
+    assert ref["ranked"] is False
+    assert ref["dims"]["factual"] == 100.0, "ref 的 omniscience=99 超过核心最大值, 应钳到 100"
+    assert ref["capability"] is not None, "参照模型应拿到能力分"
+    assert ref["blended_price"] is not None
+    assert ref["value"] is not None
+
+
 def test_negative_index_is_normalized_without_negative_output():
     scores, _ = build_scores(_models(), _benchmarks(), META, _settings())
     assert scores["zhipu/c"]["dims"]["factual"] >= 0

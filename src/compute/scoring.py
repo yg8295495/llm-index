@@ -45,19 +45,26 @@ def best_per_model(bench_rows: list[dict], universe: set[str],
 
 
 def normalize_dim(dim: str, bench_groups: dict[str, list[str]], benchmarks: dict,
-                  meta: dict, universe: set[str]) -> tuple[dict[str, float], dict[str, int]]:
-    """返回 ({model_id: 维度分}, {model_id: 有数据的 benchmark 数})"""
+                  meta: dict, universe: set[str], score_for: set[str] | None = None
+                  ) -> tuple[dict[str, float], dict[str, int]]:
+    """返回 ({model_id: 维度分}, {model_id: 有数据的 benchmark 数})
+
+    universe 决定归一化的 min/max 标尺（榜内核心模型），score_for 决定给谁算分。
+    参照模型用**同一把尺子**取分但不参与定标，因此可以出现 0 或 100 之外的值 ——
+    钳位后展示，名次仍然只给核心模型。
+    """
     keys = [b for b in bench_groups.get(dim, []) if b in benchmarks]
+    targets = score_for if score_for is not None else universe
     per_model: dict[str, list[float]] = {}
     covered: dict[str, int] = {}
     for b in keys:
         m = meta.get(b) or {}
         reverse = m.get("direction") == "lower"
-        raw = best_per_model(benchmarks[b], universe, reverse)
-        if not raw:
+        scale_vals = best_per_model(benchmarks[b], universe, reverse)
+        if not scale_vals:
             continue
-        lo, hi = _bench_bounds(list(raw.values()))
-        for mid, v in raw.items():
+        lo, hi = _bench_bounds(list(scale_vals.values()))
+        for mid, v in best_per_model(benchmarks[b], targets, reverse).items():
             n = 50.0 if hi == lo else (v - lo) / (hi - lo) * 100.0
             per_model.setdefault(mid, []).append(100.0 - n if reverse else n)
             covered[mid] = covered.get(mid, 0) + 1
@@ -97,6 +104,7 @@ def build_scores(models: dict, benchmarks: dict, meta: dict, settings: dict
     """
     core_ids = {mid for mid, m in models.items() if m.get("in_scope")}
     universe = core_ids or set(models)
+    all_ids = set(models)
     groups = (settings.get("_bench_groups") or {})
     lb = settings.get("leaderboards") or {}
     cap_dims_cfg = (lb.get("capability") or {}).get("dimensions") or {}
@@ -107,18 +115,21 @@ def build_scores(models: dict, benchmarks: dict, meta: dict, settings: dict
     for dim in list(dims):
         if dim == "cost":
             continue
-        sc, cov = normalize_dim(dim, groups, benchmarks, meta, universe)
+        # 定标只看核心模型, 但参照模型也要在同一标尺上取分, 否则"参照"只是空壳
+        sc, cov = normalize_dim(dim, groups, benchmarks, meta, universe, score_for=all_ids)
         dims[dim] = sc
         coverage[dim] = cov
         dim_bench_count[dim] = len([b for b in groups.get(dim, []) if b in benchmarks])
 
     # 成本维: 直接用混合单价 (稳定, 不受"某套题多大"影响), 反向 min-max
-    prices = {mid: blended_price(models[mid]) for mid in universe}
-    prices = {k: v for k, v in prices.items() if v is not None}
-    if prices:
-        lo, hi = _bench_bounds(list(prices.values()))
-        for mid, p in prices.items():
+    prices_all = {mid: blended_price(models[mid]) for mid in all_ids}
+    prices_all = {k: v for k, v in prices_all.items() if v is not None}
+    scale = [v for k, v in prices_all.items() if k in universe] or list(prices_all.values())
+    if scale:
+        lo, hi = _bench_bounds(scale)
+        for mid, p in prices_all.items():
             dims["cost"][mid] = _clamp(50.0 if hi == lo else (hi - p) / (hi - lo) * 100.0)
+    prices = {k: v for k, v in prices_all.items() if k in universe} or prices_all
 
     pref_empty = not dims["preference"]
     weights = active_weights(settings, dims, prefer_no_pref=pref_empty)
@@ -144,7 +155,7 @@ def build_scores(models: dict, benchmarks: dict, meta: dict, settings: dict
             wsum = sum(weights[d] for d in vals)
             if wsum:
                 composite = round(sum(vals[d] * weights[d] for d in vals) / wsum, 2)
-        price = prices.get(mid)
+        price = prices_all.get(mid)
         value_raw = round(capability / max(price, floor), 4) if (capability and price) else None
         out[mid] = {
             "dims": dim_scores,
