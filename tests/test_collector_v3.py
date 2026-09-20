@@ -397,3 +397,118 @@ def test_manual_ingest_requires_source_url(temp_db, manual_mod):
     doc["sources"] = {}
     with pytest.raises(SystemExit):
         manual_mod.ingest(temp_db, doc, dry_run=False)
+
+
+def test_manual_ingest_snapshot_date_latest_follows_the_newest_batch(
+        temp_db, manual_mod, fake_scored, fake_registry, benchmarks_cfg, vendors):
+    """changelog #39: `snapshot_date: latest` 让自报数据自动跟着最新 AA 批次,
+    日更之后不必再手改 YAML —— 但 observed_at 必须是批次日, 不是登记日。"""
+    models = _fake_models(fake_scored, fake_registry, benchmarks_cfg, vendors)
+    urls = {e.benchmark: "https://example.invalid/src" for m in models for e in m.evals}
+    sid = S.upsert_snapshot(temp_db, "2026-09-20", {
+        "source": "artificial_analysis", "source_url": "u", "fetched_at": "t"})
+    S.write(temp_db, models, sid, "2026-09-20", urls, dry_run=False)
+    temp_db.commit()
+
+    doc = _manual_doc()
+    doc["snapshot_date"] = "latest"
+    doc["collected_at"] = "2026-10-05T00:00:00+00:00"      # 登记日比批次日晚
+    _action, _pk, written, _tier, got_sid = manual_mod.ingest(temp_db, doc, dry_run=False)
+    temp_db.commit()
+    assert written > 0
+    assert got_sid == sid, "自报行必须挂进最新 AA 批次, 不另开快照"
+    obs = temp_db.execute(
+        "SELECT DISTINCT observed_at FROM benchmark_evals WHERE benchmark LIKE '%_official'"
+    ).fetchall()
+    assert [r[0] for r in obs] == ["2026-09-20"], "observed_at 取批次日而非登记日"
+
+
+def test_manual_ingest_refuses_date_older_than_the_latest_batch(temp_db, manual_mod):
+    """changelog #39 护栏: 自报数据若挂到比 AA 批次更早的日期, 导出器按"最新批次"
+    取数时会把整个榜单顶成只剩混元一条。"""
+    doc = _manual_doc()
+    doc["snapshot_date"] = "2026-09-20"
+    manual_mod.ingest(temp_db, doc, dry_run=False)
+    temp_db.commit()
+
+    newer = S.upsert_snapshot(temp_db, "2026-10-01", {
+        "source": "artificial_analysis", "source_url": "u", "fetched_at": "t"})
+    pk = temp_db.execute("SELECT id FROM models LIMIT 1").fetchone()[0]
+    temp_db.execute(
+        """INSERT INTO benchmark_evals (model_pk, benchmark, source, confidence,
+                                        observed_at, collected_at, snapshot_id, source_url)
+           VALUES (?, 'aa_omniscience', 'artificial_analysis', 0.9,
+                   '2026-10-01', '2026-10-01T00:00:00+00:00', ?, 'u')""", (pk, newer))
+    temp_db.commit()
+
+    with pytest.raises(SystemExit):
+        manual_mod.ingest(temp_db, doc, dry_run=False)
+
+
+# ---------------------------------------------------------------------------
+# 元数据字段名兼容 (changelog #37)
+# ---------------------------------------------------------------------------
+
+
+def test_model_metadata_accepts_detail_page_key_names():
+    """AA 详情页与榜单页对同一属性用了不同键名, 写死一个就静默丢字段。
+
+    2026-09-20 实测: 榜单页 payload 里根本没有 contextWindow*, 上下文窗口只在
+    详情页以 contextWindowTokens 出现; 激活参数在详情页叫
+    inferenceParametersActiveBillions; 输出速度在详情页藏在 timescaleData 里。
+    """
+    detail = {
+        "contextWindowTokens": 1_000_000,
+        "inferenceParametersActiveBillions": 40,
+        "timescaleData": {"medianOutputSpeed": 82.1},
+        "intelligenceIndexTimePerTask": 866.3,
+        "openness": {"opennessIndex": 33.3},
+    }
+    meta = M.model_metadata(detail)
+    assert meta["context_window"] == 1_000_000
+    assert meta["active_params"] == 40
+    assert meta["answer_speed"] == pytest.approx(82.1)
+    assert meta["time_per_task_s"] == pytest.approx(866.3)
+    assert meta["openness_index"] == pytest.approx(33.3)
+
+    board = {
+        "contextWindow": 262144, "activeParams": 8,
+        "medianCanonicalAnswerOutputSpeed": 50.0, "opennessIndex": 11.0,
+    }
+    meta2 = M.model_metadata(board)
+    assert (meta2["context_window"], meta2["active_params"], meta2["answer_speed"]) == (
+        262144, 8, 50.0)
+    assert meta2["time_per_task_s"] is None, "榜单页没有该字段时应为 None, 不得编造"
+
+
+def test_build_evals_tolerates_aa_key_casing(fake_scored, fake_registry,
+                                             benchmarks_cfg, vendors):
+    """同一指标在两个 payload 里分别是 itbenchSre / itBenchSre。"""
+    scored = [dict(fake_scored[0], itBenchSre=0.4769)]
+    models, _ = M.map_records(scored, fake_registry, benchmarks_cfg, vendors, {}, {})
+    names = {e.benchmark for m in models for e in m.evals}
+    assert "itbench_sre" in names, "详情页大小写不同的 aa_key 也要能取到"
+
+
+def test_rerun_does_not_wipe_metadata_the_page_lacks(temp_db, fake_scored, fake_registry,
+                                                     benchmarks_cfg, vendors):
+    """补采到详情页元数据后, 再跑一次只含榜单页的批不得把它洗成 NULL。"""
+    models = _fake_models(fake_scored, fake_registry, benchmarks_cfg, vendors)
+    urls = {e.benchmark: "https://example.invalid/src" for m in models for e in m.evals}
+    sid = S.upsert_snapshot(temp_db, "2026-09-20", {
+        "source": "artificial_analysis", "source_url": "u", "fetched_at": "t"})
+    models[0].row.context_window = 1_048_576
+    S.write(temp_db, models, sid, "2026-09-20", urls, dry_run=False)
+    temp_db.commit()
+
+    slug = models[0].row.aa_slug
+    again = _fake_models(fake_scored, fake_registry, benchmarks_cfg, vendors)
+    assert again[0].row.aa_slug == slug
+    again[0].row.context_window = None            # 模拟榜单页 payload 没有这个字段
+    S.write(temp_db, again, sid, "2026-09-20", urls, dry_run=False)
+    temp_db.commit()
+
+    got = temp_db.execute(
+        "SELECT context_window FROM models WHERE aa_slug = ?", (slug,)
+    ).fetchone()[0]
+    assert got == 1_048_576, "None 不得覆盖已知的模型元数据"

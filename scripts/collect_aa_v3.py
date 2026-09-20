@@ -298,15 +298,19 @@ def main() -> int:
             conn.rollback()
             return 3
 
-        snap_dir = write_snapshot_files(date_str, page, parsed, bm)
-        print(f"   快照落盘: {snap_dir}")
+        # 干跑不落盘。解析产物是给"库里已有的这一批"做复现凭据的 (changelog #27);
+        # 干跑也落一份, 会让人误以为库里存在那个批次 (2026-09-21 实际踩过)。
+        snap_dir = None if args.dry_run else write_snapshot_files(date_str, page, parsed, bm)
+        if snap_dir:
+            print(f"   快照落盘: {snap_dir}")
         sid = S.upsert_snapshot(conn, date_str, {
             "source": "artificial_analysis",
             "source_url": page.url,
             "fetched_at": page.fetched_at,
             "html_sha256": page.sha256,
             "html_bytes": page.bytes,
-            "parsed_path": str(snap_dir.relative_to(snap_dir.parents[2])),
+            "parsed_path": (str(snap_dir.relative_to(snap_dir.parents[2]))
+                            if snap_dir else None),
             "notes": f"{TOOL}; RSC chunks={parsed['source']['rsc_chunks']}",
         })
         report = S.write(conn, mapped, sid, date_str, urls, dry_run=args.dry_run)

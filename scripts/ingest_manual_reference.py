@@ -38,6 +38,16 @@ from src.storage import snapshot_store as S  # noqa: E402
 OFFICIAL_CONFIDENCE = 0.45   # 厂商自报: 口径不可核验, 置信度显式压低
 
 
+def _latest_aa_batch(conn) -> str:
+    """最新一个含 AA 同口径评测的快照日 (YYYY-MM-DD 字符串); 没有则返回 ''"""
+    row = conn.execute(
+        """SELECT s.snapshot_date FROM snapshots s
+           JOIN benchmark_evals be ON be.snapshot_id = s.id
+           WHERE be.benchmark NOT LIKE '%_official' AND be.source LIKE 'artificial%'
+           GROUP BY s.id ORDER BY s.snapshot_date DESC LIMIT 1""").fetchone()
+    return str(row[0])[:10] if row else ""
+
+
 def load_entries() -> list[dict]:
     wl = yaml.safe_load(config_path("watchlist.yaml").read_text(encoding="utf-8")) or {}
     out = []
@@ -59,17 +69,43 @@ def ingest(conn, doc, dry_run):
     vendors = load_vendors()
     tier = next((v.get("tier") for v in vendors.values() if v["namespace"] == provider),
                 "unclassified")
-    date_str = str(doc.get("collected_at", ""))[:10] or datetime.now(
-        timezone.utc).date().isoformat()
+    # snapshot_date 三种写法: 'latest' = 跟着最新 AA 批次走(推荐, 日更后不必改 YAML);
+    # 显式日期 = 回填某一批历史数据; 缺省 = 退回 collected_at 的日期并告警。
+    raw_date = str(doc.get("snapshot_date") or "").strip()
+    if raw_date.lower() in ("latest", "auto"):
+        date_str = _latest_aa_batch(conn)
+        if not date_str:
+            raise SystemExit(f"{mid}: snapshot_date: latest, 但库里还没有 AA 批次, "
+                             "请先跑 collect_aa_v3.py")
+    else:
+        date_str = raw_date[:10] or str(doc.get("collected_at", ""))[:10] or datetime.now(
+            timezone.utc).date().isoformat()
+        if not raw_date:
+            print(f"   ⚠️ {mid}: YAML 未写 snapshot_date, 回退到 collected_at 日期 {date_str}")
     rel = (doc.get("sources") or {}).get("official_release") or {}
     snapshot_url = rel.get("url") or (doc.get("sources") or {}).get("model_card", {}).get("url")
     if not snapshot_url:
         raise SystemExit(f"{mid}: 没有任何 source url, 按标准拒绝入库")
 
-    # 自报数据挂到**同一天的批次快照**上，不另开快照日。
-    # 快照表按 snapshot_date 取"最新一批"，若在这里造 '2026-09-20-tencent-official'
-    # 这种非日期值，它会按字典序排在 '2026-09-20' 之后，导出器会误把它当最新批次、
-    # 只导出混元一条数据而清空整个榜单。口径靠行级 source / confidence 区分。
+    # 护栏: 自报数据必须落在"当前最新 AA 批次"同一天 (changelog #33 / #35 / #39)。
+    #   - 日期比最新批次新 → 会凭空造出一个只含混元的更新快照, 而导出器按 snapshot_date
+    #     取最新批次, 整个榜单被这一条模型顶掉 (2026-09-20 差点踩中);
+    #   - 日期比最新批次旧 → 行是写进去了, 但前端永远读不到, 变成静默死数据;
+    #   - 非日期值 (如 '2026-09-20-tencent-official') 按字典序排在真日期之后, 同样中招。
+    # 三种都拒绝: 口径区分靠行级 source / confidence, 不靠另开快照日。
+    newest = _latest_aa_batch(conn)
+    if newest:
+        if date_str > newest:
+            raise SystemExit(
+                f"{mid}: snapshot_date={date_str} 比最新 AA 批次 {newest} 更晚, "
+                "会新建一个只含自报数据的批次并顶掉整个榜单。"
+                f"请把 YAML 的 snapshot_date 改成 {newest}")
+        if date_str < newest:
+            raise SystemExit(
+                f"{mid}: snapshot_date={date_str} 早于最新 AA 批次 {newest}, "
+                "自报数据会落在旧快照里而前端按最新批次取数 = 永远不显示。"
+                f"请把 YAML 的 snapshot_date 改成 {newest}")
+
     row = conn.execute("SELECT id FROM snapshots WHERE snapshot_date = ?", (date_str,)).fetchone()
     if row:
         sid = int(row[0])

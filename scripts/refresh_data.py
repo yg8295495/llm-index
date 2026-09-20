@@ -42,6 +42,12 @@ def main() -> int:
         collect += ["--from-file", args.from_file]
 
     steps = [("采集并入库 (AA Omniscience 主批次 + config/watchlist.yaml 补采)", collect)]
+    # 元数据补采: 上下文窗口/单任务耗时只有详情页有, 榜单页 payload 里没这些键 (#37)。
+    # 默认只拉"还缺元数据"的模型, 所以补过一次之后这一步近乎零成本。
+    enrich = [py, "scripts/enrich_metadata.py"]
+    if args.apply:
+        enrich.append("--apply")
+    steps.append(("补采模型元数据 (详情页: 上下文窗口 / 单任务耗时)", enrich))
     if args.apply:
         steps.append(("登记厂商自报数据 (AA 未收录的模型, 见 data/raw/manual/)",
                       [py, "scripts/ingest_manual_reference.py", "--no-dry-run"]))

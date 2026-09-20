@@ -1,0 +1,183 @@
+{
+  "tool": "enrich_metadata",
+  "batch_snapshot_date": "2026-09-20",
+  "generated_at": "2026-09-20T21:19:26+00:00",
+  "dry_run": false,
+  "targets": 1,
+  "rows_changed": 0,
+  "failures": [],
+  "runs": [
+    {
+      "generated_at": "2026-09-20T21:19:26+00:00",
+      "dry_run": false,
+      "targets": 1,
+      "rows_changed": 0,
+      "failures": []
+    }
+  ],
+  "models": [
+    {
+      "models_id": 657,
+      "model_id": "google/gemini-3.5-flash-lite",
+      "aa_slug": "gemini-3-5-flash-lite",
+      "source_url": "https://artificialanalysis.ai/models/gemini-3-5-flash-lite",
+      "html_sha256": "ddf83bfc3060de2e4fdf5d3416e175fc768ff7cfa3610e9e55cfe2dfc05df188",
+      "bytes": 3845071,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 1000000,
+        "time_per_task_s": 46.32554005712749
+      },
+      "already_had": {
+        "pricing_input": 0.3,
+        "pricing_output": 2.5,
+        "pricing_cache_input": 0.03,
+        "answer_speed": 377.905991089564,
+        "size_class": "medium",
+        "open_source": "proprietary",
+        "supports_vision": 1,
+        "supports_audio": 1
+      }
+    },
+    {
+      "models_id": 452,
+      "model_id": "openai/gpt-5.6-luna",
+      "aa_slug": "gpt-5-6-luna",
+      "source_url": "https://artificialanalysis.ai/models/gpt-5-6-luna",
+      "html_sha256": "3b8c5d3a35c6f7a7bea051326fc0afd6a77ff7802200f2d2c4815938e0830f66",
+      "bytes": 3841863,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 1000000,
+        "time_per_task_s": 253.65213743746372
+      },
+      "already_had": {
+        "pricing_input": 0.2,
+        "pricing_output": 1.2,
+        "pricing_cache_input": 0.02,
+        "answer_speed": 162.563541815825,
+        "size_class": "medium",
+        "open_source": "proprietary",
+        "supports_vision": 1,
+        "supports_audio": 0
+      }
+    },
+    {
+      "models_id": 674,
+      "model_id": "openai/gpt-6-astra",
+      "aa_slug": "gpt-6-astra-medium",
+      "source_url": "https://artificialanalysis.ai/models/gpt-6-astra-medium",
+      "html_sha256": "875fea222bde329105bd15296fce03b8200b5136cf79b2411d49b7a38ec1e9d1",
+      "bytes": 3849823,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 1000000,
+        "time_per_task_s": 179.44319691769064
+      },
+      "already_had": {
+        "pricing_input": 10.0,
+        "pricing_output": 50.0,
+        "pricing_cache_input": 1.0,
+        "answer_speed": 53.4408705282613,
+        "size_class": "large",
+        "open_source": "proprietary",
+        "supports_vision": 1,
+        "supports_audio": 0
+      }
+    },
+    {
+      "models_id": 677,
+      "model_id": "xai/grok-4.6",
+      "aa_slug": "grok-4-6",
+      "source_url": "https://artificialanalysis.ai/models/grok-4-6",
+      "html_sha256": "ec2b1f0c38cade88dcd4d67dcfaa5bef3b2b7063c220b042935edbb80e400929",
+      "bytes": 3845936,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 500000,
+        "time_per_task_s": 613.2927891519721
+      },
+      "already_had": {
+        "pricing_input": 2.0,
+        "pricing_output": 6.0,
+        "pricing_cache_input": 0.5,
+        "answer_speed": 58.4296937497494,
+        "size_class": "large",
+        "open_source": "proprietary",
+        "supports_vision": 1,
+        "supports_audio": 0
+      }
+    },
+    {
+      "models_id": 683,
+      "model_id": "ifm/k2-horizon-375b-a23b",
+      "aa_slug": "k2-horizon-375b-a23b",
+      "source_url": "https://artificialanalysis.ai/models/k2-horizon-375b-a23b",
+      "html_sha256": "c5116dcca641b5dad7a35278184ded91c862a247ac5d4b485aa3bd7ed82d8441",
+      "bytes": 3741079,
+      "fetched_at": "2026-09-20T21:19:26+00:00",
+      "would_set": {},
+      "already_had": {
+        "context_window": 524288,
+        "parameters": 375.0,
+        "active_params": 23.0,
+        "size_class": "large",
+        "open_source": "open",
+        "supports_vision": 0,
+        "supports_audio": 0
+      }
+    },
+    {
+      "models_id": 496,
+      "model_id": "mistral/mistral-medium-3.5",
+      "aa_slug": "mistral-medium-3-5",
+      "source_url": "https://artificialanalysis.ai/models/mistral-medium-3-5",
+      "html_sha256": "767c92ca2b337a37fd393f65103fe2382beb61f70c7c77b034894e308485bf69",
+      "bytes": 3924588,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 256000,
+        "time_per_task_s": 172.28606789655097
+      },
+      "already_had": {
+        "parameters": 128.0,
+        "active_params": 128.0,
+        "pricing_input": 1.5,
+        "pricing_output": 7.5,
+        "pricing_cache_input": 0.15,
+        "answer_speed": 151.40823354892,
+        "openness_index": 33.333333333333336,
+        "size_class": "medium",
+        "open_source": "open",
+        "supports_vision": 1,
+        "supports_audio": 0
+      }
+    },
+    {
+      "models_id": 682,
+      "model_id": "qwen/qwen3.8-27b",
+      "aa_slug": "qwen3-8-27b",
+      "source_url": "https://artificialanalysis.ai/models/qwen3-8-27b",
+      "html_sha256": "e0c43f7ca2bd909d55de8a9719477298398ee4ea78a31e571b12be382f3bc19b",
+      "bytes": 3929301,
+      "fetched_at": "2026-09-20T20:50:44+00:00",
+      "would_set": {
+        "context_window": 256000,
+        "time_per_task_s": 1320.2506624088285
+      },
+      "already_had": {
+        "parameters": 27.0,
+        "active_params": 27.0,
+        "pricing_input": 0.5,
+        "pricing_output": 3.0,
+        "pricing_cache_input": 0.05,
+        "answer_speed": 50.5945374009985,
+        "openness_index": 38.888888888888886,
+        "size_class": "small",
+        "open_source": "open",
+        "supports_vision": 1,
+        "supports_audio": 0
+      }
+    }
+  ]
+}

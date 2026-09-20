@@ -149,7 +149,9 @@ def build_scores(models: dict, benchmarks: dict, meta: dict, settings: dict
             if wsum:
                 capability = round(sum(vals[d] * cap_weights[d] for d in vals) / wsum, 2)
         composite = None
-        if weights and dim_scores:
+        # 只有成本维时不给综合分: 混元 Hy4 preview 没有任何 AA 同口径评测, 若允许
+        # cost-only 求平均, 它会拿到 94.84 的"综合指数"排到 Sol(76.3) 之前 —— 假数。
+        if weights and dim_scores and any(d != "cost" for d in dim_scores):
             vals = {d: dim_scores[d] for d in weights if d in dim_scores}
             wsum = sum(weights[d] for d in vals)
             if wsum:

@@ -23,7 +23,7 @@ aa_model_page:
 # AA 完全没有收录的模型, 走人工登记 (见 data/raw/manual/*.yaml)
 manual:
   - model_id: tencent/hy4-preview
-    file: hy4_preview_2026-09-20.yaml
+    file: tencent_hy4_preview.yaml
     reason: >-
       混元 Hy4 preview 于 2026-08-28 发布并开源, AA 尚未收录
       (实测 /models/hy4、/models/hy4-preview、/models/hunyuan-4 均 404,

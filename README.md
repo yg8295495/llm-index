@@ -40,9 +40,10 @@
 
 - 快照日 **2026-09-20**，来源 Artificial Analysis 评测页
 - **19 个核心模型**（覆盖九家中的 8 家，MiMo 本批 AA 无数据）+ 10 个参照模型，
-  共 34 个推理档位；30 项 benchmark；572 条 AA 评测 + 4 条厂商自报指标
-- 发布物 `frontend/data.json` 约 650KB
-- 库内累计 4 个快照、7611 条评测记录，历史批次从不删除
+  共 34 个推理档位；30 项 benchmark；572 条 AA 评测 + 53 条本站派生 + 42 条厂商自报指标
+- 发布物 `frontend/data.json` 约 690KB；28 个带分模型的上下文窗口 28/28、
+  单任务耗时 27/28（缺的 `ifm/k2-horizon` 参照层，AA 未测其 Intelligence Index）
+- 库内累计 4 个快照、7680 条评测记录，历史批次从不删除
 
 ## 快速开始
 
@@ -73,6 +74,7 @@ python3 scripts/refresh_data.py --apply    # 实际写入
 ```bash
 python3 scripts/collect_aa_v3.py                    # 干跑（含 watchlist 补采）
 python3 scripts/collect_aa_v3.py --no-dry-run       # 采集并追加为新快照
+python3 scripts/enrich_metadata.py --apply          # 从详情页回填上下文窗口/单任务耗时
 python3 scripts/ingest_manual_reference.py          # 登记 AA 未收录模型的厂商自报数据
 python3 scripts/export_frontend_data.py             # 导出 data.json
 ```
@@ -82,9 +84,15 @@ python3 scripts/export_frontend_data.py             # 导出 data.json
 - `config/watchlist.yaml → aa_model_page`：AA 收录但不在 omniscience 默认对比集里的
   模型，走 `/models/<slug>` 详情页取**同口径**分数（Qwen3.8-Flash-Next、Hy3）。
 - `config/watchlist.yaml → manual` + `data/raw/manual/*.yaml`：AA 完全没收录的模型
-  （混元 Hy4 preview），只能用厂商自报数据。这类指标一律带 `_official` 后缀、
+  （混元 Hy4 preview，42 项），只能用厂商自报数据。这类指标一律带 `_official` 后缀、
   置信度压到 0.45、前端单独成块，**不参与任何榜单计算** ——
   因为官方称 Hy3 在 Terminal-Bench 2.1 得 70.8，而 AA 实测是 64.4，口径明显不同。
+  同一张官方附表里"腾讯自跑"对竞品的系统性偏移是中位 +3.3 分，
+  所以读这张表要看**表内相对名次**，不要拿绝对分去和 AA 排（见 changelog #39）。
+
+**分数之外的模型属性**（上下文窗口、激活参数、单任务墙钟耗时）只存在于 AA 详情页，
+榜单页 payload 里根本没有这些键 —— 所以采集之后要单独跑一次 `enrich_metadata.py`
+（默认干跑，只补 NULL 不覆盖已有值，每模型留来源 URL + 页面 sha256 到 `reports/`）。
 
 采集器只做**追加**：每个快照一批行，重复跑同一快照会跳过而不是覆盖。
 每次采集把页面 HTML（gzip）、解析产物与页面 sha256 落到
@@ -94,7 +102,7 @@ python3 scripts/export_frontend_data.py             # 导出 data.json
 ### 运行测试
 
 ```bash
-python3 -m pytest -q                                  # 101 passed
+python3 -m pytest -q                                  # 107 passed
 python3 -m ruff check src scripts tests --select F,E9
 ```
 

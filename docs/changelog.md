@@ -341,6 +341,89 @@
 
 ---
 
+## 2026-09-21 (第三次更新) · 横向对比补全：一个真采集 bug、一次我自己的报告错误
+
+**触发原因**：用户指出横向对比表数据不全 —— 千问 3.8 Flash 明明有数据却显示为空，
+混元 Hy4 完全不知道是什么能力级别；并要求"填不满的要说清原因和做过哪些尝试"，
+否则怀疑采集环节有 bug。
+
+**#37 AA 元数据键名不匹配，导致整批 context_window 为 NULL（用户怀疑的 bug 是真的）**
+- 发现：2026-09-21 逐 key 比对 AA 的两个 payload。`src/collector/mapping.py` 读的是
+  `contextWindow` / `activeParams` / `medianCanonicalAnswerOutputSpeed`，但
+  **榜单页 payload 里根本没有 `contextWindow*` 这个键**（只有 activeParams 和速度），
+  上下文窗口只出现在单模型详情页且叫 `contextWindowTokens`；激活参数在详情页叫
+  `inferenceParametersActiveBillions`；输出速度在详情页藏在 `timescaleData.medianOutputSpeed`。
+  结果：2026-09-20 批次 33 个带分行的 `context_window` 全为 NULL，页面明明写着 1,000,000。
+- 连带发现：`intelligenceIndexTimePerTask`（单任务墙钟耗时）也只有详情页有，
+  而这个数直接决定"夜里 8 小时能跑完多少个任务"。
+- 解决：新增 `mapping.model_metadata(record)` 作为元数据唯一入口，内部用 `_pick()`
+  做多键名 + 嵌套键 fallback；`scripts/enrich_metadata.py` 拉详情页回填这些列
+  （默认干跑、只补 NULL 不覆盖已有值、每模型记录来源 URL + 页面 sha256 到
+  `reports/enrich_metadata_*.json`）。新增列 `models.time_per_task_s`。
+- 实测：33 个目标里 31 个回填成功，2 个（minimax-m3、step-5）curl rc=35 TLS 失败待重试。
+  回填后 Qwen3.8-Flash 256k / 1393 s/task、GLM-5.3-Flash 1M / 566 s/task、
+  DS V4.1-Flash 1M / 324 s/task、Qwen3.8-Max 983k / 2402 s/task。
+- 回归测试：`test_model_metadata_accepts_detail_page_key_names`。
+
+**#38 重跑采集不得用 NULL 抹掉已知元数据**
+- 风险：修完 #37 后，主采集器只解析榜单页（没有 contextWindow），若 UPDATE 语句照例
+  全列覆盖，则"补采到上下文窗口 → 第二天日更 → 又变回 NULL"。
+- 解决：`snapshot_store._upd_params()` 在 UPDATE 时剔除本次取不到（None）的列。
+  追加式快照不该把已知事实洗掉；代价是无法通过重跑清空某列，需要清空时手工 SQL 处理。
+- 回归测试：`test_rerun_does_not_wipe_metadata_the_page_lacks`。
+
+**#39 混元 Hy4 preview：官方附表 42 项入库，并给出 AA 口径的换算区间**
+- 核实：AA 至今未收录（862 个 slug 里腾讯只有 hy3 系；`/models/hy4*` 仍 404）。
+  独立横评确实不存在 —— 钛媒体 2026-08-31 原话："独立机构的大规模横评还没出来…
+  目前一半还靠官方自己的数据撑着"。唯一的第三方信号是 Arena 系：Code Arena Elo 1624
+  (名次 9–17, 09-12)、前端 WebDev Elo 1641±15 (名次 8–17, Preliminary, 09-16)，
+  且本项目直连 lmarena 失败、数值取自第三方镜像，可信度不足以入库，只登记在 YAML 注释里。
+- 采用数据：官方附表原图 `Tencent-Hunyuan/Hy4-preview/assets/benchmark-appendix.jpg`
+  （4960×10840，下载后切 12 条逐行读图核对，非二手转述）→ 42 项指标入库，
+  仍按 #33 的隔离口径（`_official` 后缀 / `source=tencent_official` / `confidence=0.45`）。
+- **口径校准（这张表的正确用法）**：同一 harness 下"腾讯自跑"对竞品的系统性偏移
+  （vs AA 2026-09-20 实测）：DS V4 Pro +9.2、GLM-5.3 +4.3、Kimi K3 +3.3、Hy3 +6.4、
+  Qwen3.8-Max −2.2、GPT-5.6 Sol +0.8 → 中位 +3.3。据此 Hy4 自报 Terminal-Bench 2.1
+  的 85.4 折算到 AA 口径约 **79–83**，即与 DeepSeek V4 Pro (78.7) 同档、低于
+  GLM-5.3-Flash (84.3)。**不得**把 85.4 直接排到 Kimi K3 (85.0) 之前。
+- 例外：附表里的 CritPt 与 GDPval-AA V2 就是 AA 标尺（Hy3 4.9 = 站内 0.049、
+  GLM 19.1 = 0.191、Kimi 23.4 = 0.234 完全对得上），这两行可直接横向比。
+- 新增护栏：`ingest_manual_reference.py` 现在要求 YAML 显式写 `snapshot_date`，
+  且该日期既不早于也不晚于最新 AA 批次，否则拒绝执行 —— 避免 #33/#35 那个
+  "自报行开新快照日把整个榜单顶掉"的坑重演。
+  回归测试：`test_manual_ingest_refuses_date_older_than_the_latest_batch`。
+
+**#40 我自己的报告错误：表里的"—"来自记忆，不是来自数据库**
+- 现象：上一轮横向对比表把 Qwen3.8-Flash 写成"只有 5 个数、attemptRate 未发布"，
+  而库里它有 14 项 AA 同口径评测（gpqa 0.923、GDPval 1612、tb2.1 0.861、lcr 0.797…），
+  性价比在站内排第 2。用户据此得出的结论被我误导了。
+- 原因：那张表是凭上下文里的旧摘要手写的，没有回查数据库；采集层其实是对的。
+- 流程修：**任何对外结论表必须由脚本从库里生成**（本轮所有表格出自
+  `benchmark_evals WHERE snapshot_id=4` 的一次查询），并且把"—"逐条回到
+  AA 详情页做存在性核验，能说出"这个键在该模型页上就是 null"才算数。
+- 核验结论：本轮矩阵里剩余的"—"全部是 AA 未发布，而非解析失败 ——
+  GLM-5.3/5.3-Flash 无 mmmuPro（榜单页与详情页都是 null）、
+  DS V4.1-Flash 无 gpqa/tauBanking/terminalBench21/mlcrOverall、
+  Qwen3.8-Flash 无 mlcrOverall/attemptRate/briefcase/enterpriseOpsGym。
+  另发现 `itbenchSre` 在详情页与榜单页大小写不同，已在 `build_evals` 加大小写兜底。
+
+**#41 只有成本维的模型拿到了 94.84 的"综合指数"**
+- 发现：2026-09-21 给 Hy4 补完 42 条自报指标后回查 `data.json`，它的
+  `scores.composite = 94.84`，比 GPT-5.6 Sol 的 76.27 还高。
+- 原因：`build_scores` 的综合分是"该模型可用维度上的加权平均"，而 Hy4 没有任何
+  AA 同口径评测 → 可用维度只剩 cost 一个 → 纯成本分被当成了综合能力分。
+  榜面按 `ranked=false` 不给它名次，但综合分本身仍然可见、仍然会误导。
+- 解决：综合分要求**至少有一个非成本维**；成本分照旧单独展示（它确实便宜，
+  $1.25/1M 混合价是事实），能力分/性价比/综合分一律 None。
+- 回归测试：`test_cost_only_model_gets_no_composite`。
+
+**本批数据（第三次更新后）**：29 个模型（核心 19 + 参照 10）/ 572 条 AA 评测
++ 53 条派生 + **42 条厂商自报**（原 4 条）；28 个带分模型的上下文窗口 28/28、单任务耗时 27/28
+覆盖（修复前整批为 NULL）；`pytest` **108 passed**，`refresh_data.py` 干跑 exit=0，
+`frontend/data.json` 690 KB。
+
+---
+
 ## 待办与已知不足（如实记录，不粉饰）
 
 | 项 | 说明 | 影响 |
@@ -348,11 +431,16 @@
 | 九家中 MiMo（小米）无数据 | 本批 AA payload 里没有任何小米模型 | 榜单 18 个核心模型只覆盖 8 家，前端需明示 |
 | 用户点名的"字节 2.1-0915"不存在于 AA | 九家范围外，且该页 653 条注册表里也没有 | 无法纳入，需另找来源 |
 | LMArena 维度为空 | 见 #24 | 综合指数实际按四维归一计算 |
-| AA 详情页还有两个字段没接 | `contextWindowTokens` 与官方 `price1mBlended0To3To1`（正好是 3:1 混合单价）已在 #32 发现但未接入 | 上下文窗口仍为空；混合单价仍是本站估算而非 AA 官方值 |
-| 混元 Hy4 preview 无同口径分数 | AA 未收录，只有厂商自报数据（见 #33） | 它不进任何榜，只能看自报指标；等 AA 收录后走 watchlist 自动补上 |
+| AA 详情页的官方混合单价未接 | `price1mBlended0To3To1`（3:1 混合）等 5 个 blended 价在详情页有，站内成本维仍用 input/output 自算混合价 | 性价比榜的成本是本站口径估算，不是 AA 官方值；contextWindowTokens 已在 #37 接入 |
+| 混元 Hy4 preview 无同口径分数 | AA 至今未收录（862 个 slug 里腾讯只有 hy3 系），只有厂商自报数据 42 项（见 #39） | 它不进任何榜；自报口径与 AA 存在中位 +3.3 的系统性偏移，只能按附表内部相对名次用；等 AA 收录后走 watchlist 自动补上 |
+| Hy4 的唯一第三方信号未入库 | Code Arena Elo 1624 (名次 9–17)、WebDev Arena 1641±15 (Preliminary) 取自第三方镜像 aitntnews，本机直连 lmarena.ai 失败 | 可信度不足，只登记在 YAML 注释；要入库需拿到 lmarena 原始页 |
+| `context_window` / `time_per_task_s` 前端未渲染 | 数据已在 `data.json` 的 `models[]` 里，榜单视图与模型详情没有这两列 | 下一步补 UI：上下文窗口决定能否一次读下整份交接文档，单任务耗时决定夜里能跑多少个任务 |
+| `enrich_metadata.py` 已并入 `refresh_data.py` | 默认只拉"还缺元数据"的模型，补过之后这一步近乎零成本 | 但它是**按 model_id 收敛**：若某模型只有兄弟档位行有值，带分行仍留 NULL，导出层靠跨行合并兜底 |
+| 详情页抓取偶发 curl rc=35（TLS 抖动） | 首轮 33 个目标失败 8 个，重试后只剩 minimax-m3/step-5 一度失败、再试即通过 | 脚本只补 NULL 不覆盖，重跑即可；`k2-horizon-375b-a23b`（参照层）留到下次 --apply |
+| 尚未采 2026-09-21 批次 | 榜面仍是 2026-09-20 快照；09-21 干跑显示主批次 544 条（比 09-20 少 1 条，AA 撤了 muse-spark 的一行） | 用户确认本轮数据无误后再决定是否日更；`refresh_data.py --apply` 一条命令即可 |
 | 腾讯的榜面身份待定 | `config/vendors.yaml` 里 `tencent: tier: reference`（遵守"严守九家"） | 若要把混元当选型候选，改这一行为 `core` 重跑导出即可 |
 | 库里残留 137 行 `provider='unknown'` | 8 月泄漏的范围外模型，不属本批快照，前端不可见 | 不影响榜面；若要彻底清理需单独一次带审计的归档迁移，未做 |
-| `scripts/fetch_openrouter_meta.py`、`load_accessibility.py` 未接入 v3 | 上下文窗口、可访问性标签仍是旧数据或空 | 上下文窗口在新 payload 里不存在，如需补应走 OpenRouter |
+| `scripts/fetch_openrouter_meta.py`、`load_accessibility.py` 未接入 v3 | 可访问性标签仍是旧数据或空 | 上下文窗口已改由 AA 详情页提供（#37），OpenRouter 通道不再必需，仍未接入 |
 | AA 不提供逐项评测日期 | 全 payload 唯一日期是 `releaseDate` | 分数只能标"某日 AA 快照"，已按用户要求如实标注 |
 | 无自动调度 | `settings.yaml: ingestion.schedule` 无代码读取；AA 加密化后全自动不可靠 | 采集节奏人工触发 |
 | mypy 未安装 | `project_rules.md §4.1` 要求 ruff/mypy/pytest 三道闸门，只跑了 ruff+pytest | 类型检查缺位 |

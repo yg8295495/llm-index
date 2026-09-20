@@ -123,6 +123,7 @@ class ModelRow:
     pricing_cache_input: float | None = None
     openness_index: float | None = None
     answer_speed: float | None = None
+    time_per_task_s: float | None = None
     needs_manual_review: int = 0
     notes: list[str] = field(default_factory=list)
 
@@ -161,6 +162,29 @@ def _num(value: Any) -> float | None:
     return value if isinstance(value, (int, float)) and not isinstance(value, bool) else None
 
 
+def _pick(record: dict[str, Any], *keys: str, nested: tuple[str, str] | None = None) -> Any:
+    """按候选键名顺序取第一个非空值。
+
+    为什么需要 (changelog #37): AA 的两个 payload 对同一个属性用了不同键名 ——
+    榜单页 (omniscience SSR) 完全没有 contextWindow*, 单模型详情页用
+    `contextWindowTokens`; activeParams 在榜单页叫 `activeParams`, 详情页叫
+    `inferenceParametersActiveBillions`; ifbench/itbenchSre 也存在大小写分叉
+    (`ifbench` vs `itBenchSre` / `itbenchSre`)。旧实现只写死一个键名, 于是
+    2026-09-20 批次里**所有带分行的 context_window 都是 NULL** —— 页面明明有值。
+    """
+    for key in keys:
+        value = record.get(key)
+        if value is not None and value != "":
+            return value
+    if nested:
+        holder = record.get(nested[0])
+        if isinstance(holder, dict):
+            value = holder.get(nested[1])
+            if value is not None and value != "":
+                return value
+    return None
+
+
 def _bool_to_int(raw: Any) -> int | None:
     return None if raw is None else int(bool(raw))
 
@@ -171,6 +195,34 @@ def _openness(raw: Any) -> str | None:
     if raw is False:
         return "proprietary"
     return raw if isinstance(raw, str) and raw else None
+
+
+def model_metadata(record: dict[str, Any]) -> dict[str, Any]:
+    """从 AA payload 取"非分数"元数据, 返回 models 表列名 -> 值。
+
+    榜单页与详情页各调一次: 榜单页缺的字段 (contextWindow*) 由详情页补。
+    补采脚本 scripts/enrich_metadata.py 与本模块共用这一个入口, 免得两处键名
+    各写一半再次跑偏 (changelog #37)。
+    """
+    return {
+        "context_window": _num(_pick(record, "contextWindowTokens", "contextWindow")),
+        "context_window_fmt": record.get("contextWindowFormatted"),
+        "supports_vision": _bool_to_int(record.get("inputModalityImage")),
+        "supports_audio": _bool_to_int(record.get("inputModalitySpeech")),
+        "open_source": _openness(record.get("isOpenWeights")),
+        "size_class": record.get("sizeClass"),
+        "parameters": _num(record.get("parameters")),
+        "active_params": _num(_pick(record, "activeParams",
+                                    "inferenceParametersActiveBillions")),
+        "pricing_input": _num(record.get("price1mInputTokens")),
+        "pricing_output": _num(record.get("price1mOutputTokens")),
+        "pricing_cache_input": _num(record.get("cacheHitPrice")),
+        "openness_index": _num(_pick(record, "opennessIndex",
+                                     nested=("openness", "opennessIndex"))),
+        "answer_speed": _num(_pick(record, "medianCanonicalAnswerOutputSpeed",
+                                   nested=("timescaleData", "medianOutputSpeed"))),
+        "time_per_task_s": _num(_pick(record, "intelligenceIndexTimePerTask")),
+    }
 
 
 def build_registry_index(registry: Iterable[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -278,20 +330,8 @@ def resolve_identity(
         family=(reg.get("release") or {}).get("slug"),
         release_date=reg.get("releaseDate") or record.get("releaseDate"),
         deprecated=int(bool(reg.get("deprecated"))),
-        context_window=_num(record.get("contextWindow")),
-        context_window_fmt=record.get("contextWindowFormatted"),
-        supports_vision=_bool_to_int(record.get("inputModalityImage")),
-        supports_audio=_bool_to_int(record.get("inputModalitySpeech")),
         is_reasoning=_bool_to_int(reg.get("isReasoning", record.get("isReasoning"))),
-        open_source=_openness(record.get("isOpenWeights")),
-        size_class=record.get("sizeClass"),
-        parameters=_num(record.get("parameters")),
-        active_params=_num(record.get("activeParams")),
-        pricing_input=_num(record.get("price1mInputTokens")),
-        pricing_output=_num(record.get("price1mOutputTokens")),
-        pricing_cache_input=_num(record.get("cacheHitPrice")),
-        openness_index=_num(record.get("opennessIndex")),
-        answer_speed=_num(record.get("medianCanonicalAnswerOutputSpeed")),
+        **model_metadata(record),
         needs_manual_review=int(tier != "core"),
         notes=notes,
     )
@@ -313,8 +353,15 @@ def build_evals(
     token_costs = record.get("canonicalEvalTokenCounts") or {}
     evals: list[EvalRow] = []
     skipped = 0
+    # AA 在两个 payload 里对同一指标用过不同大小写 (榜单页 itbenchSre /
+    # 详情页 itBenchSre), 精确匹配会静默丢字段 —— 见 changelog #37
+    lowered = {k.lower(): k for k in record}
     for aa_key, spec in bidx.items():
         raw = record.get(aa_key)
+        if raw is None:
+            alt = lowered.get(aa_key.lower())
+            if alt and alt != aa_key:
+                raw = record.get(alt)
         if raw is None:
             continue
         if not isinstance(raw, (int, float)) or isinstance(raw, bool):

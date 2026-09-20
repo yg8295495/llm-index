@@ -160,6 +160,15 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
             key=lambda r: (0 if r["aa_slug"] and r["aa_slug"] == r["family"] else 1,
                            LEVEL_PREF.get(r["reasoning_level"] or "", 99)),
         )[0]
+        # 模型级常量属性: 同一 model_id 的多个档位行里可能只有其中一行有值
+        # (context_window 就是典型 —— 它只来自详情页补采, 见 changelog #37)。
+        # 价格与速度**不做合并**: 它们按档位不同, 混用会给出错误的成本结论。
+        def _coalesce(col):
+            for r in rows:
+                if r[col] is not None:
+                    return r[col]
+            return None
+
         models[mid] = {
             "id": mid,
             "provider": base["provider"],
@@ -178,6 +187,10 @@ def collect(conn, snapshot, cfg) -> tuple[dict, dict]:
             "pricing_cache_input": _f(base["pricing_cache_input"]),
             "answer_speed": _f(base["answer_speed"]),
             "openness_index": _f(base["openness_index"]),
+            "context_window": _coalesce("context_window"),
+            "parameters_b": _f(_coalesce("parameters")),
+            "active_params_b": _f(_coalesce("active_params")),
+            "time_per_task_s": _f(_coalesce("time_per_task_s")),
             "size_class": base["size_class"],
             "deprecated": bool(base["deprecated"]),
             "needs_manual_review": bool(base["needs_manual_review"]),

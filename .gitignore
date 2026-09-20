@@ -12,9 +12,14 @@ venv/
 # 这一批数据是怎么来的。见 docs/changelog.md #27
 data/raw/*
 !data/raw/snapshots/
+# 人工登记的厂商自报数据是 42 条库内行的唯一出处,
+# 没有任何脚本能重算出来, 必须进版本库 (changelog #39)
+!data/raw/manual/
 data/raw/snapshots/**/*.html.gz
 data/raw_*/
 data/*.db
+data/*.db-wal
+data/*.db-shm
 data/*.db.bak*
 data/screenshots/
 data/internal/

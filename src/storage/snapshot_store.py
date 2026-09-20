@@ -61,6 +61,7 @@ MODEL_NEW_COLUMNS = {
     "openness_index": "FLOAT",
     "answer_speed": "FLOAT",
     "active_params": "FLOAT",
+    "time_per_task_s": "FLOAT",
     "needs_manual_review": "INTEGER DEFAULT 0",
 }
 
@@ -254,9 +255,21 @@ def _model_params(row, tier_col_ok: bool = True) -> dict[str, Any]:
         "pricing_cache_input": row.pricing_cache_input,
         "openness_index": row.openness_index,
         "answer_speed": row.answer_speed,
+        "time_per_task_s": row.time_per_task_s,
         "needs_manual_review": row.needs_manual_review,
         "status": "deprecated" if row.deprecated else "active",
     }
+
+
+def _upd_params(params: dict[str, Any]) -> dict[str, Any]:
+    """UPDATE 用的字段集: 剔除主键列, 并剔除本次取不到的 None。
+
+    为什么剔除 None (changelog #37): AA 榜单页 payload 压根没有 contextWindow*,
+    只有单模型详情页有。若允许 None 覆盖, 则"先补采详情页元数据、再跑一次日更"
+    会把已经拿到的上下文窗口重新洗成 NULL。追加式快照不该抹掉已知事实。
+    """
+    return {k: v for k, v in params.items()
+            if k not in ("model_id", "reasoning_level") and v is not None}
 
 
 def write(
@@ -301,7 +314,7 @@ def write(
                 )
             if dry_run:
                 continue
-            upd = {k: v for k, v in p.items() if k not in ("model_id", "reasoning_level")}
+            upd = _upd_params(p)
             assignments = ", ".join(f"{k} = :{k}" for k in upd)
             conn.execute(
                 f"UPDATE models SET {assignments}, updated_at = :__now WHERE id = :__pk",
@@ -354,7 +367,7 @@ def write(
                 report.models_updated += 1
                 if dry_run:
                     continue
-                upd = {k: v for k, v in p.items() if k not in ("model_id", "reasoning_level")}
+                upd = _upd_params(p)
                 assignments = ", ".join(f"{k} = :{k}" for k in upd)
                 conn.execute(
                     f"UPDATE models SET {assignments}, updated_at = :__now WHERE id = :__pk",
@@ -371,13 +384,15 @@ def write(
                         context_window, context_window_fmt, supports_vision, supports_audio,
                         is_reasoning, open_source, size_class, parameters, active_params,
                         pricing_input, pricing_output, pricing_cache_input, openness_index,
-                        answer_speed, needs_manual_review, status, created_at, updated_at)
+                        answer_speed, time_per_task_s, needs_manual_review, status,
+                        created_at, updated_at)
                        VALUES (:model_id, :reasoning_level, :aa_slug, :aa_base_slug,
                         :display_name, :provider, :family, :release_date, :deprecated, :tier,
                         :context_window, :context_window_fmt, :supports_vision,
                         :supports_audio, :is_reasoning, :open_source, :size_class, :parameters,
                         :active_params, :pricing_input, :pricing_output, :pricing_cache_input,
-                        :openness_index, :answer_speed, :needs_manual_review, :status,
+                        :openness_index, :answer_speed, :time_per_task_s,
+                        :needs_manual_review, :status,
                         :__now, :__now)""",
                         {**p, "__now": now},
                     )

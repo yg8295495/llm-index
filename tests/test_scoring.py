@@ -117,6 +117,24 @@ def test_reference_model_does_not_set_the_scale():
     assert scores["xai/ref"]["ranked"] is False
 
 
+def test_cost_only_model_gets_no_composite():
+    """只有成本维的模型不得产出"综合指数"。
+
+    混元 Hy4 preview 没有任何 AA 同口径评测 (changelog #39), 若 cost-only 也能求加权
+    平均, 它会拿到 94.84 的综合分排到 GPT-5.6 Sol (76.3) 之前 —— 一个纯成本数字
+    被当成了能力结论。
+    """
+    models = _models()
+    models["tencent/hy4-preview"] = {"in_scope": False, "pricing_input": 0.834,
+                                     "pricing_output": 2.501}
+    scores, _ = build_scores(models, _benchmarks(), META, _settings())
+    r = scores["tencent/hy4-preview"]
+    assert r["cost"] is not None, "成本维本身仍应可算, 它只是不构成综合分"
+    assert r["composite"] is None
+    assert r["capability"] is None
+    assert r["value_raw"] is None, "没有能力分就不能编出性价比"
+
+
 def test_reference_model_is_still_scored_on_the_core_scale():
     """参照模型不是空壳: 它要在核心模型定的同一把尺子上拿到可比的分,
     只是不占名次。否则前端「含参照模型」开关打开后全是破折号, 用户无法判断。"""
