@@ -53,12 +53,13 @@
 cd frontend && python3 -m http.server 8002     # 打开 http://127.0.0.1:8002
 ```
 
-### 后端 API（本地开发用，线上未部署）
+### 后端 API
 
-```bash
-pip install -r requirements.txt
-uvicorn src.main:app --reload                  # 文档 http://127.0.0.1:8000/docs
-```
+**没有后端。** 线上是纯静态站：GitHub Pages 只发布 `frontend/`，页面直接读
+同目录的 `data.json`。v2 时代的 FastAPI 服务（`src/main.py` + `src/dashboard/`）
+从未部署过，已于 2026-09-29 归档到 `_archive/v2/src/`。
+
+依赖只有三个：`sqlalchemy`、`pyyaml`、`pytest`（CI 另加 `ruff`）。
 
 ### 更新数据
 
@@ -102,7 +103,7 @@ python3 scripts/export_frontend_data.py             # 导出 data.json
 ### 运行测试
 
 ```bash
-python3 -m pytest -q                                  # 107 passed
+python3 -m pytest -q                                  # 78 passed（v2 死代码的 30 个测试已随归档退役）
 python3 -m ruff check src scripts tests --select F,E9
 ```
 

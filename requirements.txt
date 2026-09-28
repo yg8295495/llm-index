@@ -1,44 +1,17 @@
-# Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# llm-index 运行依赖（v3 管线实测 import 闭包，2026-09-29 精简）
+#
+# 采集走 curl 子进程（AA 在 TLS 指纹层拦 python-http），不依赖 requests/httpx/aiohttp；
+# 前端是纯静态站，不依赖任何 web 框架。v2 的 fastapi/uvicorn/pydantic/alembic/pandas/
+# numpy/playwright/apscheduler 等已随 _archive/v2/ 一起退役，见 _archive/v2/README.md。
 
-# Database
+# 存储层 ORM（建表 / 测试）
 sqlalchemy==2.0.25
-alembic==1.13.1
 
-# Data Processing
-pandas==2.2.0
-numpy==1.26.3
-
-# HTTP Client
-httpx==0.26.0
-aiohttp==3.9.1
-beautifulsoup4==4.12.2
-lxml==5.1.0
-
-# Web Scraping
-playwright==1.41.0
-
-# Configuration
+# 配置与登记文件（benchmarks.yaml / settings.yaml / watchlist.yaml / manual/*.yaml）
 pyyaml==6.0.1
-python-dotenv==1.0.0
 
-# Scheduling
-apscheduler==3.10.4
-
-# Utilities
-python-dateutil==2.8.2
-click==8.1.7
-rich==13.7.0
-
-# Testing
+# 测试
 pytest==7.4.4
-pytest-asyncio==0.23.3
-pytest-cov==4.1.0
 
-# Code Quality
-black==24.1.1
+# CI 门禁（.github/workflows/ci.yml）
 ruff==0.1.14
-mypy==1.8.0

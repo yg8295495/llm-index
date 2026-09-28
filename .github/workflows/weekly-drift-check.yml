@@ -1,0 +1,86 @@
+name: weekly-drift-check
+
+# 每周两次看 AA 有没有新数据/改版。**只开 issue, 不写库、不 push、不发布** ——
+# 发布闸门保留在人手里（用户 2026-09-20 定的规矩：确认无误才发布）。
+# 真正的入库动作由人或托管 agent 在看到 issue 后执行 refresh_data.py --apply。
+on:
+  schedule:
+    # 周一/周四 19:00 UTC = 北京时间 周二/周五 03:00（落在用户的夜间工作窗内）
+    - cron: "0 19 * * 1,4"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 干跑采集并比对
+        id: drift
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          # 不依赖 SQLite：比对对象是**已提交**的解析产物
+          # (data/raw/snapshots/<最新>/manifest.json + scored_models.json)，
+          # 因为 data/*.db 被 gitignore，全新 checkout 上没有库。
+          import json, pathlib, sys
+          sys.path.insert(0, ".")
+          from src.collector import aa_omniscience as AA
+          from src.collector import mapping as M
+
+          def pairs(records, bidx):
+              return sum(1 for r in records for k in bidx
+                         if isinstance(r.get(k), (int, float))
+                         and not isinstance(r.get(k), bool))
+
+          bidx = M.benchmark_index(M.load_benchmarks())
+          snap = sorted(pathlib.Path("data/raw/snapshots").iterdir())[-1]
+          manifest = json.loads((snap / "manifest.json").read_text(encoding="utf-8"))
+          committed = json.loads((snap / "scored_models.json").read_text(encoding="utf-8"))
+          committed_pairs = pairs(committed, bidx)
+
+          page = AA.fetch_page()
+          parsed = AA.parse_page(page)
+          live_pairs = pairs(parsed["scored_models"], bidx)
+
+          reasons = []
+          if page.sha256 != manifest["source"]["html_sha256"]:
+              reasons.append(f"页面指纹变了 {manifest['source']['html_sha256'][:8]} → {page.sha256[:8]}")
+          if len(parsed["scored_models"]) != manifest["counts"]["scored"]:
+              reasons.append(f"带分模型数 {manifest['counts']['scored']} → {len(parsed['scored_models'])}")
+          if live_pairs != committed_pairs:
+              reasons.append(f"评测对数 {committed_pairs} → {live_pairs}")
+          print(f"drifted={'true' if reasons else 'false'}")
+          print("detail=" + ("；".join(reasons) if reasons else
+                f"与已提交批次 {manifest['snapshot_date']} 完全一致（{live_pairs} 对）"))
+          PY
+      - name: 有漂移 → 开 issue
+        if: steps.drift.outputs.drifted == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DETAIL: ${{ steps.drift.outputs.detail }}
+        run: |
+          gh issue create --title "AA 数据漂移待处理（weekly-drift-check）" \
+            --body "$DETAIL
+
+          处理步骤见 docs/HANDOVER.md §3：
+          1. 本地或托管 agent 跑 \`python3 scripts/refresh_data.py\` 看完整干跑报告
+          2. 人工过目榜面变化与 reports/collection_*.md
+          3. \`refresh_data.py --apply\` 入库并 push（push 即发布）"
+      - name: 抓取/解析失败 → 开 issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "AA 抓取或解析失败（weekly-drift-check）" \
+            --body "dry-run 本身没跑通：多半是 AA 改版（payload 结构变化）或网络拦截。
+          失败 run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          处理见 docs/HANDOVER.md §4（AA 改版适配流程与硬约束）。"

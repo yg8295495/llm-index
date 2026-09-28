@@ -424,6 +424,48 @@
 
 ---
 
+## 2026-09-29 (第四次更新) · 截断 v2 遗留、补 CI 门禁、写交接手册
+
+**触发原因**：用户要求把源码升到"基本成型"的状态后 push，并把仓库交给托管方
+（muse.ai 一类）做定期维护。交接的前提是仓库里没有会让接手方误判的死代码、
+没有"push 即发布却无测试闸门"的裸奔 CI、没有只存在于某人本机的隐性知识。
+
+**#42 截断 v2 遗留：2862 行活代码之外的全部退役**
+- 审计方法：从 5 个活脚本做 import 闭包分析。活管线只依赖
+  `aa_omniscience / mapping / scoring / snapshot_store / models` 五个模块；
+  其余 `src/collector`（BaseCollector 多源框架 + 5 个 stub collector + Discoverer）、
+  `src/compute`（Normalizer/WeightManager/IndexCalculator）、`src/api` + `src/main.py` +
+  `src/dashboard`（从未部署的 FastAPI）、`src/storage/db_manager`（会 DELETE 历史的 v2 写入路径）、
+  8 个零引用脚本，全部 `git mv` 到 `_archive/v2/`，附 README 说明退役理由。
+- 连带：`tests/test_api.py`、`tests/test_calculator.py` 随被测代码归档，
+  `pytest` 108 → **78 passed**（少的 30 个全是死代码的测试，不是覆盖倒退）；
+  三个包的 `__init__.py` 不再 re-export 退役 API（此前 `import src.storage` 会
+  顺带拉起 SQLAlchemy session 封装这条死链）。
+- `requirements.txt` 从 24 个依赖精简到 4 个（sqlalchemy / pyyaml / pytest / ruff）——
+  采集走 curl 子进程、前端是纯静态站，fastapi/pandas/playwright/apscheduler 全是死重。
+
+**#43 此前 push 即发布、且 CI 不跑测试**
+- 现象：`.github/workflows/deploy.yml` 在 push master 后直接上传 `frontend/`；
+  坏代码或坏数据可以一路绿灯上线。
+- 解决：新增 `ci.yml`（push/PR 跑 pytest + ruff F,E9 + `refresh_data.py` 干跑）；
+  新增 `weekly-drift-check.yml`（每周两次比对"当前 AA 页面"与"已提交快照产物"的
+  页面指纹/带分模型数/评测对数，**只开 issue，不写库不发布**；抓取或解析失败也开 issue）。
+  巡检不依赖 SQLite —— `data/*.db` 被 gitignore，全新 checkout 上没有库，
+  所以比对对象是已提交的 `data/raw/snapshots/<最新>/manifest.json + scored_models.json`。
+
+**#44 交接手册 `docs/HANDOVER.md`**
+- 自包含（不依赖任何本机路径），含：五条数据口径铁律、日常维护命令序列与验收、
+  数据漂移处理流程、AA 改版适配的已知失败模式表、**决策权边界表**（机械的归机器、
+  判断的归人）、发布闸门清单、目录地图、接手自检八步。
+- 决策权边界是交接的核心：解析修复/补采/重试/归档/测试 = 可自决；
+  口径权重、vendor tier、自报数据收录、发布、删历史 = 必须问人。
+
+**本批改动后**：`src/` 4392 → 约 1530 行；`pytest` 78 passed；ruff F,E9 零告警；
+`refresh_data.py` 干跑 exit 0。数据批次仍是 2026-09-20（**已 9 天旧**，
+交接后第一件维护事项就是跑一次新批次，见 HANDOVER §3）。
+
+---
+
 ## 待办与已知不足（如实记录，不粉饰）
 
 | 项 | 说明 | 影响 |
@@ -440,7 +482,7 @@
 | 尚未采 2026-09-21 批次 | 榜面仍是 2026-09-20 快照；09-21 干跑显示主批次 544 条（比 09-20 少 1 条，AA 撤了 muse-spark 的一行） | 用户确认本轮数据无误后再决定是否日更；`refresh_data.py --apply` 一条命令即可 |
 | 腾讯的榜面身份待定 | `config/vendors.yaml` 里 `tencent: tier: reference`（遵守"严守九家"） | 若要把混元当选型候选，改这一行为 `core` 重跑导出即可 |
 | 库里残留 137 行 `provider='unknown'` | 8 月泄漏的范围外模型，不属本批快照，前端不可见 | 不影响榜面；若要彻底清理需单独一次带审计的归档迁移，未做 |
-| `scripts/fetch_openrouter_meta.py`、`load_accessibility.py` 未接入 v3 | 可访问性标签仍是旧数据或空 | 上下文窗口已改由 AA 详情页提供（#37），OpenRouter 通道不再必需，仍未接入 |
+| 可访问性标签 / OpenRouter 元数据通道无活代码 | 相关脚本与 v2 框架已于 #42 整体归档 | 需要时从 `_archive/v2/` 取回，先读该目录 README |
 | AA 不提供逐项评测日期 | 全 payload 唯一日期是 `releaseDate` | 分数只能标"某日 AA 快照"，已按用户要求如实标注 |
 | 无自动调度 | `settings.yaml: ingestion.schedule` 无代码读取；AA 加密化后全自动不可靠 | 采集节奏人工触发 |
 | mypy 未安装 | `project_rules.md §4.1` 要求 ruff/mypy/pytest 三道闸门，只跑了 ruff+pytest | 类型检查缺位 |

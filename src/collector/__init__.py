@@ -1,30 +1,8 @@
-"""Collector module — 数据采集框架
+"""Collector 模块 — v3 只保留两条解析路径
 
-Phase 1 进度：
-- registry:   BenchmarkRegistry(配置驱动)
-- base:       BaseCollector 抽象基类
-- output:     Observation 统一输出模型
-- strategies: 4 级采集策略(API / JSON / Static / Playwright)
-- 5 个具体 collector(全部 stub,P1/P2 填充)
+  aa_omniscience — AA 榜单页 / 单模型详情页的 RSC payload 解析
+  mapping        — 注册表驱动的身份解析 + AA 字段 → 规范 benchmark
+
+v2 的多源采集框架 (BaseCollector / Discoverer / strategies / 5 个 stub collector)
+已归档到 _archive/v2/src/collector/, 原因见 _archive/v2/README.md。
 """
-
-from .base import BaseCollector
-from .discoverer import (
-    BaseDiscoverer,
-    DiscoveredModel,
-    OpenRouterDiscoverer,
-    persist_discoveries,
-)
-from .output import CollectionResult, Observation
-from .registry import BenchmarkRegistry
-
-__all__ = [
-    "BaseCollector",
-    "BaseDiscoverer",
-    "DiscoveredModel",
-    "OpenRouterDiscoverer",
-    "persist_discoveries",
-    "Observation",
-    "CollectionResult",
-    "BenchmarkRegistry",
-]

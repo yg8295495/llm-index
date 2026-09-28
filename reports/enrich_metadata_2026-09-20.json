@@ -1,8 +1,8 @@
 {
   "tool": "enrich_metadata",
   "batch_snapshot_date": "2026-09-20",
-  "generated_at": "2026-09-20T21:19:26+00:00",
-  "dry_run": false,
+  "generated_at": "2026-09-28T22:27:15+00:00",
+  "dry_run": true,
   "targets": 1,
   "rows_changed": 0,
   "failures": [],
@@ -10,6 +10,13 @@
     {
       "generated_at": "2026-09-20T21:19:26+00:00",
       "dry_run": false,
+      "targets": 1,
+      "rows_changed": 0,
+      "failures": []
+    },
+    {
+      "generated_at": "2026-09-28T22:27:15+00:00",
+      "dry_run": true,
       "targets": 1,
       "rows_changed": 0,
       "failures": []
@@ -113,9 +120,9 @@
       "model_id": "ifm/k2-horizon-375b-a23b",
       "aa_slug": "k2-horizon-375b-a23b",
       "source_url": "https://artificialanalysis.ai/models/k2-horizon-375b-a23b",
-      "html_sha256": "c5116dcca641b5dad7a35278184ded91c862a247ac5d4b485aa3bd7ed82d8441",
-      "bytes": 3741079,
-      "fetched_at": "2026-09-20T21:19:26+00:00",
+      "html_sha256": "3b621142eb683d49437792b4e9b2d54305e07fd99063655735f898fba9aead0a",
+      "bytes": 3780816,
+      "fetched_at": "2026-09-28T22:27:15+00:00",
       "would_set": {},
       "already_had": {
         "context_window": 524288,
