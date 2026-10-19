@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>片库查询 · 2019-2026 高分片单</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%231e293b'/%3E%3Cpath d='M8 6.5v11l8-5.5z' fill='%23f6c453'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f6f4ee; --card:#fff; --ink:#1c1c1a; --sub:#6b6b63; --line:#e7e2d8;
+  --accent:#b8860b; --accent-deep:#8a6406; --green:#2e7d32; --green-bg:#e6f4e7;
+  --gray-bg:#eef0f3; --tag-bg:#f1efe9; --tag-on:#8a8a82;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+header{padding:20px 16px 12px;background:linear-gradient(180deg,#232c38,#1e293b);color:#fff}
+header h1{font-size:20px;font-weight:700;letter-spacing:.5px}
+header .sub{font-size:13px;color:#b9c2cf;margin-top:4px}
+.stats{display:flex;gap:18px;margin-top:14px;font-size:13px;color:#dfe5ec}
+.stats b{font-size:20px;color:#f6c453;font-weight:700;margin-right:3px}
+.stats span{display:block;font-size:11px;color:#9aa6b5;margin-top:1px}
+.tabs{display:flex;gap:10px;margin-top:14px}
+.tab{flex:1;height:40px;border:1px solid rgba(255,255,255,.25);border-radius:20px;background:rgba(255,255,255,.08);color:#d7dde6;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab.on{background:#f6c453;border-color:#f6c453;color:#232c38}
+.tab span{font-size:12px;font-weight:700;opacity:.9;background:rgba(0,0,0,.14);border-radius:9px;padding:1px 7px}
+.tab.on span{background:rgba(0,0,0,.2);color:#fff}
+/* ===== 筛选面板（分组布局） ===== */
+.toolbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 12px 12px;border-bottom:1px solid var(--line)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 12px;box-shadow:0 1px 4px rgba(0,0,0,.04);max-width:720px;margin:0 auto}
+.group{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 2px;border-bottom:1px dashed var(--line)}
+.group:last-child{border-bottom:none}
+.glabel{flex:none;width:54px;font-size:13px;font-weight:600;color:var(--ink)}
+/* 检索行 */
+.g-search input{flex:1;min-width:0;height:38px;padding:0 12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#faf9f5;outline:none}
+.g-search input:focus{border-color:var(--accent);background:#fff}
+/* 下拉框统一样式（原生美化：去默认箭头，换内置图标） */
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' stroke='%238a8a82' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px;padding-right:28px;cursor:pointer}
+select:focus{outline:none;border-color:var(--accent)}
+.g-search select{flex:none;height:38px;padding:0 28px 0 10px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:#fff;color:var(--ink)}
+.reset{flex:none;height:38px;padding:0 14px;font-size:13px;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:10px;white-space:nowrap;cursor:pointer}
+/* 资源 seg */
+.seg{display:flex;gap:8px;flex:1;min-width:0}
+.seg button{flex:1;height:36px;font-size:13px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--sub);cursor:pointer}
+.seg button.on{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff;font-weight:600}
+/* 年份组：两行式（上行 label+下拉，下行滑块全宽） */
+.g-year{flex-direction:column;align-items:stretch;gap:0;padding:0 2px}
+.y-top{display:flex;align-items:center;gap:10px;min-height:40px;flex-wrap:wrap}
+.g-year select{height:36px;padding:0 26px 0 10px;font-size:13px;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:9px;background-color:#fff;flex:1 1 110px;min-width:0;max-width:150px}
+.g-year .hint{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent-deep);background:rgba(184,134,11,.12);border-radius:8px;padding:5px 10px;white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
+/* 滑块容器：宽度 100% 与 panel 栅格对齐 */
+.range-wrap{width:100%;align-self:stretch;min-width:0;position:relative;height:38px;margin-top:2px;touch-action:none;box-sizing:border-box}
+/* 轨道左右各留 11px（= 滑块半径）；滑块以轨道为定位基准，端点中心落在轨道两端，不再溢出容器 */
+.dr-track{position:absolute;left:11px;right:11px;top:50%;transform:translateY(-50%);height:6px;border-radius:3px;background:#e3ddd0}
+.dr-fill{position:absolute;left:0;top:0;height:6px;border-radius:3px;background:var(--accent)}
+.dr-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid var(--accent-deep);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:grab;touch-action:none;z-index:2}
+.dr-thumb:active{cursor:grabbing}
+.dr-thumb:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
+.dr-thumb::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%;background:var(--accent-deep)}
+/* 端点标签：移到轨道下方的独立行，不再与滑块垂直重叠 */
+.edge-row{display:flex;justify-content:space-between;padding:0 11px;margin-top:-2px}
+.edge-label{font-size:11px;color:var(--sub);letter-spacing:.3px;pointer-events:none;line-height:1.2}
+/* 评分组：单滑块（缩短，不占满） */
+.g-score input[type=range]{flex:0 1 220px;min-width:140px;height:34px;accent-color:var(--accent-deep);cursor:pointer}
+.rval{flex:none;font-size:12px;color:var(--sub);min-width:48px;text-align:right;white-space:nowrap}
+/* 类型组 */
+.genre-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0}
+.genre-scroll::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;height:34px;padding:0 12px;font-size:13px;border-radius:17px;border:1px solid var(--line);background:#fff;color:var(--sub);display:inline-flex;align-items:center;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* ===== 列表/卡片 ===== */
+.list{padding:14px 16px 60px;display:flex;flex-direction:column;gap:12px;max-width:720px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;cursor:pointer;transition:box-shadow .15s}
+.card:active{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card-title{font-size:17px;font-weight:700;line-height:1.35;min-width:0;flex:1}
+.score{flex:0 0 auto;min-width:52px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff}
+.score.s9{background:#a16207}
+.score.s85{background:#ca8a04}
+.score.s8{background:#d9b36c}
+.meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--sub);flex-wrap:wrap}
+.meta-plat{margin-left:auto;font-size:11px;color:#8a8a82;background:var(--tag-bg);border-radius:6px;padding:2px 8px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;font-size:11px;font-weight:600}
+.badge.iq-yes{background:var(--green-bg);color:var(--green)}
+.badge.iq-vip{background:#fdeef0;color:#c62828}
+.badge.iq-no{background:var(--gray-bg);color:#8a8a82}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.tag{font-size:11px;color:var(--tag-on);background:var(--tag-bg);padding:2px 8px;border-radius:6px}
+.note{margin-top:9px;font-size:13px;color:#4a4a44;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card.expanded .note{display:block}
+.card.expanded .note-hint{display:none}
+.note-hint{margin-top:4px;font-size:11px;color:var(--accent)}
+.empty{padding:60px 20px;text-align:center;color:var(--sub);font-size:15px}
+.empty .e-sub{font-size:13px;color:#9a9a92;margin-top:6px}
+.count{padding:2px 16px 0;max-width:720px;margin:0 auto;font-size:12px;color:var(--sub)}
+@media (min-width:768px){
+  .card{padding:16px}
+  .card-title{font-size:18px}
+  .toolbar{padding:12px 20px}
+  .panel{max-width:720px;margin:0 auto}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>片库查询 · 2019-2026</h1>
+  <div class="sub">高分片单 · 按评分 / 年份区间 / 爱奇艺资源 / 类型筛选</div>
+  <div class="stats">
+    <div><b id="st-total">0</b><span>影片总数</span></div>
+    <div><b id="st-score">0</b><span>平均评分</span></div>
+    <div><b id="st-iq">0</b><span>爱奇艺可看</span></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="movie">电影 <span id="tabMovieN"></span></button>
+    <button class="tab" data-tab="tv">电视剧 <span id="tabTvN"></span></button>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="panel">
+
+    <div class="group g-search">
+      <input id="q" type="search" placeholder="搜索片名…" autocomplete="off">
+      <select id="sortSel">
+        <option value="score-desc">评分↓</option>
+        <option value="score-asc">评分↑</option>
+        <option value="year-desc">年份新</option>
+        <option value="year-asc">年份旧</option>
+        <option value="title">片名 A-Z</option>
+      </select>
+      <button class="reset" id="reset">重置</button>
+    </div>
+
+    <div class="group">
+      <span class="glabel">资源</span>
+      <div class="seg" id="iqSeg">
+        <button data-iq="all" class="on">全部</button>
+        <button data-iq="yes">爱奇艺有</button>
+        <button data-iq="no">无</button>
+      </div>
+    </div>
+
+    <div class="group g-year">
+      <div class="y-top">
+        <span class="glabel">年份</span>
+        <select id="yearSel"></select>
+        <span class="hint" id="yearHint"></span>
+      </div>
+      <div class="range-wrap" id="yearRange">
+        <div class="dr-track" id="drTrack">
+          <div class="dr-fill" id="drFill"></div>
+          <div class="dr-thumb" id="drThumbL" tabindex="0" role="slider" aria-label="起始年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"></div>
+          <div class="dr-thumb" id="drThumbR" tabindex="0" role="slider" aria-label="结束年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15"></div>
+        </div>
+      </div>
+      <div class="edge-row">
+        <span class="edge-label l">更早</span>
+        <span class="edge-label r">2026</span>
+      </div>
+    </div>
+
+    <div class="group g-score">
+      <span class="glabel">评分</span>
+      <input type="range" id="scoreRange" min="60" max="95" step="5" value="60">
+      <span class="rval" id="scoreVal">不限</span>
+    </div>
+
+    <div class="group">
+      <span class="glabel">类型</span>
+      <div class="genre-scroll" id="genreBar"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="count" id="countLine"></div>
+<div class="list" id="list"></div>
+
+<script>
+const DATA = [{"year": "2019", "title": "寄生虫", "score": 8.8, "genres": "剧情", "iqiyi": "无", "note": "穷家四口逐个混入富户当家教，中段急转直下。奥斯卡最佳影片，节奏极好，不闷。"}, {"year": "2019", "title": "爱尔兰人", "score": 8.8, "genres": "剧情,传记,犯罪", "iqiyi": "无", "note": "斯科塞斯 3.5 小时黑帮史诗，杀手暮年回望。经典配置，但慢、长，挑人。"}, {"year": "2019", "title": "小丑", "score": 8.7, "genres": "剧情,惊悚,犯罪", "iqiyi": "无", "note": "失败喜剧演员在哥谭底层一步步疯成小丑。演技封神，但阴郁压抑，不是爽片。"}, {"year": "2019", "title": "克劳斯：圣诞节的秘密", "score": 8.7, "genres": "喜剧,动画,冒险", "iqiyi": "无", "note": "邮差与隐居木匠在极北小镇「发明」了圣诞老人。手绘风美到犯规，圣诞必看。"}, {"year": "2019", "title": "黑水", "score": 8.6, "genres": "剧情", "iqiyi": "无", "note": "律师死磕杜邦化工污染二十年。真实事件改编，冷静克制，看完想查自家的不粘锅。"}, {"year": "2019", "title": "复仇者联盟4：终局之战", "score": 8.5, "genres": "剧情,动作,科幻,奇幻,冒险", "iqiyi": "有", "note": "漫威十年收官：幸存者穿越时空集齐宝石，与灭霸终局决战。系列粉丝必看，3 小时不冷场。"}, {"year": "2019", "title": "玩具总动员4", "score": 8.5, "genres": "喜剧,动画,奇幻", "iqiyi": "有", "note": "胡迪在公路旅行中遇上新朋友叉叉。皮克斯合家欢，笑泪都有，大人看也不闷。"}, {"year": "2019", "title": "极速车王", "score": 8.5, "genres": "剧情,传记,运动", "iqiyi": "有", "note": "福特造赛车挑战法拉利的勒芒霸业，贝尔与达蒙飙戏。赛车段落燃，非车迷也能看。"}, {"year": "2019", "title": "1917", "score": 8.5, "genres": "剧情,战争", "iqiyi": "有", "note": "一战两名传令兵穿越火线送停战命令，一镜到底。沉浸感拉满的战争片。"}, {"year": "2019", "title": "哪吒之魔童降世", "score": 8.4, "genres": "剧情,喜剧,动画,奇幻", "iqiyi": "有", "note": "魔丸哪吒对抗天命，国漫里程碑，票房 50 亿。热闹又好哭，老少通吃。"}, {"year": "2019", "title": "绅士们", "score": 8.3, "genres": "喜剧,动作,犯罪", "iqiyi": "无", "note": "盖·里奇英伦黑帮喜剧，大佬退隐引发连环算计。话痨加反转，他最擅长的配方。"}, {"year": "2019", "title": "乔乔的异想世界", "score": 8.3, "genres": "剧情,喜剧,战争", "iqiyi": "有", "note": "纳粹男孩的幻想朋友是滑稽版希特勒，妈妈在家藏了犹太女孩。笑着笑着就哭了。"}, {"year": "2019", "title": "少年的你", "score": 8.2, "genres": "剧情,爱情,犯罪", "iqiyi": "有", "note": "高考前夜，校园霸凌把优等生和街头少年绑到一起。周冬雨、易烊千玺出演，偏沉重写实。"}, {"year": "2019", "title": "理查德·朱维尔的哀歌", "score": 8.2, "genres": "剧情,传记,犯罪", "iqiyi": "有", "note": "救人保安被 FBI 和媒体反手打成嫌疑人。伊斯特伍德工整叙事，气人又好看。"}, {"year": "2019", "title": "利刃出鞘", "score": 8.1, "genres": "剧情,喜剧,悬疑,犯罪", "iqiyi": "有", "note": "富豪作家暴毙，全家都是嫌疑人，「007」丹尼尔·克雷格探案。本格推理，反转干净利落。"}, {"year": "2019", "title": "罗小黑战记", "score": 8.0, "genres": "动作,动画,奇幻", "iqiyi": "有", "note": "小黑猫流浪找家，卷入人与妖精的对立。画风治愈，节奏温和，适合放松看。"}, {"year": "2020", "title": "心灵奇旅", "score": 8.7, "genres": "动画,音乐,奇幻", "iqiyi": "有", "note": "中学音乐老师灵魂出窍，在「生之来处」重想活着的意义。皮克斯写给成年人的一封信。"}, {"year": "2020", "title": "蜡笔小新：激战！涂鸦王国和约四位勇士", "score": 8.7, "genres": "动画,家庭", "iqiyi": "有", "note": "小新拿魔法蜡笔拯救涂鸦王国。合家欢，笑点密，大人看个情怀。"}, {"year": "2020", "title": "芝加哥七君子审判", "score": 8.6, "genres": "剧情,历史", "iqiyi": "无", "note": "1968 年反越战示威者受审，法庭戏全程高能对呛。索金剧本，台词密度极高。"}, {"year": "2020", "title": "南山的部长们", "score": 8.2, "genres": "剧情,惊悚,历史", "iqiyi": "无", "note": "朴正熙遇刺前 40 天，情报部长们的暗斗。韩国政治惊悚，冷峻写实。"}, {"year": "2021", "title": "天书奇谭", "score": 9.2, "genres": "动画,奇幻", "iqiyi": "无", "note": "1983 年上美厂经典 4K 修复：袁公授天书，三只狐狸下凡作乱。老动画美术天花板，怀旧之选。"}, {"year": "2021", "title": "蜡笔小新：谜团！花之天下春日部学院", "score": 9.0, "genres": "动画,悬疑", "iqiyi": "无", "note": "小新一行人住进精英学院解谜。校园推理味的剧场版，合家欢。"}, {"year": "2021", "title": "健听女孩", "score": 8.6, "genres": "剧情,音乐", "iqiyi": "无", "note": "聋哑家庭里唯一的听人女儿爱上唱歌。奥斯卡最佳影片，温暖励志，不过火。"}, {"year": "2021", "title": "芬奇", "score": 8.4, "genres": "剧情,科幻", "iqiyi": "无", "note": "末世里垂死的汤姆·汉克斯造出机器人，只为护送自己的狗。公路片外壳的催泪弹。"}, {"year": "2021", "title": "雄狮少年", "score": 8.3, "genres": "剧情,喜剧,动画", "iqiyi": "有", "note": "留守少年组队学舞狮。被造型争议耽误的好片，结尾跃柱一幕燃爆。"}, {"year": "2021", "title": "咒术回战0", "score": 8.3, "genres": "动作,动画,奇幻", "iqiyi": "无", "note": "乙骨忧太前传，纯爱战神大战特级咒灵。粉丝向，没看过 TV 版也能入，补完第一季更佳。"}, {"year": "2021", "title": "最后的决斗", "score": 8.2, "genres": "剧情,历史", "iqiyi": "有", "note": "中世纪性侵案三视角罗生门，最终以骑士决斗定罪。雷德利·斯科特执导，沉重有力。"}, {"year": "2021", "title": "爱情神话", "score": 8.1, "genres": "剧情,喜剧,爱情", "iqiyi": "有", "note": "上海弄堂里中年男女的感情拉扯，全程沪语。轻盈好笑，城市小品里的顶级。"}, {"year": "2021", "title": "扎克·施奈德版正义联盟", "score": 8.1, "genres": "动作,科幻,奇幻,冒险", "iqiyi": "有", "note": "4 小时导演剪辑版，钢骨线补完、黑超登场。比院线版完整得多，DC 粉必看，路人慎入时长。"}, {"year": "2021", "title": "摩加迪沙", "score": 8.1, "genres": "剧情,动作", "iqiyi": "无", "note": "索马里内战爆发，韩朝两国外交官结盟逃亡。真实事件改编，紧张不煽情。"}, {"year": "2021", "title": "宇宙探索编辑部", "score": 8.0, "genres": "喜剧,科幻", "iqiyi": "有", "note": "科幻杂志主编带队去四川山村找外星人。荒诞土味科幻，笑着笑着就心酸了。"}, {"year": "2021", "title": "X特遣队：全员集结", "score": 8.0, "genres": "喜剧,动作,科幻,冒险", "iqiyi": "有", "note": "詹姆斯·古恩重启自杀小队，血浆与笑点齐飞。DC 最放飞的一部，娱乐性拉满。"}, {"year": "2022", "title": "灌篮高手", "score": 8.9, "genres": "动画,运动", "iqiyi": "有（会员）", "note": "井上雄彦亲自执导，山王战完整呈现，宫城良田主视角。情怀杀，比赛段落窒息感拉满。"}, {"year": "2022", "title": "西线无战事", "score": 8.5, "genres": "剧情,动作,战争", "iqiyi": "无", "note": "一战德军新兵的人间炼狱。Netflix 出品，反战片新标杆，极其惨烈压抑。"}, {"year": "2022", "title": "十三条命", "score": 8.5, "genres": "剧情,惊悚,传记", "iqiyi": "无", "note": "泰国洞穴救援少年足球队，朗·霍华德纪实惊悚。全程捏汗，节奏无尿点。"}, {"year": "2022", "title": "关于我和鬼变成家人的那件事", "score": 8.1, "genres": "喜剧,悬疑,同性,奇幻", "iqiyi": "无", "note": "直男警察捡红包被迫与男鬼冥婚，联手破案。笑中带泪，台式喜剧佳作。"}, {"year": "2022", "title": "穿靴子的猫2", "score": 8.1, "genres": "喜剧 / 动画 / 奇幻 / 冒险", "iqiyi": "无", "note": "猫大侠只剩最后一条命，与死神赛跑寻找许愿星。画风革新，意外地认真探讨死亡。"}, {"year": "2022", "title": "青春变形记", "score": 8.0, "genres": "喜剧,动画,奇幻,冒险", "iqiyi": "无", "note": "华裔少女一激动就变成红熊猫。皮克斯的青春期寓言，迪士尼独占，国内平台无。"}, {"year": "2022", "title": "壮志凌云2：独行侠", "score": 8.0, "genres": "动作", "iqiyi": "无", "note": "阿汤哥时隔 36 年回归，实拍飞行戏份封神。年度爽片标杆；爱奇艺只有 1986 年前作，这部要自找。"}, {"year": "2023", "title": "奥本海默", "score": 8.8, "genres": "剧情,传记,历史", "iqiyi": "有", "note": "诺兰拍原子弹之父，三小时文戏靠剪辑和表演烧出大片感。台词密度高，看前先睡饱。"}, {"year": "2023", "title": "首尔之春", "score": 8.8, "genres": "剧情", "iqiyi": "无", "note": "1979 年「双十二政变」的一夜，韩国票房冠军。政治惊悚，窒息式紧张。"}, {"year": "2023", "title": "蜘蛛侠：纵横宇宙", "score": 8.5, "genres": "喜剧,动作,科幻,动画,奇幻,冒险", "iqiyi": "有", "note": "迈尔斯闯入蜘蛛侠总部对抗既定命运。视觉革命；注意这是上集，结尾断在高潮。"}, {"year": "2023", "title": "流浪地球2", "score": 8.3, "genres": "科幻,冒险,灾难", "iqiyi": "有", "note": "前传：月球危机与数字生命之争，太空电梯段落封神。国产科幻工业标杆，信息量巨大。"}, {"year": "2023", "title": "长安三万里", "score": 8.3, "genres": "动画,历史", "iqiyi": "有", "note": "以高适视角回望李白一生，大唐群星谱。诗篇密集，适合带孩子一起看。"}, {"year": "2023", "title": "银河护卫队3", "score": 8.3, "genres": "科幻 / 动作 / 冒险", "iqiyi": "有（会员）", "note": "火箭浣熊身世揭底，詹姆斯·古恩的漫威告别作。笑着进哭着出，漫威近年最佳之一。"}, {"year": "2023", "title": "画江湖之天罡", "score": 8.2, "genres": "动画 / 武侠", "iqiyi": "无", "note": "袁天罡传位之战，《画江湖》系列电影化。水墨武侠，偏粉丝向，但打斗过硬。"}, {"year": "2023", "title": "蓝色巨星", "score": 8.2, "genres": "动画 / 音乐 / 剧情", "iqiyi": "无", "note": "热血爵士：乡下少年立志成为世界第一萨克斯手。演奏段落燃到起鸡皮疙瘩。"}, {"year": "2023", "title": "年会不能停！", "score": 8.1, "genres": "喜剧 / 剧情", "iqiyi": "有（会员）", "note": "钳工老胡被调进大厂总部，打工人嘴替喜剧。梗密共鸣强，解压首选。"}, {"year": "2023", "title": "周处除三害", "score": 8.1, "genres": "剧情 / 动作 / 犯罪", "iqiyi": "有（会员）", "note": "通缉犯陈桂林决心除掉排名在自己前面的两名「害」。阮经天封神之作，尺度生猛。"}, {"year": "2023", "title": "芭比", "score": 8.0, "genres": "喜剧 / 奇幻 / 冒险", "iqiyi": "无", "note": "芭比逃出芭比乐园闯入真实世界。粉红视觉轰炸加女性议题，娱乐与表达兼备。"}, {"year": "2023", "title": "俄罗斯方块", "score": 8.0, "genres": "剧情 / 传记 / 惊悚", "iqiyi": "无", "note": "冷战末期各方抢夺《俄罗斯方块》版权的商战谍战。Apple 出品，节奏像惊悚片。"}, {"year": "2024", "title": "好东西", "score": 8.9, "genres": "剧情 / 喜剧 / 爱情", "iqiyi": "有（会员）", "note": "单亲妈妈与邻居女孩的都市生活，《爱情神话》姊妹篇。轻松好笑，2024 年口碑王。"}, {"year": "2024", "title": "因果报应", "score": 8.7, "genres": "剧情 / 犯罪 / 悬疑", "iqiyi": "有（会员）", "note": "印度悬疑片：理发师女儿失踪牵出连环局，结尾连环反转。前半慢热，后程封神。"}, {"year": "2024", "title": "雄狮少年2", "score": 8.5, "genres": "动画 / 剧情 / 动作", "iqiyi": "有（会员）", "note": "阿娟进城打格斗擂台。舞狮变格斗，作画升级，结尾依旧燃。"}, {"year": "2024", "title": "破·地狱", "score": 8.4, "genres": "剧情", "iqiyi": "有（会员）", "note": "香港殡葬业父女档，黄子华、许冠文主演。生死题材，克制催泪，港片年度之作。"}, {"year": "2024", "title": "头脑特工队2", "score": 8.4, "genres": "动画 / 家庭 / 奇幻 / 冒险", "iqiyi": "有（会员）", "note": "莱莉进入青春期，「焦虑」接管大脑总部。皮克斯稳定发挥，成年人共鸣更深。"}, {"year": "2024", "title": "排球少年！！垃圾场决战", "score": 8.2, "genres": "动画 / 运动 / 剧情", "iqiyi": "有（会员）", "note": "乌野对音驹的宿命战，85 分钟就是一场比赛。粉丝狂欢，路人也能被热血点燃。"}, {"year": "2024", "title": "沙丘2", "score": 8.1, "genres": "科幻 / 冒险 / 动作", "iqiyi": "有（会员）", "note": "保罗骑沙虫、决战菲德，维伦纽瓦史诗续章。大银幕级视听，主线推进比第一部大得多。"}, {"year": "2024", "title": "荒野机器人", "score": 8.1, "genres": "动画 / 科幻 / 冒险", "iqiyi": "有（会员）", "note": "机器人萝丝流落荒岛，成了孤儿雁的妈。梦工厂催泪弹，亲子向天花板。"}, {"year": "2024", "title": "蓦然回首", "score": 8.1, "genres": "动画 / 剧情", "iqiyi": "有（会员）", "note": "藤本树短篇改编：两个女孩因漫画相遇。仅 58 分钟，后劲极大，看完沉默十分钟。"}, {"year": "2025", "title": "南京照相馆", "score": 8.7, "genres": "剧情 / 历史 / 战争", "iqiyi": "有", "note": "南京大屠杀期间，照相馆里的人冒死保存日军罪证胶片。沉重催泪，年度国产佳作。"}, {"year": "2025", "title": "F1：狂飙飞车", "score": 8.7, "genres": "剧情 / 动作 / 运动", "iqiyi": "无", "note": "布拉德·皮特演过气车手复出，实拍赛车视听炸裂。Apple 独占，国内平台无，自找片源。"}, {"year": "2025", "title": "罗小黑战记2", "score": 8.7, "genres": "动画 / 奇幻 / 冒险", "iqiyi": "有", "note": "小黑与师父无限执行新任务，作画再升级。治愈与热血并存。"}, {"year": "2025", "title": "浪浪山小妖怪", "score": 8.5, "genres": "剧情 / 喜剧 / 动画 / 奇幻", "iqiyi": "有", "note": "《中国奇谭》小猪妖续篇：小妖怪们组队「取经」。打工人寓言，笑中带刺。"}, {"year": "2025", "title": "哪吒之魔童闹海", "score": 8.4, "genres": "剧情 / 喜剧 / 动画 / 奇幻", "iqiyi": "有", "note": "哪吒、敖丙重塑肉身大战龙族，票房破 154 亿登顶全球影史。中国影史冠军，特效量级拉满。"}, {"year": "2025", "title": "疯狂动物城2", "score": 8.3, "genres": "喜剧 / 动画 / 悬疑 / 犯罪 / 冒险", "iqiyi": "有", "note": "朱迪与尼克追查爬行动物大案，时隔 9 年的续作。稳定发挥，细节梗密集。"}, {"year": "2025", "title": "新·驯龙高手", "score": 8.2, "genres": "剧情 / 喜剧 / 动作 / 奇幻 / 冒险", "iqiyi": "有", "note": "梦工厂动画真人翻拍：小嗝嗝与无牙仔。高度还原，合家欢稳妥之选。"}, {"year": "2025", "title": "哆啦A梦：大雄的绘画奇遇记", "score": 8.2, "genres": "喜剧 / 动画 / 奇幻 / 冒险", "iqiyi": "无", "note": "大雄一行进入画中世界冒险。系列第 44 部，粉丝例行之作，国内视频平台未上。"}, {"year": "2025", "title": "捕风追影", "score": 8.0, "genres": "剧情 / 动作 / 犯罪", "iqiyi": "有", "note": "成龙带队以天眼追踪，对决梁家辉的盗匪团。近年港产警匪口碑之作，动作扎实。"}, {"year": "2025", "title": "一战再战", "score": 8.0, "genres": "剧情 / 动作 / 惊悚 / 犯罪", "iqiyi": "有", "note": "小李子演落魄革命者，为救女儿一路狂奔。保罗·托马斯·安德森执导，紧张又荒诞。"}, {"year": "2026", "title": "欢迎来龙餐馆", "score": 8.7, "genres": "剧情 / 战争", "iqiyi": "无", "note": "文牧野执导、沈腾主演：2003 年伊拉克，中国餐馆老板护送孤儿穿越战区。票房 23 亿，中国申奥片，国内平台暂未上。"}, {"year": "2026", "title": "奥德赛", "score": 8.6, "genres": "动作 / 历史 / 奇幻 / 冒险", "iqiyi": "无", "note": "诺兰新片：奥德修斯的归乡史诗。2026 年最受期待的大片之一，国内未上流媒体。"}, {"year": "2026", "title": "挽救计划", "score": 8.6, "genres": "剧情 / 科幻 / 惊悚", "iqiyi": "有（会员）", "note": "高斯林演失忆教师在外星醒来，与外星人组队拯救地球。《火星救援》作者原著改编，硬科幻爽片。"}, {"year": "2026", "title": "八仙！", "score": 8.2, "genres": "喜剧 / 动画 / 奇幻 / 冒险", "iqiyi": "无", "note": "国产动画：八仙过海新编。口碑黑马，国内平台暂未上。"}, {"year": "2026", "title": "诺曼底72小时", "score": 8.2, "genres": "剧情 / 历史 / 战争", "iqiyi": "无", "note": "二战题材：诺曼底登陆前后的 72 小时。战争片爱好者自找片源。"}, {"year": "2026", "title": "玩具总动员5", "score": 8.0, "genres": "剧情 / 喜剧 / 动画 / 奇幻 / 冒险", "iqiyi": "无", "note": "胡迪、巴斯光年回归，玩具大战平板电脑时代。皮克斯王牌续作，国内未上流媒体。"}, {"year": "2026", "title": "三国第一部：争洛阳", "score": 8.0, "genres": "动画 / 历史", "iqiyi": "无", "note": "追光动画三国系列开篇，《长安三万里》团队新作。国内未上流媒体。"}];
+const TV = [{"year": "2026", "title": "主角", "score": 8.1, "genres": "剧情,年代,现实题材,秦腔", "iqiyi": "无", "note": "CVB上半年收视率第一+14亿人次+腾讯热度破3万，台网双爆", "platform": "CCTV1,腾讯视频"}, {"year": "2026", "title": "九门", "score": 6.6, "genres": "剧情,奇幻,冒险,悬疑,民国", "iqiyi": "无", "note": "开播前预约破600万+优酷热度破万+19.16亿播放，2026暑期档代表", "platform": "优酷"}, {"year": "2026", "title": "低智商犯罪", "score": 8.2, "genres": "剧情,犯罪,悬疑,喜剧", "iqiyi": "有", "note": "爱奇艺10天热度破万+11.83亿播放+15万人豆瓣评价", "platform": "爱奇艺,东方卫视,江苏卫视"}, {"year": "2026", "title": "兰香如故", "score": 7.5, "genres": "剧情,爱情,古装,宅斗", "iqiyi": "无", "note": "腾讯年度热度峰值纪录+18.74亿播放+新京报Q3影响力剧集", "platform": "CCTV8,腾讯视频"}, {"year": "2026", "title": "太平年", "score": 8.7, "genres": "剧情,历史,古装,重大历史题材", "iqiyi": "有", "note": "CVB官方收视+微博话题112亿+豆瓣17万余人评价，2026年度热度口碑双爆第一梯队", "platform": "CCTV1,腾讯视频,爱奇艺,芒果TV"}, {"year": "2026", "title": "成何体统", "score": 7.3, "genres": "喜剧,爱情,古装,穿书", "iqiyi": "有", "note": "爱奇艺热度9097+9.36亿播放+9.4万人豆瓣评价，Q1古装轻喜剧黑马", "platform": "爱奇艺"}, {"year": "2026", "title": "早春晴朗", "score": 6.7, "genres": "剧情,爱情,职场,现偶", "iqiyi": "无", "note": "云合市占率40.3%为2026单剧最高档+Netflix全球第二+微博热搜1323个", "platform": "优酷,Netflix(海外)"}, {"year": "2026", "title": "此处通往繁星", "score": null, "genres": "喜剧,殡葬题材,治愈", "iqiyi": "无", "note": "用户重点关注+预约破百万+抖音推流频繁", "platform": "优酷,芒果TV"}, {"year": "2026", "title": "生命树", "score": 8.4, "genres": "剧情,现实题材,生态保护,年代", "iqiyi": "有", "note": "爱奇艺热度8713+微博话题70亿+豆瓣8.4，开年现实题材爆款", "platform": "CCTV8,爱奇艺"}, {"year": "2026", "title": "逐玉", "score": 6.4, "genres": "剧情,爱情,古装,古偶", "iqiyi": "有", "note": "37.27亿播放为2026线上播放量最高档+23万人豆瓣评价+拼播爱奇艺", "platform": "腾讯视频,爱奇艺"}, {"year": "2025", "title": "乌云之上", "score": 5.9, "genres": "犯罪,悬疑,剧情", "iqiyi": "有", "note": "孙俪迷雾剧场+爱奇艺热度破8000，热度高口碑中等", "platform": "爱奇艺(迷雾剧场独播)"}, {"year": "2025", "title": "六姊妹", "score": 5.7, "genres": "剧情,家庭,年代", "iqiyi": "无", "note": "2025央视收视率冠军5.581%，电视端大众收视断层领先（豆瓣口碑偏低不影响大众热度判定）", "platform": "CCTV-1,腾讯视频"}, {"year": "2025", "title": "北上", "score": 7.0, "genres": "年代,剧情,运河文化", "iqiyi": "有", "note": "CVB历史收视第三高3.615%，央视一套黄金档+爱奇艺大家剧场开台大剧", "platform": "CCTV-1,爱奇艺"}, {"year": "2025", "title": "唐朝诡事录之长安", "score": 8.0, "genres": "古装,悬疑,奇幻,探案", "iqiyi": "有", "note": "悬疑剧有效播放冠军21.22亿+爱奇艺热度破万，豆瓣8.0口碑热度双高", "platform": "爱奇艺"}, {"year": "2025", "title": "国色芳华", "score": 7.8, "genres": "古装,爱情,剧情", "iqiyi": "无", "note": "抖音话题175亿为年度最高之一+猫眼古装剧热度冠军，杨紫李现流量大爆", "platform": "芒果TV"}, {"year": "2025", "title": "沉默的荣耀", "score": 8.0, "genres": "谍战,历史,国安", "iqiyi": "有", "note": "CVB同时段第一+累计播放6.85亿，豆瓣8.0口碑热度双丰收，爱奇艺谍战自制标杆", "platform": "爱奇艺"}, {"year": "2025", "title": "漂白", "score": 5.3, "genres": "犯罪,刑侦,悬疑", "iqiyi": "有", "note": "云合集均播放年度冠军+迷雾剧场热度破万（豆瓣口碑后期下滑但大众热度与话题度极高）", "platform": "爱奇艺"}, {"year": "2025", "title": "生万物", "score": 7.2, "genres": "剧情,年代,农村", "iqiyi": "有", "note": "灯塔年度播放前三+酷云收视领跑，爱奇艺大家剧场S+现实主义大剧", "platform": "爱奇艺,CCTV-8"}, {"year": "2025", "title": "藏海传", "score": 7.1, "genres": "古装,权谋,悬疑", "iqiyi": "无", "note": "猫眼/云合/灯塔三榜年度第一+抖音164亿话题，2025现象级古装权谋剧", "platform": "优酷,CCTV-8"}, {"year": "2025", "title": "蛮好的人生", "score": 6.1, "genres": "都市,民生,剧情", "iqiyi": "无", "note": "孙俪董子健+2025央八年冠+首播8亿人次，收视热度确凿", "platform": "CCTV-8,东方卫视,北京卫视,优酷(网络独播)"}, {"year": "2025", "title": "许我耀眼", "score": 6.5, "genres": "都市,爱情,剧情", "iqiyi": "无", "note": "云合霸屏榜TOP3+集均播放TOP2，腾讯2025都市爱情S+爆款", "platform": "腾讯视频"}, {"year": "2025", "title": "难哄", "score": 5.4, "genres": "都市,爱情,剧情", "iqiyi": "无", "note": "白敬亭章若楠现偶+18万人豆瓣打分，热度高口碑争议", "platform": "优酷(独播)"}, {"year": "2024", "title": "与凤行", "score": 7.2, "genres": "古装,爱情,奇幻", "iqiyi": "无", "note": "集均V30第二+累计破20亿，赵丽颖林更新古偶头部声量", "platform": "腾讯视频"}, {"year": "2024", "title": "九重紫", "score": 7.8, "genres": "古装,爱情", "iqiyi": "无", "note": "孟子义李昀锐+腾讯热度破30000+豆瓣7.8，年末古偶黑马", "platform": "腾讯视频(独播)"}, {"year": "2024", "title": "剑来（第一季 / 第二季）", "score": null, "genres": "动画,3D仙侠,小说改,古风", "iqiyi": "无", "note": "2024腾讯爆款，抖音话题22.5亿、热度破2.5万", "platform": "腾讯视频独家"}, {"year": "2024", "title": "南来北往", "score": 7.4, "genres": "年代,刑侦,家庭", "iqiyi": "有", "note": "郑晓龙执导+央视八套破纪录收视+爱奇艺独播热度近万，开年年代刑侦爆款", "platform": "爱奇艺,央视八套"}, {"year": "2024", "title": "唐朝诡事录之西行", "score": 8.6, "genres": "古装,悬疑,探案", "iqiyi": "有", "note": "爱奇艺热度破万+累计破20亿+豆瓣8.6，古装探案口碑与声量双收", "platform": "爱奇艺"}, {"year": "2024", "title": "墨雨云间", "score": 6.6, "genres": "古装,爱情,喜剧", "iqiyi": "无", "note": "集均V30第四+微博8.5高分，于正古装爽剧大众讨论度高", "platform": "优酷"}, {"year": "2024", "title": "大奉打更人 第一季", "score": 5.6, "genres": "古装,奇幻,喜剧,悬疑", "iqiyi": "无", "note": "王鹤棣大IP+腾讯热度30000+有效播放10亿，口碑两极但热度极高", "platform": "CCTV-8,腾讯视频(独播)"}, {"year": "2024", "title": "小巷人家", "score": 8.4, "genres": "年代,家庭,剧情", "iqiyi": "无", "note": "芒果站内霸榜25天+省卫收视年冠，正午阳光年代剧国民度高", "platform": "芒果TV,湖南卫视"}, {"year": "2024", "title": "山花烂漫时", "score": 9.6, "genres": "现实,传记,剧情", "iqiyi": "无", "note": "宋佳演张桂梅+豆瓣9.6+收视户次8.8亿，年度口碑王", "platform": "CCTV-1,腾讯视频(网络独播),北京卫视,东方卫视"}, {"year": "2024", "title": "庆余年第二季", "score": 7.3, "genres": "古装,剧情,喜剧", "iqiyi": "无", "note": "2024网播年冠，云合45.1亿有效播放+集均V30第一，双重权威数据坐实", "platform": "腾讯视频,央视八套"}, {"year": "2024", "title": "我是刑警", "score": 7.7, "genres": "刑侦,犯罪,剧情", "iqiyi": "有", "note": "爱奇艺站内2024热度年冠+微博近800热搜，台网双爆", "platform": "爱奇艺,央视"}, {"year": "2024", "title": "我的阿勒泰", "score": 8.9, "genres": "文艺,剧情,迷你剧", "iqiyi": "有", "note": "豆瓣8.9+央视收视2.62+文旅出圈，2024现象级口碑剧", "platform": "CCTV-1,爱奇艺(微尘剧场)"}, {"year": "2024", "title": "永夜星河", "score": 7.6, "genres": "古装,奇幻,轻喜剧,爱情", "iqiyi": "无", "note": "虞书欣丁禹兮+腾讯热度破30000，2024古偶爆款", "platform": "腾讯视频(独播)"}, {"year": "2024", "title": "牧神记（年番）", "score": null, "genres": "动画,3D玄幻,小说改,热血", "iqiyi": "无", "note": "2024黑马年番，B站前五、19亿播放、豆瓣9.0", "platform": "哔哩哔哩(B站)独家"}, {"year": "2024", "title": "猎冰", "score": 4.3, "genres": "缉毒,犯罪,警匪", "iqiyi": "无", "note": "张颂文主演+腾讯首日热度25000，口碑两极但热度极高（符合放宽保留标准）", "platform": "腾讯视频(独播)"}, {"year": "2024", "title": "玫瑰的故事", "score": 7.5, "genres": "都市,爱情,剧情", "iqiyi": "无", "note": "腾讯都市剧热度纪录+刘亦菲效应，都市题材顶流声量", "platform": "腾讯视频"}, {"year": "2024", "title": "繁花", "score": 8.7, "genres": "都市,剧情,商战", "iqiyi": "无", "note": "王家卫电影级质感+腾讯热度破3万+累计破20亿，2024开年国民剧", "platform": "腾讯视频,央视八套"}, {"year": "2024", "title": "边水往事", "score": 7.9, "genres": "悬疑,冒险,剧情", "iqiyi": "无", "note": "抖音主话题57亿+优酷热度破万+全网热搜1119次，悬疑冒险年度爆款", "platform": "优酷"}, {"year": "2024", "title": "长相思 第二季", "score": 6.3, "genres": "古装,奇幻,爱情", "iqiyi": "无", "note": "杨紫IP续作+腾讯热度破30000，虽口碑较第一季下滑但热度仍高", "platform": "腾讯视频(独播)"}, {"year": "2023", "title": "一念关山", "score": 6.4, "genres": "古装,武侠,爱情", "iqiyi": "有", "note": "刘诗诗刘宇宁+爱奇艺热度破万+7200热搜，年末爆款", "platform": "爱奇艺(独播),浙江卫视(跟播)"}, {"year": "2023", "title": "三体", "score": 8.8, "genres": "科幻,悬疑,剧情", "iqiyi": "无", "note": "腾讯首日热度破平台纪录+央视上星，2023科幻剧王", "platform": "腾讯视频,CCTV8"}, {"year": "2023", "title": "中国奇谭", "score": 8.7, "genres": "动画,奇幻", "iqiyi": "无", "note": "B站3.5亿播放+年度现象动画，官媒广泛报道", "platform": "B站,上海美术电影制片厂"}, {"year": "2023", "title": "云之羽", "score": 6.3, "genres": "古装,谍爱,奇幻", "iqiyi": "有", "note": "虞书欣张凌赫+爱奇艺热度9743，18万人豆瓣打分，热度高口碑两极", "platform": "爱奇艺(独播)"}, {"year": "2023", "title": "他是谁", "score": 5.6, "genres": "刑侦,悬疑,犯罪", "iqiyi": "无", "note": "张译刑侦爆款，优酷最快破万+2003热搜，口碑两极但热度极高", "platform": "CCTV-8,优酷(网络独播)"}, {"year": "2023", "title": "仙逆（年番）", "score": null, "genres": "动画,3D玄幻,小说改,逆袭", "iqiyi": "无", "note": "2024-2026腾讯最大黑马，年番播放全网第二、Q1断层领跑", "platform": "腾讯视频独家"}, {"year": "2023", "title": "去有风的地方", "score": 8.8, "genres": "剧情,爱情,治愈", "iqiyi": "无", "note": "抖音首个破百亿剧集+带火大理文旅，现象级治愈剧", "platform": "湖南卫视,芒果TV"}, {"year": "2023", "title": "宁安如梦", "score": 6.8, "genres": "古装,爱情", "iqiyi": "有", "note": "爱奇艺2023热度第三（峰值10310），暑期古偶爆款", "platform": "爱奇艺"}, {"year": "2023", "title": "尘封十三载", "score": 8.0, "genres": "刑侦,悬疑,犯罪", "iqiyi": "有", "note": "陈晓陈建斌+豆瓣8.0，爱奇艺迷雾剧场口碑爆款", "platform": "爱奇艺(迷雾剧场独播)"}, {"year": "2023", "title": "平凡之路", "score": 7.2, "genres": "都市,职场,律政,轻喜剧", "iqiyi": "无", "note": "用户点名剧，豆瓣7.2万人评分+官媒报道，热度确凿", "platform": "CCTV-8,腾讯视频(全网独播)"}, {"year": "2023", "title": "显微镜下的大明之丝绢案", "score": 7.9, "genres": "古装,悬疑,剧情", "iqiyi": "有", "note": "马伯庸IP+豆瓣7.9，爱奇艺独播古装口碑剧", "platform": "爱奇艺(独播),北京卫视(跟播)"}, {"year": "2023", "title": "沧元图（第一季 / 第二季·东宁府番外）", "score": null, "genres": "动画,3D玄幻,国风水墨,小说改", "iqiyi": "无", "note": "优酷新国风动漫标杆，2023口碑黑马，预约252万", "platform": "优酷独播"}, {"year": "2023", "title": "漫长的季节", "score": 9.4, "genres": "剧情,悬疑,家庭", "iqiyi": "无", "note": "豆瓣9.4近八年国产剧最高+全网热搜1180+，年度口碑剧王", "platform": "腾讯视频"}, {"year": "2023", "title": "狂飙", "score": 8.5, "genres": "犯罪,警匪,剧情", "iqiyi": "有", "note": "2023超级现象剧，抖音约550亿播放+爱奇艺热度破平台历史纪录", "platform": "爱奇艺,CCTV8"}, {"year": "2023", "title": "繁城之下", "score": 8.5, "genres": "古装,悬疑,犯罪", "iqiyi": "无", "note": "白宇帆宁理古装悬疑+豆瓣8.5，年度口碑之作", "platform": "腾讯视频(X剧场独播)"}, {"year": "2023", "title": "莲花楼", "score": 8.5, "genres": "古装,武侠,悬疑", "iqiyi": "有", "note": "爱奇艺破万剧+抖音话题破百亿，暑期武侠爆款", "platform": "爱奇艺"}, {"year": "2023", "title": "镇魂街（第三季）", "score": null, "genres": "动画,2D热血,奇幻,漫改", "iqiyi": "无", "note": "B站经典热血漫改，系列千万追番、第三季3.2亿播放", "platform": "哔哩哔哩(B站)"}, {"year": "2023", "title": "长相思 第一季", "score": 7.8, "genres": "古装,爱情,奇幻", "iqiyi": "无", "note": "腾讯2023年度剧王，站内热度33144创年冠", "platform": "腾讯视频"}, {"year": "2023", "title": "长风渡", "score": 6.5, "genres": "古装,爱情,喜剧", "iqiyi": "有", "note": "爱奇艺破万剧+抖音132亿，云合年榜前十", "platform": "爱奇艺,CCTV8"}, {"year": "2023", "title": "鹊刀门传奇", "score": 8.1, "genres": "古装,武侠,喜剧", "iqiyi": "无", "note": "赵本山武侠喜剧+腾讯热度25000+豆瓣8.1，暑期爆款", "platform": "腾讯视频(独播)"}, {"year": "2023", "title": "黑暗荣耀 (The Glory)", "score": null, "genres": "剧情,悬疑", "iqiyi": "无", "note": "Netflix全球非英语剧第一+微博29.7亿，2023引进剧现象级", "platform": "Netflix"}, {"year": "2022", "title": "人世间", "score": 8.4, "genres": "剧情,年代,现实", "iqiyi": "有", "note": "2022开年全民剧王，播放/收视/抖音声量三料第一，证据充分", "platform": "央视CCTV-1,爱奇艺（网络独播）"}, {"year": "2022", "title": "卿卿日常", "score": 7.2, "genres": "喜剧,古装,爱情", "iqiyi": "有", "note": "猫眼喜剧年冠+爱奇艺热度破万，暖冬爆款", "platform": "爱奇艺（独播）"}, {"year": "2022", "title": "县委大院", "score": 6.8, "genres": "主旋律,现实,剧情", "iqiyi": "有", "note": "胡歌正午阳光+央视一套首播破2%，年度压轴大剧", "platform": "CCTV-1,浙江卫视,北京卫视,东方卫视,腾讯视频,咪咕视频,爱奇艺"}, {"year": "2022", "title": "幸福到万家", "score": 7.1, "genres": "农村,现实,剧情", "iqiyi": "无", "note": "CVB双台年冠+21万人豆瓣，郑晓龙赵丽颖现实题材大剧", "platform": "北京卫视,东方卫视,优酷(网络独播)"}, {"year": "2022", "title": "底线", "score": 7.4, "genres": "法治,剧情,犯罪", "iqiyi": "有", "note": "首部法院题材大剧+豆瓣7.4，湖南卫视+爱奇艺播出", "platform": "湖南卫视,芒果TV,爱奇艺"}, {"year": "2022", "title": "庭外", "score": 7.6, "genres": "司法,悬疑,犯罪", "iqiyi": "无", "note": "夏雨罗晋AB剧+豆瓣7.6年度悬疑最高分", "platform": "优酷(独播)"}, {"year": "2022", "title": "开端", "score": 7.9, "genres": "悬疑,奇幻,都市,时间循环", "iqiyi": "无", "note": "2022开年第一爆剧，播放30亿+微博热搜刷屏", "platform": "腾讯视频（独播，正午阳光）"}, {"year": "2022", "title": "斗破苍穹（年番）", "score": null, "genres": "动画,3D玄幻,小说改,冒险", "iqiyi": "无", "note": "腾讯年番头部，2024年播放冠军，热度证据充分", "platform": "腾讯视频独家"}, {"year": "2022", "title": "星汉灿烂·月升沧海", "score": 7.7, "genres": "古装,爱情,传奇", "iqiyi": "无", "note": "云合播放量年度第二，暑期S级古偶，大众热度硬指标达标", "platform": "腾讯视频（独播）"}, {"year": "2022", "title": "梦华录", "score": 7.9, "genres": "古装,爱情,励志", "iqiyi": "无", "note": "播放破40亿+登上腾讯财报，6月古偶爆款", "platform": "腾讯视频（独播）"}, {"year": "2022", "title": "沉香如屑·沉香重华", "score": 5.9, "genres": "古装,仙侠,爱情", "iqiyi": "无", "note": "优酷暑期热度破万、猫眼日冠，但豆瓣5.9口碑两极，热度硬指标达标故保留", "platform": "优酷（独播）"}, {"year": "2022", "title": "猎罪图鉴", "score": 7.6, "genres": "悬疑,犯罪", "iqiyi": "有", "note": "播放破10亿+云合集均第二，模拟画像悬疑黑马爆款", "platform": "爱奇艺,腾讯视频（双平台）"}, {"year": "2022", "title": "罚罪", "score": 7.0, "genres": "都市,罪案,悬疑,犯罪", "iqiyi": "有", "note": "全端播放80亿+云合年榜第6，暑期扫黑爆款", "platform": "爱奇艺（独播）"}, {"year": "2022", "title": "苍兰诀", "score": 8.2, "genres": "古装,奇幻,仙侠,爱情", "iqiyi": "有", "note": "抖音话题180亿+爱奇艺热度破万，暑期仙侠现象级爆款", "platform": "爱奇艺（独播）"}, {"year": "2022", "title": "警察荣誉", "score": 8.5, "genres": "都市,警匪,现实", "iqiyi": "有", "note": "豆瓣2022华语剧No.1+爱奇艺热度9068，口碑热度双爆", "platform": "CCTV-8,爱奇艺"}, {"year": "2022", "title": "风吹半夏", "score": 8.2, "genres": "剧情,爱情,年代,商战", "iqiyi": "有", "note": "爱奇艺热度破9500+猫眼年度热度前三，年末口碑爆款", "platform": "爱奇艺（独播）"}, {"year": "2021", "title": "乔家的儿女", "score": 7.7, "genres": "都市,家庭", "iqiyi": "无", "note": "腾讯14亿播放+抖音热搜116次话题50亿，现实家庭剧出圈爆款", "platform": "腾讯视频,浙江卫视,江苏卫视"}, {"year": "2021", "title": "你是我的荣耀", "score": 6.9, "genres": "都市,爱情", "iqiyi": "无", "note": "顶流主演+开播4小时破亿，2021暑期都市爱情话题爆款", "platform": "腾讯视频"}, {"year": "2021", "title": "功勋", "score": 9.0, "genres": "现实,传记,主旋律,单元剧", "iqiyi": "有", "note": "豆瓣9.0+CVB收视领跑+三网播放3亿，主旋律爆款", "platform": "北京卫视,东方卫视,浙江卫视,江苏卫视,优酷,爱奇艺,腾讯视频"}, {"year": "2021", "title": "叛逆者", "score": 7.7, "genres": "剧情,谍战,爱情", "iqiyi": "有", "note": "爱奇艺热度9100+收视20天第一+飞天奖获奖，谍战剧口碑热度双收", "platform": "CCTV-8,爱奇艺"}, {"year": "2021", "title": "司藤", "score": 6.9, "genres": "奇幻,悬爱,都市", "iqiyi": "无", "note": "播放超10亿+12万人豆瓣评分，年度黑马", "platform": "优酷,腾讯视频,爱奇艺"}, {"year": "2021", "title": "周生如故", "score": 7.3, "genres": "古装,爱情,悲剧", "iqiyi": "有", "note": "爱奇艺独播古装虐剧，热度破8000+豆瓣7.3", "platform": "爱奇艺(独播),安徽卫视(跟播)"}, {"year": "2021", "title": "完美世界（年番）", "score": null, "genres": "动画,3D玄幻,小说改,冒险", "iqiyi": "无", "note": "250亿+播放腾讯年番，长期霸榜经典畅销榜", "platform": "腾讯视频独家"}, {"year": "2021", "title": "小敏家", "score": 6.0, "genres": "家庭,伦理,现实", "iqiyi": "无", "note": "周迅黄磊三搭+四网收视第一+375热搜，现实题材热度高", "platform": "湖南卫视,优酷(全网独播)"}, {"year": "2021", "title": "山海情", "score": 9.2, "genres": "剧情,农村,励志", "iqiyi": "有", "note": "豆瓣9.2+微博热搜登顶+青年观众十大国产剧，口碑与声量双爆", "platform": "东方卫视,北京卫视,优酷,爱奇艺"}, {"year": "2021", "title": "御赐小仵作", "score": 8.0, "genres": "古装,探案,甜爽,喜剧", "iqiyi": "无", "note": "豆瓣8.0+播放近9亿，口碑逆袭年度黑马", "platform": "腾讯视频(独播)"}, {"year": "2021", "title": "扫黑风暴", "score": 7.1, "genres": "剧情,犯罪", "iqiyi": "有", "note": "暑期档播放破40亿+三平台联播+青年观众十大，犯罪题材爆款", "platform": "东方卫视,北京卫视,腾讯视频,爱奇艺,优酷"}, {"year": "2021", "title": "时光代理人 第一季", "score": 8.1, "genres": "动画", "iqiyi": "无", "note": "B站播放破1.8亿+豆瓣8.1+出海全球动画榜前20，2021国漫口碑爆款", "platform": "哔哩哔哩"}, {"year": "2021", "title": "枕刀歌（第一季 / 第三季）", "score": null, "genres": "动画,2D武侠,古风,原创", "iqiyi": "无", "note": "高口碑武侠短片，但播放量不足4000万，大众热度偏低", "platform": "哔哩哔哩(B站)（首季曾在腾讯视频）"}, {"year": "2021", "title": "画江湖之不良人（第4/5/6季）", "score": null, "genres": "动画,3D武侠,动作,原创", "iqiyi": "无", "note": "武侠国漫顶流，第6季豆瓣9.4高分破圈，热度可信", "platform": "腾讯视频"}, {"year": "2021", "title": "眷思量（第一季 / 第二季）", "score": null, "genres": "动画,3D古风,奇幻,原创", "iqiyi": "无", "note": "原创小众口碑作，4亿播放量不及头部年番，大众热度中等", "platform": "腾讯视频独播"}, {"year": "2021", "title": "觉醒年代", "score": 9.3, "genres": "剧情,历史", "iqiyi": "有", "note": "豆瓣9.3+央视收视第一+青年观众十大第一，全民现象级主旋律剧", "platform": "CCTV-1,优酷,爱奇艺"}, {"year": "2021", "title": "谁是凶手", "score": 6.2, "genres": "悬疑,犯罪,刑侦", "iqiyi": "有", "note": "赵丽颖主演迷雾剧场，23万人豆瓣评分，热度高口碑两极", "platform": "爱奇艺(迷雾剧场独播)"}, {"year": "2021", "title": "赘婿", "score": 6.3, "genres": "古装,喜剧", "iqiyi": "有", "note": "爱奇艺热度破万10745+1.8亿台设备+900热搜，开年古装喜剧爆款", "platform": "爱奇艺"}, {"year": "2021", "title": "雪中悍刀行", "score": 5.9, "genres": "古装,武侠", "iqiyi": "无", "note": "腾讯播放破70亿+28天日冠+央视收视，男频IP大剧热度极高（口碑两极）", "platform": "CCTV-8,腾讯视频"}, {"year": "2021", "title": "风起洛阳", "score": 6.4, "genres": "古装,悬疑,权谋", "iqiyi": "无", "note": "黄轩王一博宋茜S+古装，8万人开分，流量热度确凿", "platform": "优酷(独播)"}, {"year": "2021", "title": "鱿鱼游戏 第一季", "score": 7.7, "genres": "悬疑,惊悚", "iqiyi": "无", "note": "Netflix全球1.11亿观看+史上最受欢迎非英语剧，2021全球现象级引进剧", "platform": "Netflix"}, {"year": "2020", "title": "一念永恒（第一季 / 第二季 / 年番）", "score": null, "genres": "动画,2D搞笑,修仙,小说改", "iqiyi": "无", "note": "腾讯2D年番代表，17亿播放且口碑稳定", "platform": "腾讯视频"}, {"year": "2020", "title": "三十而已", "score": null, "genres": "都市,女性,现实", "iqiyi": "无", "note": "2020年播放量与卫视收视双料冠军，全民话题剧", "platform": "腾讯视频（独播）,东方卫视"}, {"year": "2020", "title": "二十不惑", "score": 6.3, "genres": "青春,都市,爱情", "iqiyi": "有", "note": "爱奇艺2020暑期档第一+89个热搜，平台官方数据", "platform": "湖南卫视,爱奇艺"}, {"year": "2020", "title": "仙王的日常生活（第二/三/四季）", "score": null, "genres": "动画,2D搞笑,日常,小说改", "iqiyi": "无", "note": "千万追番、2.7亿播放的长期连载搞笑番，大众热度在", "platform": "哔哩哔哩(B站)独家"}, {"year": "2020", "title": "以家人之名", "score": 6.8, "genres": "都市,家庭,青春", "iqiyi": "无", "note": "上星收视峰值破3，芒果TV四十亿级播放，暑期档爆款", "platform": "湖南卫视,芒果TV"}, {"year": "2020", "title": "传闻中的陈芊芊", "score": 7.3, "genres": "古装,喜剧,爱情", "iqiyi": "无", "note": "小成本反套路甜宠黑马，播放21.5亿、话题54亿助赵露出圈", "platform": "腾讯视频"}, {"year": "2020", "title": "凡人修仙传（年番：星海飞驰/外海风云/重返天南/慕兰之战等篇章）", "score": null, "genres": "动画,3D玄幻,小说改,热血", "iqiyi": "无", "note": "B站国创一哥，播放/追番/豆瓣三料登顶，热度证据充分", "platform": "哔哩哔哩(B站)独家"}, {"year": "2020", "title": "后翼弃兵", "score": null, "genres": "剧情,引进（美国）,迷你剧", "iqiyi": "无", "note": "2020全球现象级引进迷你剧，豆瓣9分级高热讨论（非国产，按引进纳入）", "platform": "Netflix"}, {"year": "2020", "title": "吞噬星空（年番）", "score": null, "genres": "动画,3D科幻,小说改,战斗", "iqiyi": "无", "note": "百亿播放级腾讯年番，长期位列经典畅销榜前列", "platform": "腾讯视频独家"}, {"year": "2020", "title": "大江大河2", "score": null, "genres": "年代,现实,剧情", "iqiyi": "有", "note": "年末大剧，双台收视破2+豆瓣年度口碑冠军", "platform": "东方卫视,浙江卫视,优酷,爱奇艺,腾讯视频"}, {"year": "2020", "title": "天官赐福（第一季）", "score": null, "genres": "动画,2D古风,玄幻,小说改", "iqiyi": "无", "note": "2020年B站现象级国创，最快破亿、海外热搜30余次", "platform": "哔哩哔哩(B站)出品/独播"}, {"year": "2020", "title": "天宝伏妖录（第一季 / 第二季）", "score": null, "genres": "动画,3D古风,玄幻,小说改", "iqiyi": "无", "note": "B站古风3D口碑作，但6000万播放、180万追番属中等体量", "platform": "哔哩哔哩(B站)出品"}, {"year": "2020", "title": "想见你", "score": 9.2, "genres": "悬疑,爱情,奇幻", "iqiyi": "有", "note": "2020年初现象级台剧，豆瓣9.2华语剧王（台湾首播年份为2019，按内地2020热度纳入）", "platform": "台湾中视（2019）,腾讯视频,爱奇艺（内地2019年底上线）"}, {"year": "2020", "title": "我是余欢水", "score": null, "genres": "都市,喜剧,现实", "iqiyi": "有", "note": "12集现实题材短剧黑马，全网播放超10亿、话题阅读10亿+", "platform": "爱奇艺"}, {"year": "2020", "title": "有翡", "score": 5.6, "genres": "武侠,古装,剧情", "iqiyi": "无", "note": "评分不高但顶流热度与网播量爆，符合大众主流热度视角", "platform": "腾讯视频"}, {"year": "2020", "title": "棋魂", "score": 8.4, "genres": "青春,奇幻,运动", "iqiyi": "有", "note": "低开高走口碑逆袭，豆瓣8.4后期网播进前三，爱奇艺独播可直接看", "platform": "爱奇艺"}, {"year": "2020", "title": "沉默的真相", "score": null, "genres": "悬疑,犯罪,剧情", "iqiyi": "有", "note": "迷雾剧场口碑与热度封顶之作，豆瓣9分级全民讨论", "platform": "爱奇艺（迷雾剧场）"}, {"year": "2020", "title": "琉璃", "score": null, "genres": "古装,仙侠,爱情", "iqiyi": "无", "note": "暑期仙侠爆款，多网播热度榜登顶，优酷剧集年冠", "platform": "优酷,芒果TV"}, {"year": "2020", "title": "穿越火线", "score": 7.9, "genres": "电竞,青春,热血", "iqiyi": "无", "note": "播放3.8亿+豆瓣7.9，电竞题材口碑热度双高", "platform": "腾讯视频(全网独播)"}, {"year": "2020", "title": "隐秘的角落", "score": null, "genres": "悬疑,犯罪,剧情", "iqiyi": "有", "note": "全民爆款悬疑短剧，216个微博热搜带动'中剧崛起'讨论", "platform": "爱奇艺（迷雾剧场）"}, {"year": "2020", "title": "隐秘而伟大", "score": null, "genres": "年代,谍战,剧情", "iqiyi": "无", "note": "央视八套连续25天收视第一，话题阅读203亿的新主流破圈剧", "platform": "CCTV-8,腾讯视频,芒果TV"}, {"year": "2020", "title": "雾山五行", "score": null, "genres": "动画,动作,玄幻", "iqiyi": "无", "note": "动画圈层口碑爆款，但仅3集、声量集中于B站/动漫社区，大众主流热度证据有限", "platform": "哔哩哔哩（B站）"}, {"year": "2019", "title": "亲爱的，热爱的", "score": 6.7, "genres": "都市,爱情,青春", "iqiyi": "有", "note": "抖音出圈+爱奇艺热度9638+双台收视2.3%，2019暑期现偶爆款，爱奇艺有正片", "platform": "东方卫视,浙江卫视,爱奇艺,腾讯视频"}, {"year": "2019", "title": "全职高手", "score": 7.3, "genres": "青春,电竞,励志", "iqiyi": "无", "note": "腾讯播放破30亿+国内外数据榜多次第一，电竞男频头部剧，但正片腾讯独播，爱奇艺无正片", "platform": "腾讯视频（独播）"}, {"year": "2019", "title": "大明风华", "score": 6.0, "genres": "古装,历史,剧情", "iqiyi": "无", "note": "卫视黄金档古装大剧+腾讯/人民网报道，话题度确凿", "platform": "湖南卫视,优酷(全网独播)"}, {"year": "2019", "title": "小欢喜", "score": 8.2, "genres": "都市,家庭", "iqiyi": "有", "note": "双台全年收视第一+爱奇艺热度17天冠+抖音官号点赞年冠，口碑收视双丰收，爱奇艺有正片", "platform": "东方卫视,浙江卫视,爱奇艺,腾讯视频"}, {"year": "2019", "title": "少年派", "score": 6.5, "genres": "都市,家庭,青春", "iqiyi": "有", "note": "CSM55城峰值1.97%、2019上半年卫视收视第一，高考家庭全民追剧，爱奇艺有正片", "platform": "湖南卫视,爱奇艺,腾讯视频,芒果TV,优酷"}, {"year": "2019", "title": "庆余年 第一季", "score": 7.9, "genres": "古装,剧情,喜剧", "iqiyi": "有", "note": "国内播放超160亿、豆瓣超百万人打分，跨年国民级热剧，且爱奇艺有正片", "platform": "腾讯视频,爱奇艺"}, {"year": "2019", "title": "灵笼（第一季 / 第二季）", "score": null, "genres": "动画,3D科幻,末世,原创", "iqiyi": "无", "note": "B站原创科幻霸权番，11.5亿播放+千万追番，口碑热度双高", "platform": "哔哩哔哩(B站)独家"}, {"year": "2019", "title": "破冰行动", "score": 6.8, "genres": "犯罪,悬疑,警匪", "iqiyi": "有", "note": "爱奇艺风云榜首位+微博话题9亿+央视全国网收视1.46%，缉毒题材爆款，爱奇艺自制有正片", "platform": "爱奇艺,CCTV-8"}, {"year": "2019", "title": "都挺好", "score": 7.7, "genres": "都市,家庭,剧情", "iqiyi": "有", "note": "双台收视破2+日均4次热搜+网播日超2亿，2019一季度现象级现实剧，爱奇艺有正片", "platform": "浙江卫视,江苏卫视,爱奇艺,优酷,腾讯视频"}, {"year": "2019", "title": "锦衣之下", "score": 7.5, "genres": "古装,悬疑,爱情", "iqiyi": "有", "note": "云合48亿播放+年度第三，古装黑马热度证据充分", "platform": "芒果TV,爱奇艺"}, {"year": "2019", "title": "长安十二时辰", "score": 8.1, "genres": "古装,悬疑,剧情", "iqiyi": "无", "note": "猫眼年度峰值热度9775.79+多圈层破圈讨论，但正片优酷独播，爱奇艺无正片", "platform": "优酷（独播）"}, {"year": "2019", "title": "陈情令", "score": 7.7, "genres": "古装,仙侠,剧情", "iqiyi": "无", "note": "腾讯独播网剧播放年冠+微博话题280亿+人民网现象级报道，大众声量顶级", "platform": "腾讯视频（独播）"}, {"year": "2019", "title": "鹤唳华亭", "score": 7.1, "genres": "古装,爱情,权谋", "iqiyi": "无", "note": "豆瓣近10万人评价+人民网报道，古装权谋热度证据充分", "platform": "优酷(全网独播)"}, {"year": "2018", "title": "和平饭店", "score": 7.8, "genres": "剧情,悬疑,谍战", "iqiyi": "有", "note": "豆瓣2018高分榜第4+30亿网播+爱奇艺有正片", "platform": "浙江卫视"}, {"year": "2018", "title": "大江大河", "score": 8.8, "genres": "剧情,年代,改革", "iqiyi": "有", "note": "豆瓣2018年度口碑第一+正午阳光献礼剧+爱奇艺有正片", "platform": "东方卫视,北京卫视,爱奇艺(网络)"}, {"year": "2018", "title": "天盛长歌", "score": 8.1, "genres": "爱情,古装,权谋", "iqiyi": "有", "note": "豆瓣2018高分榜第2+陈坤倪妮大制作，证据充分", "platform": "湖南卫视,芒果TV/爱奇艺(网络)"}, {"year": "2018", "title": "如懿传", "score": 7.5, "genres": "剧情,古装,宫斗", "iqiyi": "无", "note": "周迅霍建华大制作宫斗+豆瓣回升至7.5+爱奇艺现有正片", "platform": "腾讯视频(网剧),央视八套(后上星)"}, {"year": "2018", "title": "少年歌行（动画版：风花雪月篇 / 海外仙山篇）", "score": null, "genres": "动画,3D武侠,古风,小说改", "iqiyi": "无", "note": "B站武侠国漫长IP，多篇章连载+真人剧破圈，有一定大众热度", "platform": "哔哩哔哩(B站)"}, {"year": "2018", "title": "延禧攻略", "score": 7.1, "genres": "剧情,爱情,古装,宫斗", "iqiyi": "有", "note": "全球搜索第一+爱奇艺独播现象级爆款", "platform": "爱奇艺(网剧)"}, {"year": "2018", "title": "悍城", "score": 7.2, "genres": "剧情,动作,悬疑,罪案", "iqiyi": "有", "note": "爱奇艺奇悬疑剧场开山作+独播自制正片确凿", "platform": "爱奇艺(网剧)"}, {"year": "2018", "title": "斗罗大陆（动画年番，2023年第一部完结）", "score": null, "genres": "动画,3D玄幻,小说改,热血", "iqiyi": "无", "note": "国漫播放量天花板，600亿级播放，国民度极高", "platform": "腾讯视频独家"}, {"year": "2018", "title": "正阳门下小女人", "score": 7.6, "genres": "剧情,年代,家庭", "iqiyi": "有", "note": "白玉兰视后+年代口碑热播剧+爱奇艺有正片", "platform": "央视八套,北京卫视"}, {"year": "2018", "title": "知否知否应是绿肥红瘦", "score": 8.0, "genres": "剧情,爱情,古装,家庭", "iqiyi": "无", "note": "豆瓣8.0+正午阳光赵丽颖冯绍峰大爆古偶，口碑热度确凿", "platform": "湖南卫视,腾讯视频(网络)"}, {"year": "2018", "title": "镇魂", "score": 6.4, "genres": "剧情,悬疑,奇幻", "iqiyi": "无", "note": "粉丝热度确凿，但豆瓣条目链接未核实到、正片在优酷", "platform": "优酷(网剧)"}, {"year": "2018", "title": "香蜜沉沉烬如霜", "score": 7.8, "genres": "爱情,奇幻,古装", "iqiyi": "有", "note": "2018现象级仙侠爆款+近60万人打分+爱奇艺有正片", "platform": "江苏卫视,腾讯视频(网络)"}, {"year": "2017", "title": "三生三世十里桃花", "score": 6.6, "genres": "剧情,爱情,奇幻,古装", "iqiyi": "有", "note": "首部500亿播放剧+开年玄幻大爆，国民度极高", "platform": "东方卫视,浙江卫视,优酷/腾讯(网络)"}, {"year": "2017", "title": "人民的名义", "score": 8.3, "genres": "剧情,犯罪,悬疑,反腐", "iqiyi": "无", "note": "年度剧王+收视破8+210亿播放，证据极充分", "platform": "湖南卫视,芒果TV(网络)"}, {"year": "2017", "title": "大军师司马懿之军师联盟", "score": 8.2, "genres": "剧情,历史,古装,战争", "iqiyi": "无", "note": "高制作高口碑历史剧+豆瓣8.2+爱奇艺有正片", "platform": "江苏卫视,优酷(网络)"}, {"year": "2017", "title": "我的前半生", "score": 6.4, "genres": "剧情,家庭,都市", "iqiyi": "有", "note": "年度收视前十+全民话题，证据充分", "platform": "东方卫视,北京卫视"}, {"year": "2017", "title": "楚乔传", "score": 5.4, "genres": "剧情,爱情,古装,动作", "iqiyi": "有", "note": "419亿播放年度剧王级热度(豆瓣分低但声量极大)", "platform": "湖南卫视,爱奇艺/腾讯/优酷(网络)"}, {"year": "2017", "title": "白夜追凶", "score": 8.9, "genres": "剧情,犯罪,悬疑", "iqiyi": "无", "note": "豆瓣8.9+46.8亿网播+年度网剧剧王，证据充分", "platform": "优酷(网剧)"}, {"year": "2017", "title": "白鹿原", "score": 8.8, "genres": "剧情,年代", "iqiyi": "无", "note": "豆瓣2017高分大陆剧第一，口碑证据充分", "platform": "江苏卫视,浙江卫视"}, {"year": "2017", "title": "那年花开月正圆", "score": 7.2, "genres": "剧情,古装,年代,商战", "iqiyi": "有", "note": "年度收视第二+106亿网播，国民热度确凿", "platform": "东方卫视,江苏卫视"}, {"year": "2017", "title": "风筝", "score": 8.8, "genres": "剧情,悬疑,谍战", "iqiyi": "有", "note": "豆瓣8.8谍战口碑巅峰+爱奇艺有正片", "platform": "北京卫视"}, {"year": "2016", "title": "从前有座灵剑山（动画版）", "score": null, "genres": "动画,搞笑修仙,小说改", "iqiyi": "无", "note": "动画为2016年日本团队制作、2019热度主要来自真人剧，动画本身非近年主打", "platform": "哔哩哔哩(B站)/腾讯动漫"}, {"year": "2016", "title": "余罪 第一季", "score": 8.4, "genres": "剧情,犯罪,悬疑", "iqiyi": "无", "note": "口碑热度确凿，但爱奇艺现行正片页未检出、疑似下架", "platform": "爱奇艺(网剧)"}, {"year": "2016", "title": "欢乐颂", "score": 7.5, "genres": "剧情,爱情,都市", "iqiyi": "有", "note": "年度社会话题剧+豆瓣年度榜+爱奇艺有正片", "platform": "东方卫视,浙江卫视"}, {"year": "2016", "title": "法医秦明", "score": 7.0, "genres": "剧情,悬疑,刑侦", "iqiyi": "无", "note": "人民网现象级定性+12亿播放，证据充分(正片在搜狐)", "platform": "搜狐视频(网剧)"}, {"year": "2016", "title": "锦绣未央", "score": 4.9, "genres": "剧情,古装,爱情", "iqiyi": "有", "note": "225亿播放+年度收视前十，国民热度确凿(口碑差但热度高)", "platform": "东方卫视,北京卫视"}, {"year": "2015", "title": "伪装者", "score": 8.6, "genres": "剧情,悬疑,谍战", "iqiyi": "有", "note": "豆瓣年度高分+国民谍战剧+爱奇艺独播", "platform": "湖南卫视,爱奇艺(网络)"}, {"year": "2015", "title": "琅琊榜", "score": 9.4, "genres": "剧情,古装,权谋", "iqiyi": "有", "note": "豆瓣年度第一+百亿播放+爱奇艺独播，证据充分", "platform": "北京卫视,东方卫视,爱奇艺(网络)"}, {"year": "2015", "title": "芈月传", "score": 6.2, "genres": "剧情,古装,历史", "iqiyi": "有", "note": "2015收视年冠+郑晓龙孙俪大作，虽豆瓣分低但国民度极高", "platform": "北京卫视,东方卫视,乐视/腾讯(网络)"}, {"year": "2015", "title": "花千骨", "score": 7.5, "genres": "剧情,爱情,奇幻,古装,仙侠", "iqiyi": "有", "note": "周播剧收视纪录+现象级IP+爱奇艺有正片", "platform": "湖南卫视(钻石独播剧场)"}, {"year": "2014", "title": "北平无战事", "score": 8.9, "genres": "剧情,战争,历史", "iqiyi": "有", "note": "豆瓣9万人评分8.9，孔笙+刘和平黄金班底，证据充分", "platform": "北京卫视,天津卫视,爱奇艺"}, {"year": "2014", "title": "古剑奇谭", "score": 7.4, "genres": "剧情,奇幻,武侠,古装,仙侠", "iqiyi": "无", "note": "2014年暑假现象级流量剧，收视份额18.35%，证据充分", "platform": "湖南卫视钻石独播剧场,腾讯视频,芒果TV"}, {"year": "2014", "title": "大丈夫", "score": 7.1, "genres": "剧情,爱情,家庭", "iqiyi": "有", "note": "2014年话题都市剧，王志文/李小冉/俞飞鸿主演，证据充分", "platform": "浙江/北京/东方/安徽四大卫视,爱奇艺"}, {"year": "2014", "title": "战长沙", "score": 9.1, "genres": "剧情,历史,战争", "iqiyi": "有", "note": "豆瓣2014年度大陆剧冠军，33万人评分9.1，证据充分", "platform": "央视八套,爱奇艺（独播）"}, {"year": "2014", "title": "父母爱情", "score": 9.4, "genres": "剧情,爱情,家庭", "iqiyi": "有", "note": "豆瓣9.4分近40万人评价，孔笙导演家庭神作，证据充分", "platform": "央视一套,山东卫视,爱奇艺"}, {"year": "2014", "title": "离婚律师", "score": 7.2, "genres": "剧情,爱情,都市,律政", "iqiyi": "无", "note": "豆瓣2014年度榜单在列，5.4万人评分，证据充分", "platform": "江苏/浙江/天津/深圳四大卫视,腾讯视频"}, {"year": "2014", "title": "红色", "score": 9.1, "genres": "剧情,战争,悬疑,谍战", "iqiyi": "有", "note": "豆瓣9.1分，中新网认证年度良心好剧，证据充分", "platform": "云南经济生活频道,山东/北京/湖北/重庆卫视,爱奇艺"}, {"year": "2014", "title": "红高粱", "score": 8.3, "genres": "剧情,历史,爱情,战争", "iqiyi": "无", "note": "2014年网络播放量3周破25亿，四大卫视破1，证据充分", "platform": "山东/北京/浙江/东方四大卫视,腾讯视频"}, {"year": "2013", "title": "咱们结婚吧", "score": 7.4, "genres": "剧情,爱情,家庭", "iqiyi": "无", "note": "2013年全国收视冠军，央视+湖南卫视双台破1，证据充分", "platform": "央视一套,湖南卫视,西瓜视频（网络）"}, {"year": "2013", "title": "大秦帝国之纵横", "score": 9.3, "genres": "剧情,历史,古装", "iqiyi": "有", "note": "豆瓣9.3分历史剧巅峰，富大龙演技封神，证据充分", "platform": "央视一套,爱奇艺"}, {"year": "2013", "title": "小爸爸", "score": 6.9, "genres": "剧情,喜剧,家庭", "iqiyi": "无", "note": "2013年收视冠军+网络破4亿，文章导演处女作，证据充分", "platform": "深圳/浙江/陕西/四大卫视,优酷土豆"}, {"year": "2013", "title": "打狗棍", "score": 7.5, "genres": "剧情,战争,历史,军旅", "iqiyi": "有", "note": "2013年国产剧收视新高，70集郭靖宇传奇剧，证据充分", "platform": "江苏城市频道,北京/天津/安徽/重庆四大卫视,爱奇艺"}, {"year": "2013", "title": "舞乐传奇", "score": 8.7, "genres": "剧情,历史,悬疑,古装", "iqiyi": "有", "note": "豆瓣8.7分口碑神作，于荣光导演，证据充分", "platform": "央视八套,爱奇艺"}, {"year": "2013", "title": "陆贞传奇", "score": 7.8, "genres": "剧情,爱情,古装,宫廷", "iqiyi": "无", "note": "2013年湖南卫视收视冠军，赵丽颖成名作，证据充分", "platform": "湖南卫视金鹰独播剧场,爱奇艺"}, {"year": "2012", "title": "北京爱情故事", "score": 7.4, "genres": "剧情,爱情,都市", "iqiyi": "有", "note": "陈思诚导演处女作，北漂话题剧，证据充分", "platform": "浙江卫视等,爱奇艺（独播）"}, {"year": "2012", "title": "心术", "score": 8.3, "genres": "剧情,医疗,爱情", "iqiyi": "有", "note": "首部医疗话题剧，豆瓣5.3万人评分8.3，证据充分", "platform": "浙江/安徽/东方/天津四大卫视,搜狐视频,爱奇艺（独播）"}, {"year": "2012", "title": "悬崖", "score": 8.4, "genres": "剧情,悬疑,谍战,历史", "iqiyi": "有", "note": "飞天奖获奖谍战剧，豆瓣8.4，证据充分", "platform": "东方卫视等,爱奇艺"}, {"year": "2011", "title": "后宫·甄嬛传", "score": 9.4, "genres": "剧情,古装,宫廷", "iqiyi": "无", "note": "豆瓣93万人评分9.4，国民级神作，证据充分", "platform": "地方台首播,乐视网（网络独播）"}, {"year": "2011", "title": "宫锁心玉", "score": 6.6, "genres": "剧情,古装,穿越,爱情", "iqiyi": "有", "note": "2011年现象级清穿剧，收视连续16天第一，证据充分", "platform": "湖南卫视,爱奇艺"}, {"year": "2011", "title": "步步惊心", "score": 8.4, "genres": "剧情,爱情,古装,穿越", "iqiyi": "有", "note": "豆瓣37万人评分8.4，穿越剧巅峰，证据充分", "platform": "湖南卫视,爱奇艺（未删节版）"}, {"year": "2011", "title": "永不磨灭的番号", "score": 8.9, "genres": "剧情,战争,历史", "iqiyi": "有", "note": "豆瓣8.9分抗战剧经典，黄海波代表作，证据充分", "platform": "北京卫视,深圳卫视,江苏城市频道,爱奇艺"}, {"year": "2010", "title": "黎明之前", "score": 9.2, "genres": "剧情,悬疑,谍战,历史", "iqiyi": "无", "note": "豆瓣9.2分6万人评分，谍战剧经典，证据充分", "platform": "北京/东方/重庆/云南/深圳五大卫视,搜狐视频"}, {"year": "2009", "title": "我的团长我的团", "score": 9.6, "genres": "历史,战争", "iqiyi": "有", "note": "豆瓣9.6/19万+评价、战争剧口碑天花板、爱奇艺43集全", "platform": "北京/东方/江苏等卫视首播,爱奇艺"}, {"year": "2009", "title": "潜伏", "score": 9.5, "genres": "剧情,谍战", "iqiyi": "无", "note": "豆瓣9.5/41万+评价、谍战剧第一、爱奇艺30集全(注：2008底地方台首播，2009上星)", "platform": "天津/山东等地方台2008.12开播，北京/东方/重庆/黑龙江卫视2009上星,爱奇艺"}, {"year": "2008", "title": "闯关东", "score": 9.3, "genres": "剧情,年代", "iqiyi": "有", "note": "豆瓣9.3/12万+评价、飞天金鹰大奖、爱奇艺独播52集全", "platform": "央视一套首播,爱奇艺(独播)"}, {"year": "2007", "title": "大明王朝1566", "score": 9.8, "genres": "剧情,历史,古装", "iqiyi": "无", "note": "豆瓣9.8国产剧天花板/37万+评价；爱奇艺仅解读无原剧证据充分", "platform": "湖南卫视首播,优酷"}, {"year": "2006", "title": "乔家大院", "score": 8.4, "genres": "剧情,传记,商战", "iqiyi": "有", "note": "豆瓣8.4公认经典商战正剧、爱奇艺45集全(评分略低于9分但国民度高)", "platform": "央视首播,爱奇艺"}, {"year": "2006", "title": "士兵突击", "score": 9.5, "genres": "剧情,军旅", "iqiyi": "有", "note": "豆瓣9.5/31万+评价、军旅剧天花板、爱奇艺30集全", "platform": "陕西卫视等首播,爱奇艺"}, {"year": "2006", "title": "武林外传", "score": 9.6, "genres": "喜剧,武侠,古装", "iqiyi": "有", "note": "豆瓣9.6/67万+评价、情景喜剧天花板、爱奇艺独播81集全", "platform": "央视首播,爱奇艺(独播)"}, {"year": "2005", "title": "亮剑", "score": 9.5, "genres": "剧情,战争", "iqiyi": "有", "note": "豆瓣9.5/40万+评价、抗战剧巅峰重播王、爱奇艺30集全", "platform": "央视综合频道首播,爱奇艺,各卫视重播"}, {"year": "2005", "title": "汉武大帝", "score": 9.2, "genres": "剧情,历史,古装", "iqiyi": "无", "note": "豆瓣9.2/7万+评价、收视破7%、爱奇艺有正片专辑", "platform": "央视首播,爱奇艺"}, {"year": "2003", "title": "走向共和", "score": 9.6, "genres": "剧情,历史", "iqiyi": "无", "note": "豆瓣9.6/11万+评价公认神剧；爱奇艺正片缺失证据充分", "platform": "央视首播,哔哩哔哩/央视频"}, {"year": "2001", "title": "大宅门", "score": 9.3, "genres": "剧情,家庭,年代", "iqiyi": "有", "note": "豆瓣9.3/17万+评价、央视年度收视冠军、爱奇艺有正片分集页", "platform": "央视首播,爱奇艺,优酷"}, {"year": "2001", "title": "康熙王朝", "score": 9.1, "genres": "剧情,传记,历史", "iqiyi": "有", "note": "豆瓣9.1/20万+评价、国民级历史剧、爱奇艺46集全", "platform": "央视首播,爱奇艺"}, {"year": "1999", "title": "雍正王朝", "score": 9.4, "genres": "剧情,历史,古装", "iqiyi": "有", "note": "豆瓣9.4/16万+评价、二月河IP正剧巅峰、爱奇艺44集全", "platform": "央视首播,爱奇艺"}, {"year": "1998", "title": "水浒传", "score": 9.1, "genres": "剧情,历史,古装", "iqiyi": "有", "note": "豆瓣9.1/10万+评价、央视四大名著收官作、爱奇艺43集全", "platform": "央视首播,爱奇艺,优酷,腾讯视频"}, {"year": "1994", "title": "三国演义", "score": 9.6, "genres": "剧情,历史,战争", "iqiyi": "有", "note": "豆瓣9.6/19万+评价、四大名著正剧标杆、爱奇艺84集全", "platform": "央视首播,爱奇艺"}, {"year": "1987", "title": "红楼梦", "score": 9.7, "genres": "剧情,爱情,古装", "iqiyi": "有", "note": "豆瓣9.7/23万+评价、87版公认不可超越、爱奇艺36集全", "platform": "央视首播,爱奇艺"}, {"year": "1986", "title": "西游记", "score": 9.7, "genres": "剧情,动作,奇幻,古装", "iqiyi": "有", "note": "豆瓣9.7/41万+评价、国民重播第一剧、爱奇艺正版25集全", "platform": "央视首播,爱奇艺"}];
+const YEAR_TICKS = ['更早',2000,2005,2010,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+const MAX_TICK = YEAR_TICKS.length - 1; /* 15 */
+const splitGenres = g => (g||'').split(/[,/]+/).map(t=>t.trim()).filter(Boolean);
+const iqMap = t => t==='无' ? 'no' : (t==='有（会员）' ? 'vip' : 'yes');
+const state = { tab:'movie', q:'', iq:'all', genres:[], yFrom:0, yTo:MAX_TICK, minScore:60, sort:'score-desc' };
+const getData = () => state.tab==='movie' ? DATA : TV;
+const scOf = d => typeof d.score==='number' ? d.score : -1;
+const buildGenres = arr => [...new Set(arr.flatMap(d=>splitGenres(d.genres)))].sort((a,b)=>a.localeCompare(b,'zh'));
+
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+/* 刻度档位 → 数值闭区间：'更早' 聚合 2000 年前；2000/2005/2010 各聚合 5 年；2015 起为单年 */
+function tickRange(i){
+  const v = YEAR_TICKS[i];
+  if (v === '更早') return {lo:0, hi:1999};
+  const next = YEAR_TICKS[i+1];
+  return next === undefined ? {lo:v, hi:v} : {lo:v, hi:next-1};
+}
+/* 档位显示文案，与 tickRange 的区间严格一致 */
+function tickLabel(i){
+  const v = YEAR_TICKS[i];
+  if (v === '更早') return '2000 年前';
+  const rg = tickRange(i);
+  return rg.lo === rg.hi ? String(rg.lo) : rg.lo+'-'+rg.hi;
+}
+/* 某年是否落在 [yFrom, yTo] 覆盖的档位区间内 */
+function inYearRange(year, iFrom, iTo){
+  const a = tickRange(iFrom), b = tickRange(iTo);
+  return year >= a.lo && year <= b.hi;
+}
+/* 下拉选项与滑块共用同一套档位，避免「选了某年却筛出整档」的不一致 */
+function buildYearSel(){
+  const sel = document.getElementById('yearSel');
+  const years = getData().map(d=>Number(d.year));
+  let opts = '';
+  for (let i=0;i<=MAX_TICK;i++){
+    const rg = tickRange(i);
+    if (!years.some(y=>y>=rg.lo && y<=rg.hi)) continue; /* 当前片库没有数据的档位不列 */
+    opts += `<option value="${i}">${tickLabel(i)}${rg.lo===rg.hi?' 年':''}</option>`;
+  }
+  sel.innerHTML = '<option value="all">全部年份</option><option value="range">自定义区间…</option>' + opts;
+}
+function buildGenreBar(){
+  const bar = document.getElementById('genreBar');
+  const all = buildGenres(getData());
+  bar.innerHTML = all.map(g=>`<button class="chip ${state.genres.includes(g)?'on':''}" data-g="${esc(g)}">${esc(g)}</button>`).join('');
+  bar.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+    const g = b.dataset.g;
+    state.genres = state.genres.includes(g) ? state.genres.filter(x=>x!==g) : [...state.genres, g];
+    buildGenreBar(); render();
+  }));
+}
+function paintDual(){
+  const f = state.yFrom/MAX_TICK*100, t = state.yTo/MAX_TICK*100;
+  const tL = document.getElementById('drThumbL'), tR = document.getElementById('drThumbR');
+  tL.style.left = f+'%';
+  tR.style.left = t+'%';
+  tL.setAttribute('aria-valuenow', state.yFrom);
+  tR.setAttribute('aria-valuenow', state.yTo);
+  tL.setAttribute('aria-valuetext', tickLabel(state.yFrom));
+  tR.setAttribute('aria-valuetext', tickLabel(state.yTo));
+  const fill = document.getElementById('drFill');
+  fill.style.left = f+'%';
+  fill.style.width = (t-f)+'%';
+}
+function syncYearUI(){
+  const sel = document.getElementById('yearSel');
+  const hint = document.getElementById('yearHint');
+  if (state.yFrom===0 && state.yTo===MAX_TICK){ sel.value='all'; hint.textContent='全部年份'; }
+  else if (state.yFrom===state.yTo){
+    const rg = tickRange(state.yFrom);
+    sel.value = String(state.yFrom);
+    if (sel.value !== String(state.yFrom)) sel.value='range'; /* 该档在当前片库无数据时不在选项里 */
+    hint.textContent = tickLabel(state.yFrom) + (rg.lo===rg.hi ? ' 年' : '');
+  }
+  else { sel.value='range'; hint.textContent = tickLabel(state.yFrom)+' – '+tickLabel(state.yTo); }
+  const el = document.querySelector('.edge-label.l'), er = document.querySelector('.edge-label.r');
+  if (el) el.textContent = tickLabel(0);
+  if (er) er.textContent = tickLabel(MAX_TICK);
+}
+function filtered(){
+  let arr = getData().filter(d => {
+    if (state.iq!=='all') {
+      const m = iqMap(d.iqiyi);
+      if (state.iq==='yes' && m==='no') return false;
+      if (state.iq==='no' && m!=='no') return false;
+    }
+    const y = Number(d.year);
+    if (!inYearRange(y, state.yFrom, state.yTo)) return false;
+    /* minScore=60 是滑块的「不限」端，只有大于 60 才启用阈值 */
+    if (state.minScore > 60 && scOf(d) >= 0 && d.score < state.minScore/10) return false;
+    if (state.q) {
+      const q = state.q.trim().toLowerCase();
+      if (!d.title.toLowerCase().includes(q)) return false;
+    }
+    if (state.genres.length) {
+      const gs = splitGenres(d.genres);
+      if (!state.genres.every(g=>gs.includes(g))) return false;
+    }
+    return true;
+  });
+  const key = state.sort;
+  if (key==='score-desc') arr.sort((a,b)=>(scOf(b)-scOf(a)) || a.title.localeCompare(b.title,'zh'));
+  else if (key==='score-asc') arr.sort((a,b)=>(scOf(a)-scOf(b)));
+  else if (key==='year-desc') arr.sort((a,b)=>(b.year.localeCompare(a.year)));
+  else if (key==='year-asc') arr.sort((a,b)=>(a.year.localeCompare(b.year)));
+  else arr.sort((a,b)=>a.title.localeCompare(b.title,'zh'));
+  return arr;
+}
+function cardHTML(d){
+  const hasScore = typeof d.score==='number';
+  const s = hasScore ? d.score.toFixed(1) : '—';
+  const scls = hasScore ? (d.score>=9 ? 's9' : (d.score>=8.5 ? 's85' : 's8')) : 's8';
+  const iqm = iqMap(d.iqiyi);
+  const iqBadge = iqm==='no' ? '<span class="badge iq-no">无资源</span>'
+    : (iqm==='vip' ? '<span class="badge iq-vip">爱奇艺·会员</span>' : '<span class="badge iq-yes">爱奇艺</span>');
+  const plat = d.platform ? `<span class="meta-plat">${esc(d.platform)}</span>` : '';
+  const tags = splitGenres(d.genres).map(g=>`<span class="tag">${esc(g)}</span>`).join('');
+  const note = d.note ? `<div class="note">${esc(d.note)}</div><div class="note-hint">点击展开</div>` : '';
+  return `<div class="card"><div class="card-top"><div class="card-title">${esc(d.title)}</div><div class="score ${scls}">${s}</div></div>
+  <div class="meta"><span>${d.year}</span>${iqBadge}${plat}</div>
+  <div class="tags">${tags}</div>${note}</div>`;
+}
+function render(){
+  const arr = filtered();
+  let parts = [`共 ${arr.length} 部`];
+  if (!(state.yFrom===0 && state.yTo===MAX_TICK)) {
+    const f = YEAR_TICKS[state.yFrom], t = YEAR_TICKS[state.yTo];
+    parts.push(`年份 ${f}${f===t?'':'-'+t}`);
+  }
+  if (state.minScore>60) parts.push(`≥${(state.minScore/10).toFixed(1)}分`);
+  if (state.q) parts.push(`「${state.q}」`);
+  if (state.genres.length) parts.push(`类型 ${state.genres.join('+')}`);
+  document.getElementById('countLine').textContent = parts.join(' · ');
+  const list = document.getElementById('list');
+  if (!arr.length) {
+    list.innerHTML = '<div class="empty">没有匹配的条目<div class="e-sub">换个筛选条件试试</div></div>';
+    return;
+  }
+  list.innerHTML = arr.map(cardHTML).join('');
+  list.querySelectorAll('.card').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('expanded')));
+}
+function initDual(){
+  const dr = document.getElementById('yearRange');
+  const track = dr.querySelector('.dr-track');
+  const tL = document.getElementById('drThumbL'), tR = document.getElementById('drThumbR');
+  let drag = null;
+  /* 以轨道自身 rect 为基准，滑块半径已在容器 padding 中扣除，端点不再越界 */
+  function pctX(x){
+    const r = track.getBoundingClientRect();
+    if (r.width <= 0) return 0;
+    return Math.min(100, Math.max(0, (x-r.left)/r.width*100));
+  }
+  function applyIdx(idx){
+    idx = Math.max(0, Math.min(MAX_TICK, idx));
+    if (drag==='L') state.yFrom = Math.min(idx, state.yTo);
+    else if (drag==='R') state.yTo = Math.max(idx, state.yFrom);
+    else if (drag==='C'){
+      /* 两滑块重合：按首次移动方向决定拖哪一个，否则无法分开 */
+      if (idx < state.yFrom){ drag='L'; state.yFrom = idx; }
+      else if (idx > state.yTo){ drag='R'; state.yTo = idx; }
+      else return;
+    }
+    paintDual(); syncYearUI(); render();
+  }
+  function dragTo(x){ applyIdx(Math.round(pctX(x)/100*MAX_TICK)); }
+  const startDrag = (which,e)=>{
+    drag = (state.yFrom===state.yTo) ? 'C' : which;
+    dr.setPointerCapture(e.pointerId);
+    dragTo(e.clientX);
+  };
+  tL.addEventListener('pointerdown',e=>startDrag('L',e));
+  tR.addEventListener('pointerdown',e=>startDrag('R',e));
+  dr.addEventListener('pointermove',e=>{if(drag)dragTo(e.clientX);});
+  ['pointerup','pointercancel'].forEach(ev=>dr.addEventListener(ev,()=>drag=null));
+  /* 键盘可达：左右方向键微调一个 tick，Home/End 跳到两端 */
+  [tL,tR].forEach((el,which)=>{
+    el.addEventListener('keydown',e=>{
+      const cur = which===0 ? state.yFrom : state.yTo;
+      let next = cur;
+      if (e.key==='ArrowLeft' || e.key==='ArrowDown') next = cur-1;
+      else if (e.key==='ArrowRight' || e.key==='ArrowUp') next = cur+1;
+      else if (e.key==='Home') next = 0;
+      else if (e.key==='End') next = MAX_TICK;
+      else return;
+      e.preventDefault();
+      drag = which===0 ? 'L' : 'R';
+      applyIdx(next);
+      drag = null;
+    });
+  });
+  dr.addEventListener('pointerdown',e=>{
+    if (e.target===tL || e.target===tR) return;
+    const idx = Math.max(0, Math.min(MAX_TICK, Math.round(pctX(e.clientX)/100*MAX_TICK)));
+    const closerL = Math.abs(idx-state.yFrom) <= Math.abs(idx-state.yTo);
+    drag = closerL ? 'L' : 'R';
+    if (closerL) state.yFrom = Math.min(idx, state.yTo);
+    else state.yTo = Math.max(idx, state.yFrom);
+    dr.setPointerCapture(e.pointerId);
+    paintDual(); syncYearUI(); render();
+  });
+}
+function updateStats(){
+  const arr = getData();
+  const scores = arr.map(d=>d.score).filter(x=>typeof x==='number');
+  document.getElementById('st-total').textContent = arr.length;
+  document.getElementById('st-score').textContent = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+  document.getElementById('st-iq').textContent = arr.filter(d=>iqMap(d.iqiyi)!=='no').length;
+  document.getElementById('tabMovieN').textContent = DATA.length;
+  document.getElementById('tabTvN').textContent = TV.length;
+}
+function switchTab(tab){
+  state.tab = tab;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+  state.q=''; state.iq='all'; state.genres=[]; state.yFrom=0; state.yTo=MAX_TICK; state.minScore=60; state.sort='score-desc';
+  document.getElementById('q').value='';
+  document.getElementById('yearSel').value='all';
+  document.getElementById('sortSel').value='score-desc';
+  document.getElementById('scoreRange').value=60;
+  document.getElementById('scoreVal').textContent='不限';
+  document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
+  document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
+  buildGenreBar(); buildYearSel(); paintDual(); syncYearUI(); updateStats(); render();
+}
+function init(){
+  buildGenreBar(); buildYearSel();
+  paintDual(); syncYearUI(); initDual(); updateStats();
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+  document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value; render();});
+  document.getElementById('yearSel').addEventListener('change',e=>{
+    const v = e.target.value;
+    if (v==='range'){
+      /* 自定义区间：保持当前区间，把焦点交给滑块提示用户拖动 */
+      syncYearUI();
+      const tL = document.getElementById('drThumbL');
+      tL.focus();
+      return;
+    }
+    if (v==='all'){ state.yFrom=0; state.yTo=MAX_TICK; }
+    else { const i=+v; state.yFrom=i; state.yTo=i; }
+    paintDual(); syncYearUI(); render();
+  });
+  document.getElementById('scoreRange').addEventListener('input',e=>{
+    state.minScore = +e.target.value;
+    document.getElementById('scoreVal').textContent = state.minScore<=60 ? '不限' : '≥'+(state.minScore/10).toFixed(1);
+    render();
+  });
+  document.getElementById('sortSel').addEventListener('change',e=>{state.sort=e.target.value; render();});
+  document.getElementById('iqSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); state.iq=b.dataset.iq; render();
+  }));
+  document.getElementById('reset').addEventListener('click',()=>{
+    state.q=''; state.iq='all'; state.genres=[]; state.yFrom=0; state.yTo=MAX_TICK; state.minScore=60; state.sort='score-desc';
+    document.getElementById('q').value='';
+    document.getElementById('yearSel').value='all';
+    document.getElementById('sortSel').value='score-desc';
+    document.getElementById('scoreRange').value=60;
+    document.getElementById('scoreVal').textContent='不限';
+    document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
+    document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
+    buildGenreBar(); paintDual(); syncYearUI(); render();
+  });
+  render();
+}
+init();
+</script>
+</body>
+</html>
