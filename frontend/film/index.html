@@ -3,113 +3,455 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>片库查询 · 2019-2026 高分片单</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%231e293b'/%3E%3Cpath d='M8 6.5v11l8-5.5z' fill='%23f6c453'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0e1217" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171b20" media="(prefers-color-scheme: dark)">
+<script>
+/* 主题必须在首帧前落到 <html data-theme> 上，否则深色系统会先闪一帧浅色。
+   三个状态：auto 跟随系统 / light / dark，存 localStorage。
+   「跟随系统」时监听系统变化；手动指定时忽略系统变化。 */
+(function(){
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function pref(){
+    try { return localStorage.getItem('film.theme') || 'auto'; } catch(e){ return 'auto'; }
+  }
+  window.applyTheme = function(){
+    var p = pref();
+    var dark = p === 'dark' || (p === 'auto' && mq.matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    return p;
+  };
+  var onChange = function(){ if (pref() === 'auto') window.applyTheme(); };
+  if (mq.addEventListener) mq.addEventListener('change', onChange);
+  else if (mq.addListener) mq.addListener(onChange);   /* Safari < 14 */
+  window.applyTheme();
+})();
+</script>
+<title>片库查询 · 高分影视片单</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2324262b'/%3E%3Cpath d='M8 6.5v11l8-5.5z' fill='%23d99a3c'/%3E%3C/svg%3E">
 <style>
+/* ============================================================================
+   设计系统：Graphite
+   来源：ui-craft/references/themes.md 的 Graphite 预设（原样实现，全有或全无）
+   规则：ui-craft-dense-dashboard（CRAFT 7 / MOTION 3 / DENSITY 9）
+   三层契约：预设原始 token → 语义 token → 组件规则；组件只引用语义层。
+   ========================================================================== */
 :root{
-  --bg:#f6f4ee; --card:#fff; --ink:#1c1c1a; --sub:#6b6b63; --line:#e7e2d8;
-  --accent:#b8860b; --accent-deep:#8a6406; --green:#2e7d32; --green-bg:#e6f4e7;
-  --gray-bg:#eef0f3; --tag-bg:#f1efe9; --tag-on:#8a8a82;
+  /* 原生下拉列表、滚动条、range 的 UA 部件跟着主题换配色。
+     浅色是基准，深色在下方 [data-theme="dark"] 里翻成 dark；
+     不写这两处的话，深色页面上原生部件仍是浅色，会直接冲突。 */
+  color-scheme: light;
+
+  /* — 预设原始 token：中性偏冷，色相 255 — */
+  --gray-0: oklch(99% .002 255);   /* 页面 */
+  --gray-1: oklch(97% .003 255);   /* 抬升表面 */
+  --gray-2: oklch(93% .004 255);   /* 发丝线、凹槽 */
+  --gray-3: oklch(86% .005 255);   /* 禁用底、悬停描边 */
+  --gray-6: oklch(55% .012 255);   /* 次级文字 */
+  --gray-7: oklch(42% .014 255);   /* 三级标题（本页不用，保留栅格完整） */
+  --gray-9: oklch(18% .012 255);   /* 主文字 */
+
+  /* 强调色：预设默认深靛 oklch(46% .17 275)。
+     预设允许「有品牌色时按同一明度/彩度纪律替换强调色」——
+     这里换成暖琥珀。旧强调色 #b8860b 约 L66% / h85，是「米黄底 + 金黄色」那套的高明度金；
+     新值 L46% / h70 更暗也更红，配合换成冷中性的页面底色，原来的米黄+黄铜组合不再存在。
+     换回预设默认值：把下面 3 行的色相 70 改为 275。 */
+  --accent:       oklch(46% .14 70);
+  --accent-hover: oklch(41% .14 70);
+  --accent-tint:  oklch(46% .14 70 / .08);
+  --on-accent:    oklch(99% .002 255);
+
+  --success: oklch(52% .13 155);
+  --warning: oklch(62% .14 75);
+  --danger:  oklch(52% .18 25);
+
+  /* — 形状：预设的 3 级半径，全站唯一来源，不再出现其他数值 — */
+  --radius-input: .375rem;  /* 6px  输入框、按钮、chip、seg 内件、计数徽标 */
+  --radius-card:  .625rem;  /* 10px 面板、卡片 */
+  --radius-modal: .875rem;  /* 14px 弹层（本页未用，保留契约完整性） */
+
+  --shadow-card:    0 0 0 1px oklch(0% 0 0 / .04), 0 1px 2px oklch(0% 0 0 / .05);
+  --shadow-overlay: 0 0 0 1px oklch(0% 0 0 / .05), 0 8px 24px oklch(0% 0 0 / .12);
+
+  --motion-fast: 120ms; --motion-base: 200ms; --motion-slow: 320ms;
+  --ease-out: cubic-bezier(.16,1,.3,1);
+
+  /* — 语义 token — */
+  /* banner 上的控件表面：两种主题下都比 banner 亮一阶，控件因此永远浮在 banner 之上 */
+  --banner-ctl: oklch(26% .012 255);
+  --bg: var(--gray-0);
+  --surface: oklch(100% 0 0);
+  --surface-2: var(--gray-1);
+  --line: var(--gray-2);
+  --tx-1: var(--gray-9);
+  --tx-2: var(--gray-6);
+  --on-dark: oklch(99% .002 255);
+
+  /* — 字号：面板内严格 3 档；标题 20 在面板之外 — */
+  --text-display: 20px;  /* 页面标题、指标数字 */
+  --text-body: 14px;     /* 全部控件、正文 */
+  --text-micro: 12px;    /* 端点、徽标、次级读数 */
+
+  /* — 间距：4/8 网格，禁止 5/7/9/10 — */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-6: 24px;
+
+  /* — 控件尺寸：h-9 — */
+  --h-ctl: 36px;   /* 输入框、下拉、按钮、seg 轨道 */
+  --h-pill: 28px;  /* seg 内件、chip */
+  --col: 720px;    /* 内容列宽 */
+}
+/* oklch 不支持时（Chrome<111 / Safari<15.4）按等价十六进制兜底。
+   缺这段，老引擎会把整条颜色声明丢弃，页面直接变无底色。 */
+@supports not (color: oklch(0% 0 0)){
+  :root{
+    --gray-0:#fcfcfd; --gray-1:#f6f7f9; --gray-2:#eaebef; --gray-3:#d5d7dc;
+    --gray-6:#777c85; --gray-7:#565b63; --gray-9:#24262b;
+    --accent:#8a5a18; --accent-hover:#7a4c12; --accent-tint:rgba(138,90,24,.08); --on-accent:#fcfcfd;
+    --success:#1f7a4d; --warning:#b07a10; --danger:#b3392c;
+    --surface:#fff; --on-dark:#fcfcfd; --banner-ctl:#20242a;
+  }
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-header{padding:20px 16px 12px;background:linear-gradient(180deg,#232c38,#1e293b);color:#fff}
-header h1{font-size:20px;font-weight:700;letter-spacing:.5px}
-header .sub{font-size:13px;color:#b9c2cf;margin-top:4px}
-.stats{display:flex;gap:18px;margin-top:14px;font-size:13px;color:#dfe5ec}
-.stats b{font-size:20px;color:#f6c453;font-weight:700;margin-right:3px}
-.stats span{display:block;font-size:11px;color:#9aa6b5;margin-top:1px}
-.tabs{display:flex;gap:10px;margin-top:14px}
-.tab{flex:1;height:40px;border:1px solid rgba(255,255,255,.25);border-radius:20px;background:rgba(255,255,255,.08);color:#d7dde6;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.tab.on{background:#f6c453;border-color:#f6c453;color:#232c38}
-.tab span{font-size:12px;font-weight:700;opacity:.9;background:rgba(0,0,0,.14);border-radius:9px;padding:1px 7px}
-.tab.on span{background:rgba(0,0,0,.2);color:#fff}
-/* ===== 筛选面板（分组布局） ===== */
-.toolbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 12px 12px;border-bottom:1px solid var(--line)}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 12px;box-shadow:0 1px 4px rgba(0,0,0,.04);max-width:720px;margin:0 auto}
-.group{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 2px;border-bottom:1px dashed var(--line)}
-.group:last-child{border-bottom:none}
-.glabel{flex:none;width:54px;font-size:13px;font-weight:600;color:var(--ink)}
-/* 检索行 */
-.g-search input{flex:1;min-width:0;height:38px;padding:0 12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#faf9f5;outline:none}
-.g-search input:focus{border-color:var(--accent);background:#fff}
-/* 下拉框统一样式（原生美化：去默认箭头，换内置图标） */
-select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' stroke='%238a8a82' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:12px;padding-right:28px;cursor:pointer}
-select:focus{outline:none;border-color:var(--accent)}
-.g-search select{flex:none;height:38px;padding:0 28px 0 10px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:#fff;color:var(--ink)}
-.reset{flex:none;height:38px;padding:0 14px;font-size:13px;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:10px;white-space:nowrap;cursor:pointer}
-/* 资源 seg */
-.seg{display:flex;gap:8px;flex:1;min-width:0}
-.seg button{flex:1;height:36px;font-size:13px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--sub);cursor:pointer}
-.seg button.on{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff;font-weight:600}
-/* 年份组：两行式（上行 label+下拉，下行滑块全宽） */
-.g-year{flex-direction:column;align-items:stretch;gap:0;padding:0 2px}
-.y-top{display:flex;align-items:center;gap:10px;min-height:40px;flex-wrap:wrap}
-.g-year select{height:36px;padding:0 26px 0 10px;font-size:13px;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:9px;background-color:#fff;flex:1 1 110px;min-width:0;max-width:150px}
-.g-year .hint{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent-deep);background:rgba(184,134,11,.12);border-radius:8px;padding:5px 10px;white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
-/* 滑块容器：宽度 100% 与 panel 栅格对齐 */
-.range-wrap{width:100%;align-self:stretch;min-width:0;position:relative;height:38px;margin-top:2px;touch-action:none;box-sizing:border-box}
-/* 轨道左右各留 11px（= 滑块半径）；滑块以轨道为定位基准，端点中心落在轨道两端，不再溢出容器 */
-.dr-track{position:absolute;left:11px;right:11px;top:50%;transform:translateY(-50%);height:6px;border-radius:3px;background:#e3ddd0}
-.dr-fill{position:absolute;left:0;top:0;height:6px;border-radius:3px;background:var(--accent)}
-.dr-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid var(--accent-deep);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:grab;touch-action:none;z-index:2}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  background:var(--bg);color:var(--tx-1);
+  font-size:var(--text-body);line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+}
+
+/* ===== 头部：深色 banner =====
+   Graphite 是浅色预设，但 --gray-9 属于同一中性阶，作为深色 banner 表面是阶内取值，
+   不引入第三种色相。它承担全页唯一的强对比，把「页头」和「内容」明确分开。 */
+header{
+  position:relative;
+  padding:var(--sp-6) max(var(--sp-4),calc((100% - var(--col))/2)) var(--sp-4);
+  background:var(--gray-9);color:var(--on-dark);
+}
+/* 主题下拉：贴 banner 右上角，与标题列同一右侧基准线。
+   top 取 padding 减 2px，让 28px 的控件与 24px 的 h1 中心对齐在同一水平线上。 */
+.theme-sel{
+  position:absolute;top:calc(var(--sp-6) - 2px);
+  right:max(var(--sp-4),calc((100% - var(--col))/2));
+  height:var(--h-pill);padding:0 var(--sp-6) 0 var(--sp-2);
+  font-size:var(--text-micro);font-weight:400;
+  color:oklch(99% .002 255 / .88);
+  background-color:var(--banner-ctl);
+  border:1px solid oklch(99% .002 255 / .16);
+  background-size:9px;
+}
+header h1{font-size:var(--text-display);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+header .sub{margin-top:var(--sp-1);font-size:var(--text-micro);color:oklch(99% .002 255 / .62);font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:var(--sp-6);margin-top:var(--sp-3)}
+.stats b{display:block;font-size:16px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats span{display:block;margin-top:2px;font-size:var(--text-micro);color:oklch(99% .002 255 / .55)}
+
+/* ===== 视图切换：深色 banner 上的分段控件 ===== */
+.tabs{display:flex;gap:var(--sp-2);margin-top:var(--sp-4)}
+.tab{
+  flex:0 0 auto;min-width:96px;height:var(--h-ctl);padding:0 var(--sp-4);
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  font-size:var(--text-body);font-weight:400;font-family:inherit;
+  color:oklch(99% .002 255 / .72);background:transparent;
+  border:1px solid oklch(99% .002 255 / .18);border-radius:var(--radius-input);
+  cursor:pointer;transition:color var(--motion-fast) var(--ease-out),background var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out);
+}
+.tab:hover{color:var(--on-dark);border-color:oklch(99% .002 255 / .34)}
+.tab.on{background:var(--on-dark);border-color:var(--on-dark);color:var(--gray-9);font-weight:600}
+.tab span{
+  min-width:20px;padding:1px 6px;border-radius:var(--radius-input);
+  font-size:var(--text-micro);font-weight:600;font-variant-numeric:tabular-nums;
+  background:oklch(99% .002 255 / .12);color:inherit;text-align:center;
+}
+.tab.on span{background:oklch(0% 0 0 / .08)}
+
+/* ===== 吸顶工具栏 =====
+   不画通栏分隔线：吸顶时靠面板自身白底 + 投影建立边界，
+   避免 1280 下出现一条横贯整屏的线切断 720 内容列。 */
+.toolbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:var(--sp-3) var(--sp-4)}
+
+/* ===== 筛选面板 ===== */
+.panel{
+  display:flex;flex-direction:column;gap:var(--sp-2);
+  max-width:var(--col);margin:0 auto;padding:var(--sp-3);
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+  color:var(--tx-1);font-size:var(--text-body);
+}
+.panel.is-collapsed{gap:0;padding:var(--sp-2)}
+/* 折叠用 grid-template-rows 0fr/1fr：内容高度自适应，不写死 max-height，
+   折叠后轨道仍保留布局宽度，滑块定位不会量到 0。 */
+.panel-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--motion-base) var(--ease-out)}
+.panel.is-collapsed .panel-body{grid-template-rows:0fr}
+@supports not (grid-template-rows:0fr){
+  .panel.is-collapsed .panel-body{display:none}
+}
+.pb-inner{display:flex;flex-direction:column;gap:var(--sp-2);overflow:hidden;min-height:0}
+.group{display:flex;align-items:center;gap:var(--sp-2);min-height:var(--h-ctl)}
+/* 分组标签：与控件同字号，只靠颜色退后一层 */
+.glabel{flex:none;width:32px;font-size:var(--text-body);font-weight:400;color:var(--tx-2)}
+
+/* ===== 输入框 / 下拉：白底 + 1px 发丝描边，描边是「这是个可点的框」的唯一信号 ===== */
+.g-search input{
+  flex:1;min-width:0;height:var(--h-ctl);padding:0 var(--sp-3);
+  font-size:var(--text-body);font-family:inherit;color:var(--tx-1);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-input);
+  outline:none;transition:border-color var(--motion-fast) var(--ease-out),box-shadow var(--motion-fast) var(--ease-out);
+}
+.g-search input::placeholder{color:var(--tx-2)}
+.g-search input:hover{border-color:var(--gray-3)}
+.g-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+select{
+  -webkit-appearance:none;appearance:none;cursor:pointer;height:var(--h-ctl);
+  padding:0 var(--sp-6) 0 var(--sp-3);
+  font-size:var(--text-body);font-family:inherit;font-weight:400;color:var(--tx-1);
+  background-color:var(--surface);border:1px solid var(--line);border-radius:var(--radius-input);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' stroke='%238a8f98' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right var(--sp-2) center;background-size:10px;
+  transition:border-color var(--motion-fast) var(--ease-out),box-shadow var(--motion-fast) var(--ease-out);
+}
+select:hover{border-color:var(--gray-3)}
+select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+.g-search select{flex:none;max-width:104px}
+
+/* 筛选：真按钮；重置是次级文字链接，且只在有筛选时出现 */
+.fbtn{
+  flex:none;display:inline-flex;align-items:center;gap:var(--sp-1);
+  height:var(--h-ctl);padding:0 var(--sp-2);
+  font-size:var(--text-body);font-family:inherit;font-weight:400;color:var(--tx-1);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-input);
+  white-space:nowrap;cursor:pointer;
+  transition:border-color var(--motion-fast) var(--ease-out),background var(--motion-fast) var(--ease-out);
+}
+.fbtn:hover{border-color:var(--gray-3);background:var(--surface-2)}
+.fbtn[aria-expanded="false"]{color:var(--tx-2)}
+.fbtn .caret{width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid currentColor;transition:transform var(--motion-fast) var(--ease-out)}
+.fbtn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+.fbtn .badge{
+  min-width:16px;height:16px;padding:0 var(--sp-1);border-radius:var(--radius-input);
+  background:var(--accent-tint);color:var(--accent);
+  font-size:var(--text-micro);font-weight:600;line-height:16px;text-align:center;font-variant-numeric:tabular-nums;
+}
+.fbtn .badge[hidden]{display:none}
+.reset{
+  flex:none;height:var(--h-ctl);padding:0 var(--sp-1);
+  font-size:var(--text-body);font-family:inherit;color:var(--tx-2);
+  background:none;border:none;white-space:nowrap;cursor:pointer;
+  transition:color var(--motion-fast) var(--ease-out);
+}
+.reset:hover{color:var(--tx-1)}
+.reset[hidden]{display:none}
+
+/* ===== 资源：分段控件 —— gray-2 凹槽 + 白色药丸，不靠三个独立描边按钮 ===== */
+.seg{
+  display:flex;gap:var(--sp-1);flex:1;max-width:264px;min-width:0;
+  padding:var(--sp-1);background:var(--gray-2);border-radius:var(--radius-input);
+}
+.seg button{
+  flex:1;height:var(--h-pill);
+  font-size:var(--text-body);font-family:inherit;font-weight:400;color:var(--tx-2);
+  background:transparent;border:none;border-radius:calc(var(--radius-input) - var(--sp-1));
+  cursor:pointer;transition:background var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out);
+}
+.seg button:hover{color:var(--tx-1)}
+.seg button.on{
+  background:var(--surface);color:var(--tx-1);font-weight:600;
+  box-shadow:0 1px 2px oklch(0% 0 0 / .08),0 0 0 1px oklch(0% 0 0 / .04);
+}
+
+/* ===== 年份：下拉 + 滑块同处一行，滑块吃掉右侧空白 ===== */
+.g-year{flex-wrap:wrap}
+.y-main{display:flex;align-items:center;gap:var(--sp-2);width:100%;min-width:0}
+.g-year select{flex:none;max-width:132px}
+.y-slider{flex:1 1 140px;min-width:140px;display:flex;align-items:center}
+.range-wrap{position:relative;width:100%;height:20px;touch-action:none}
+.dr-track{position:absolute;left:8px;right:8px;top:50%;transform:translateY(-50%);height:3px;border-radius:2px;background:var(--gray-3)}
+.dr-fill{position:absolute;left:0;top:0;height:3px;border-radius:2px;background:var(--accent)}
+.dr-thumb{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:14px;height:14px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--accent);
+  box-shadow:0 1px 2px oklch(0% 0 0 / .18);
+  cursor:grab;touch-action:none;z-index:2;
+}
+.dr-thumb:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .dr-thumb:active{cursor:grabbing}
-.dr-thumb:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-.dr-thumb::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%;background:var(--accent-deep)}
-/* 端点标签：移到轨道下方的独立行，不再与滑块垂直重叠 */
-.edge-row{display:flex;justify-content:space-between;padding:0 11px;margin-top:-2px}
-.edge-label{font-size:11px;color:var(--sub);letter-spacing:.3px;pointer-events:none;line-height:1.2}
-/* 评分组：单滑块（缩短，不占满） */
-.g-score input[type=range]{flex:0 1 220px;min-width:140px;height:34px;accent-color:var(--accent-deep);cursor:pointer}
-.rval{flex:none;font-size:12px;color:var(--sub);min-width:48px;text-align:right;white-space:nowrap}
-/* 类型组 */
-.genre-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0}
+
+/* ===== 评分：原生 range 美化 + 读数 ===== */
+.g-score input[type=range]{
+  flex:1 1 120px;min-width:120px;height:var(--h-pill);margin:0;padding:0;
+  -webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;
+  color:var(--accent);
+}
+/* 必须画在 track 伪元素上——input 自身的背景会被这条不透明轨道盖掉。
+   两条规则不能合并成选择器列表：一边不认识另一边的前缀，会整条丢弃。
+   --score-p 由 paintScoreFill() 写入，已做 thumb 半径内缩补偿。 */
+.g-score input[type=range]::-webkit-slider-runnable-track{
+  height:3px;border-radius:2px;
+  background:linear-gradient(to right,
+    var(--gray-3) 0 var(--score-p,0%),
+    var(--accent) var(--score-p,0%) 100%);
+}
+.g-score input[type=range]::-moz-range-track{
+  height:3px;border-radius:2px;
+  background:linear-gradient(to right,
+    var(--gray-3) 0 var(--score-p,0%),
+    var(--accent) var(--score-p,0%) 100%);
+}
+.g-score input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:14px;height:14px;margin-top:-5.5px;
+  border-radius:50%;background:var(--surface);border:2px solid var(--accent);
+  box-shadow:0 1px 2px oklch(0% 0 0 / .18);
+}
+.g-score input[type=range]::-moz-range-thumb{
+  width:14px;height:14px;border-radius:50%;background:var(--surface);
+  border:2px solid var(--accent);box-shadow:0 1px 2px oklch(0% 0 0 / .18);
+}
+.g-score input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--radius-input)}
+.rval{
+  flex:none;min-width:40px;font-size:var(--text-micro);color:var(--tx-2);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+
+/* ===== 类型：横向滚动，右侧渐隐暗示还有内容 ===== */
+.genre-scroll{
+  display:flex;gap:var(--sp-1);flex:1;min-width:0;overflow-x:auto;
+  padding:2px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
 .genre-scroll::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;height:34px;padding:0 12px;font-size:13px;border-radius:17px;border:1px solid var(--line);background:#fff;color:var(--sub);display:inline-flex;align-items:center;cursor:pointer}
-.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-/* ===== 列表/卡片 ===== */
-.list{padding:14px 16px 60px;display:flex;flex-direction:column;gap:12px;max-width:720px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;cursor:pointer;transition:box-shadow .15s}
-.card:active{box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.card-title{font-size:17px;font-weight:700;line-height:1.35;min-width:0;flex:1}
-.score{flex:0 0 auto;min-width:52px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff}
-.score.s9{background:#a16207}
-.score.s85{background:#ca8a04}
-.score.s8{background:#d9b36c}
-.meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--sub);flex-wrap:wrap}
-.meta-plat{margin-left:auto;font-size:11px;color:#8a8a82;background:var(--tag-bg);border-radius:6px;padding:2px 8px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;font-size:11px;font-weight:600}
-.badge.iq-yes{background:var(--green-bg);color:var(--green)}
-.badge.iq-vip{background:#fdeef0;color:#c62828}
-.badge.iq-no{background:var(--gray-bg);color:#8a8a82}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-.tag{font-size:11px;color:var(--tag-on);background:var(--tag-bg);padding:2px 8px;border-radius:6px}
-.note{margin-top:9px;font-size:13px;color:#4a4a44;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.genre-scroll.is-scroll{
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 20px),transparent);
+          mask-image:linear-gradient(to right,#000 calc(100% - 20px),transparent);
+}
+.chip{
+  flex:0 0 auto;height:var(--h-pill);padding:0 var(--sp-2);
+  display:inline-flex;align-items:center;
+  font-size:var(--text-body);font-family:inherit;font-weight:400;color:var(--tx-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-input);
+  white-space:nowrap;cursor:pointer;
+  transition:color var(--motion-fast) var(--ease-out),background var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out);
+}
+.chip:hover{color:var(--tx-1);border-color:var(--gray-3)}
+.chip.on{background:var(--accent-tint);border-color:var(--accent);color:var(--accent);font-weight:600}
+
+/* ===== 结果计数：靠 12px 间距分列，不堆分隔符 ===== */
+.count{
+  display:flex;flex-wrap:wrap;gap:var(--sp-3);
+  max-width:var(--col);margin:0 auto;padding:var(--sp-1) var(--sp-4) 0;
+  font-size:var(--text-micro);color:var(--tx-2);font-variant-numeric:tabular-nums;
+}
+
+/* ===== 列表与卡片：1px 发丝线优先于投影 ===== */
+.list{display:flex;flex-direction:column;gap:var(--sp-2);max-width:var(--col);margin:0 auto;padding:var(--sp-3) var(--sp-4) 64px}
+.card{
+  padding:var(--sp-4);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-card);
+  cursor:pointer;transition:border-color var(--motion-fast) var(--ease-out);
+}
+.card:hover{border-color:var(--gray-3)}
+.card-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3)}
+.card-title{flex:1;min-width:0;font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
+/* 评分是卡片的主指标：纯文字 + 等宽数字，不做色块徽标。层级靠明度，不靠新色相。 */
+.score{flex:none;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--tx-1)}
+.score.s9{color:var(--accent)}
+.score.s85{color:var(--tx-1)}
+.score.s8{color:var(--tx-2)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3);margin-top:var(--sp-2);font-size:var(--text-micro);color:var(--tx-2);font-variant-numeric:tabular-nums}
+/* 资源可用性是语义状态，用文字色表达，不做彩色底药丸 */
+.badge{display:inline-flex;align-items:center;font-size:var(--text-micro);font-weight:400;background:none;padding:0}
+.badge.iq-yes{color:var(--success)}
+.badge.iq-vip{color:var(--tx-2)}
+.badge.iq-no{color:var(--tx-2)}
+.meta-plat{color:var(--tx-2)}
+.tags{display:flex;flex-wrap:wrap;gap:var(--sp-1);margin-top:var(--sp-2)}
+.tag{font-size:var(--text-micro);color:var(--tx-2);background:var(--gray-1);padding:2px var(--sp-2);border-radius:var(--radius-input)}
+.note{
+  margin-top:var(--sp-2);font-size:var(--text-body);color:var(--tx-2);line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
 .card.expanded .note{display:block}
+.note-hint{margin-top:var(--sp-1);font-size:var(--text-micro);color:var(--tx-2)}
 .card.expanded .note-hint{display:none}
-.note-hint{margin-top:4px;font-size:11px;color:var(--accent)}
-.empty{padding:60px 20px;text-align:center;color:var(--sub);font-size:15px}
-.empty .e-sub{font-size:13px;color:#9a9a92;margin-top:6px}
-.count{padding:2px 16px 0;max-width:720px;margin:0 auto;font-size:12px;color:var(--sub)}
-@media (min-width:768px){
-  .card{padding:16px}
-  .card-title{font-size:18px}
-  .toolbar{padding:12px 20px}
-  .panel{max-width:720px;margin:0 auto}
+.empty{padding:var(--sp-6) var(--sp-4);text-align:center;color:var(--tx-2);font-size:var(--text-body)}
+.empty .e-sub{margin-top:var(--sp-1);font-size:var(--text-micro);color:var(--tx-2)}
+
+/* ===== 焦点：键盘可达，2px 强调色外圈 ===== */
+:where(.tab,.fbtn,.reset,.chip,.seg button):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ===== 触摸设备：iOS 只在输入框聚焦时放大页面（<16px），只放搜索框 =====
+   上一版把这条也套在 select 上，下拉根本不会触发聚焦放大，却一起被炸到 16px，
+   结果「自定义区间…」比「年份」标签大一圈 —— 面板整体显粗就是这么来的。 */
+@media (pointer:coarse){
+  .g-search input{font-size:16px}
+}
+
+/* ===== 窄屏：只收下拉宽度与内边距，不动字号与控件高度 ===== */
+@media (max-width:480px){
+  .glabel{width:28px}
+  .g-search select{max-width:88px}
+  .g-year select{max-width:124px}
+  .stats{gap:var(--sp-4)}
+}
+
+/* ===== 减少动态：尊重系统设置 ===== */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+
+/* ===== 深色：由 <html data-theme> 决定，跟随系统或手动指定 =====
+   为什么不用 @media (prefers-color-scheme) 直接定义：媒体查询无法被手动的「浅色」选择覆盖，
+   一旦用户手动选了浅色，媒体查询仍然会在深色系统上生效。所以主题统一由 [data-theme] 表达，
+   由 <head> 里的内联脚本在首帧前解析成 light / dark（跟随系统时监听系统变化）。
+   只翻转语义层，不动 --gray-9 —— 它在浅色下身兼两职（banner 底色 + 通过 --tx-1 当主文字色），
+   深色下这两者必须分开：banner 保持深色表面，文字反过来变浅。所以 --gray-9 留原值，
+   只翻 --tx-1 和各语义表面。
+   整段包在 @supports 里：不支持 oklch 的引擎（Chrome<111 / Safari<15.4）看不到这里，
+   继续走上面的浅色 + hex 回退，不会出现「卡片底色 invalid → 变透明」的破相。 */
+@supports (color: oklch(0% 0 0)){
+  :root[data-theme="dark"]{
+      color-scheme: dark;
+      /* 表面梯度：深色下「抬升」靠变亮，不靠阴影 */
+      --gray-0: oklch(15% .012 255);   /* 页面 */
+      --gray-1: oklch(19% .012 255);   /* 卡片 */
+      --gray-2: oklch(26% .012 255);   /* 发丝线、未选中的轨道底 */
+      --gray-3: oklch(34% .012 255);   /* 被排除的轨道、悬停描边 */
+      --gray-6: oklch(66% .012 255);   /* 次级文字 */
+      --gray-7: oklch(76% .012 255);
+      --surface: oklch(19% .012 255);
+      --surface-2: oklch(22% .012 255);
+      --tx-1: oklch(93% .004 255);
+      /* 强调色要提亮：46% 的琥珀压在 15% 的底上对比度不够 */
+      --accent: oklch(72% .13 70);
+      --accent-hover: oklch(78% .13 70);
+      --accent-tint: oklch(72% .13 70 / .14);
+      --on-accent: oklch(15% .012 255);
+      --success: oklch(72% .13 155);
+      --warning: oklch(78% .13 75);
+      --shadow-card: 0 0 0 1px oklch(0% 0 0 / .4);
+      --shadow-overlay: 0 0 0 1px oklch(0% 0 0 / .55), 0 8px 24px oklch(0% 0 0 / .5);
+      --banner-ctl: oklch(30% .012 255);
+  }
+  /* banner：浅色下它比页面深；深色下页面已经贴地，改为比页面亮一阶。
+     「banner 与内容分离」这件事仍然成立，只是方向反过来。 */
+  :root[data-theme="dark"] header{background:oklch(22% .012 255)}
+  /* 选中 tab：浅色是白药丸，深色下改中灰药丸 + 反白文字，避免一块刺眼的白 */
+  :root[data-theme="dark"] .tab.on{background:oklch(34% .012 255);border-color:oklch(34% .012 255);color:oklch(97% .002 255)}
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>片库查询 · 2019-2026</h1>
-  <div class="sub">高分片单 · 按评分 / 年份区间 / 爱奇艺资源 / 类型筛选</div>
+  <h1>片库查询</h1>
+  <div class="sub" id="subLine"></div>
   <div class="stats">
     <div><b id="st-total">0</b><span>影片总数</span></div>
     <div><b id="st-score">0</b><span>平均评分</span></div>
     <div><b id="st-iq">0</b><span>爱奇艺可看</span></div>
   </div>
+  <select class="theme-sel" id="themeSel" aria-label="主题">
+    <option value="auto">跟随系统</option>
+    <option value="light">浅色</option>
+    <option value="dark">深色</option>
+  </select>
   <div class="tabs">
     <button class="tab on" data-tab="movie">电影 <span id="tabMovieN"></span></button>
     <button class="tab" data-tab="tv">电视剧 <span id="tabTvN"></span></button>
@@ -117,7 +459,7 @@ select:focus{outline:none;border-color:var(--accent)}
 </header>
 
 <div class="toolbar">
-  <div class="panel">
+  <div class="panel" id="panel">
 
     <div class="group g-search">
       <input id="q" type="search" placeholder="搜索片名…" autocomplete="off">
@@ -128,8 +470,12 @@ select:focus{outline:none;border-color:var(--accent)}
         <option value="year-asc">年份旧</option>
         <option value="title">片名 A-Z</option>
       </select>
-      <button class="reset" id="reset">重置</button>
+      <button class="fbtn" id="fbtn" type="button" aria-expanded="true" aria-controls="panelBody">筛选<span class="badge" id="fBadge" hidden>0</span><span class="caret"></span></button>
+      <button class="reset" id="reset" type="button">重置</button>
     </div>
+
+    <div class="panel-body" id="panelBody">
+    <div class="pb-inner">
 
     <div class="group">
       <span class="glabel">资源</span>
@@ -141,21 +487,18 @@ select:focus{outline:none;border-color:var(--accent)}
     </div>
 
     <div class="group g-year">
-      <div class="y-top">
+      <div class="y-main">
         <span class="glabel">年份</span>
         <select id="yearSel"></select>
-        <span class="hint" id="yearHint"></span>
-      </div>
-      <div class="range-wrap" id="yearRange">
-        <div class="dr-track" id="drTrack">
-          <div class="dr-fill" id="drFill"></div>
-          <div class="dr-thumb" id="drThumbL" tabindex="0" role="slider" aria-label="起始年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"></div>
-          <div class="dr-thumb" id="drThumbR" tabindex="0" role="slider" aria-label="结束年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15"></div>
+        <div class="y-slider">
+          <div class="range-wrap" id="yearRange">
+            <div class="dr-track" id="drTrack">
+              <div class="dr-fill" id="drFill"></div>
+              <div class="dr-thumb" id="drThumbL" tabindex="0" role="slider" aria-label="起始年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"></div>
+              <div class="dr-thumb" id="drThumbR" tabindex="0" role="slider" aria-label="结束年份" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15"></div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="edge-row">
-        <span class="edge-label l">更早</span>
-        <span class="edge-label r">2026</span>
       </div>
     </div>
 
@@ -168,6 +511,9 @@ select:focus{outline:none;border-color:var(--accent)}
     <div class="group">
       <span class="glabel">类型</span>
       <div class="genre-scroll" id="genreBar"></div>
+    </div>
+
+    </div>
     </div>
 
   </div>
@@ -201,7 +547,7 @@ function tickLabel(i){
   const v = YEAR_TICKS[i];
   if (v === '更早') return '2000 年前';
   const rg = tickRange(i);
-  return rg.lo === rg.hi ? String(rg.lo) : rg.lo+'-'+rg.hi;
+  return rg.lo === rg.hi ? String(rg.lo) : rg.lo+'\u2013'+rg.hi;
 }
 /* 某年是否落在 [yFrom, yTo] 覆盖的档位区间内 */
 function inYearRange(year, iFrom, iTo){
@@ -220,6 +566,10 @@ function buildYearSel(){
   }
   sel.innerHTML = '<option value="all">全部年份</option><option value="range">自定义区间…</option>' + opts;
 }
+window.addEventListener('resize',()=>{
+  if(typeof syncGenreFade==='function')syncGenreFade();
+  if(typeof paintScoreFill==='function')paintScoreFill();
+});
 function buildGenreBar(){
   const bar = document.getElementById('genreBar');
   const all = buildGenres(getData());
@@ -229,6 +579,12 @@ function buildGenreBar(){
     state.genres = state.genres.includes(g) ? state.genres.filter(x=>x!==g) : [...state.genres, g];
     buildGenreBar(); render();
   }));
+  syncGenreFade();
+}
+/* 类型行是否溢出：溢出时才让右边缘淡出，并把最后半个胶囊藏进渐变里 */
+function syncGenreFade(){
+  const bar = document.getElementById('genreBar');
+  if (bar) bar.classList.toggle('is-scroll', bar.scrollWidth > bar.clientWidth + 1);
 }
 function paintDual(){
   const f = state.yFrom/MAX_TICK*100, t = state.yTo/MAX_TICK*100;
@@ -244,19 +600,47 @@ function paintDual(){
   fill.style.width = (t-f)+'%';
 }
 function syncYearUI(){
+  /* 区间文字直接写进「自定义区间…」这个选项本身。
+     之前是另开一个 #yearHint 元素，只在自定义时出现：一是同一件事说两遍
+     （「自定义区间…」+「2016 – 2026」），二是拖动时元素忽隐忽现会顶动布局。
+     现在只有一个承载点：下拉框显示什么就是什么。 */
   const sel = document.getElementById('yearSel');
-  const hint = document.getElementById('yearHint');
-  if (state.yFrom===0 && state.yTo===MAX_TICK){ sel.value='all'; hint.textContent='全部年份'; }
-  else if (state.yFrom===state.yTo){
+  const rng = sel.querySelector('option[value="range"]');
+  const hasTick = v => [...sel.options].some(o=>o.value===String(v));
+
+  if (state.yFrom===0 && state.yTo===MAX_TICK){
+    if (rng) rng.textContent='自定义区间…';
+    sel.value='all';
+  } else if (state.yFrom===state.yTo){
     const rg = tickRange(state.yFrom);
-    sel.value = String(state.yFrom);
-    if (sel.value !== String(state.yFrom)) sel.value='range'; /* 该档在当前片库无数据时不在选项里 */
-    hint.textContent = tickLabel(state.yFrom) + (rg.lo===rg.hi ? ' 年' : '');
+    const label = tickLabel(state.yFrom) + (rg.lo===rg.hi ? ' 年' : '');
+    if (hasTick(state.yFrom)){
+      if (rng) rng.textContent='自定义区间…';
+      sel.value=String(state.yFrom);
+    } else {
+      /* 该档在当前片库无数据、不在选项里：让它借用 range 这一项显示真实档位 */
+      if (rng) rng.textContent=label;
+      sel.value='range';
+    }
+  } else {
+    if (rng) rng.textContent = (state.yFrom===0 ? '2000 年前' : String(tickRange(state.yFrom).lo)) + ' – ' + String(tickRange(state.yTo).hi);
+    sel.value='range';
   }
-  else { sel.value='range'; hint.textContent = tickLabel(state.yFrom)+' – '+tickLabel(state.yTo); }
-  const el = document.querySelector('.edge-label.l'), er = document.querySelector('.edge-label.r');
-  if (el) el.textContent = tickLabel(0);
-  if (er) er.textContent = tickLabel(MAX_TICK);
+}
+/* 评分条填充：--score-p = thumb 圆心在轨道上的百分比。
+   r 是 thumb 半径（14px/2）——原生 range 的 thumb 行程是 [r, w-r]，
+   不做这个内缩补偿，滑块在两端时填充会差 7px，留下显眼的灰缺口。
+   两端直接给 0 / 100，避免「不限」时左边残留 1% 灰缝。 */
+function paintScoreFill(){
+  const el = document.getElementById('scoreRange');
+  if (!el) return;
+  const min = +el.min, max = +el.max, v = +el.value;
+  const w = el.clientWidth, r = 7;
+  let p;
+  if (v <= min) p = 0;
+  else if (v >= max) p = 100;
+  else p = w ? (r + (v-min)/(max-min)*(w-2*r)) / w * 100 : 0;
+  el.style.setProperty('--score-p', p.toFixed(2)+'%');
 }
 function filtered(){
   let arr = getData().filter(d => {
@@ -303,15 +687,29 @@ function cardHTML(d){
 }
 function render(){
   const arr = filtered();
-  let parts = [`共 ${arr.length} 部`];
-  if (!(state.yFrom===0 && state.yTo===MAX_TICK)) {
-    const f = YEAR_TICKS[state.yFrom], t = YEAR_TICKS[state.yTo];
-    parts.push(`年份 ${f}${f===t?'':'-'+t}`);
-  }
-  if (state.minScore>60) parts.push(`≥${(state.minScore/10).toFixed(1)}分`);
-  if (state.q) parts.push(`「${state.q}」`);
-  if (state.genres.length) parts.push(`类型 ${state.genres.join('+')}`);
-  document.getElementById('countLine').textContent = parts.join(' · ');
+  /* 区间文案一律取 tickRange 的真实边界：'2005' 档是 2005-2009 桶，
+     直接拼档位名会渲染成「2005-2009-2026」。 */
+  const yText = state.yFrom===state.yTo
+    ? tickLabel(state.yFrom)
+    : (state.yFrom===0 ? '2000 年前' : String(tickRange(state.yFrom).lo)) + '\u2013' + String(tickRange(state.yTo).hi);
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const parts = [`共 ${arr.length} 部`];
+  if (!(state.yFrom===0 && state.yTo===MAX_TICK)) parts.push(`年份 ${yText}`);
+  if (state.minScore>60) parts.push(`≥${(state.minScore/10).toFixed(1)} 分`);
+  if (state.q) parts.push(`「${esc(state.q)}」`);
+  if (state.genres.length) parts.push(`类型 ${esc(state.genres.join('+'))}`);
+  document.getElementById('countLine').innerHTML = parts.map(p=>`<span>${p}</span>`).join('');
+  /* 折叠后筛选仍然生效，用徽标标出活跃条件数，避免用户误以为列表出错 */
+  let act = 0;
+  if (state.iq!=='all') act++;
+  if (!(state.yFrom===0 && state.yTo===MAX_TICK)) act++;
+  if (state.minScore>60) act++;
+  if (state.genres.length) act++;
+  const fBadge = document.getElementById('fBadge');
+  if (fBadge){ fBadge.textContent = act; fBadge.hidden = act===0; }
+  /* dashboard 规范：重置只在有筛选时出现，且是文字链接不是按钮 */
+  const resetEl = document.getElementById('reset');
+  if (resetEl) resetEl.hidden = (act===0 && !state.q && state.sort==='score-desc');
   const list = document.getElementById('list');
   if (!arr.length) {
     list.innerHTML = '<div class="empty">没有匹配的条目<div class="e-sub">换个筛选条件试试</div></div>';
@@ -346,7 +744,9 @@ function initDual(){
   function dragTo(x){ applyIdx(Math.round(pctX(x)/100*MAX_TICK)); }
   const startDrag = (which,e)=>{
     drag = (state.yFrom===state.yTo) ? 'C' : which;
-    dr.setPointerCapture(e.pointerId);
+    /* setPointerCapture 在指针已释放等边界情况下会抛 NotFoundError，
+       不能让它中断后面的 dragTo，否则按下这一下不生效 */
+    try{ dr.setPointerCapture(e.pointerId); }catch(err){}
     dragTo(e.clientX);
   };
   tL.addEventListener('pointerdown',e=>startDrag('L',e));
@@ -388,6 +788,15 @@ function updateStats(){
   document.getElementById('st-iq').textContent = arr.filter(d=>iqMap(d.iqiyi)!=='no').length;
   document.getElementById('tabMovieN').textContent = DATA.length;
   document.getElementById('tabTvN').textContent = TV.length;
+  /* 副标题里的年份区间从数据算，不写死：以后加片不用再回头改标题 */
+  const ys = arr.map(d=>Number(d.year)).filter(n=>!isNaN(n));
+  const noun = state.tab==='tv' ? '电视剧' : '电影';
+  const sub = document.getElementById('subLine');
+  if (sub){
+    sub.textContent = ys.length
+      ? noun+' '+arr.length+' 部 · '+Math.min(...ys)+'–'+Math.max(...ys)
+      : '';
+  }
 }
 function switchTab(tab){
   state.tab = tab;
@@ -398,13 +807,14 @@ function switchTab(tab){
   document.getElementById('sortSel').value='score-desc';
   document.getElementById('scoreRange').value=60;
   document.getElementById('scoreVal').textContent='不限';
+  paintScoreFill();
   document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
   document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
   buildGenreBar(); buildYearSel(); paintDual(); syncYearUI(); updateStats(); render();
 }
 function init(){
   buildGenreBar(); buildYearSel();
-  paintDual(); syncYearUI(); initDual(); updateStats();
+  paintDual(); syncYearUI(); initDual(); updateStats(); paintScoreFill();
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
   document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value; render();});
   document.getElementById('yearSel').addEventListener('change',e=>{
@@ -423,9 +833,17 @@ function init(){
   document.getElementById('scoreRange').addEventListener('input',e=>{
     state.minScore = +e.target.value;
     document.getElementById('scoreVal').textContent = state.minScore<=60 ? '不限' : '≥'+(state.minScore/10).toFixed(1);
+    paintScoreFill();
     render();
   });
   document.getElementById('sortSel').addEventListener('change',e=>{state.sort=e.target.value; render();});
+  const themeEl = document.getElementById('themeSel');
+  /* 防御：head 里那段脚本若因任何原因没执行，页面其余部分也不能跟着挂掉 */
+  themeEl.value = typeof window.applyTheme === 'function' ? window.applyTheme() : 'auto';
+  themeEl.addEventListener('change',e=>{
+    try { localStorage.setItem('film.theme', e.target.value); } catch(err){}
+    if (typeof window.applyTheme === 'function') window.applyTheme();
+  });
   document.getElementById('iqSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); state.iq=b.dataset.iq; render();
@@ -437,10 +855,25 @@ function init(){
     document.getElementById('sortSel').value='score-desc';
     document.getElementById('scoreRange').value=60;
     document.getElementById('scoreVal').textContent='不限';
+    paintScoreFill();
     document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
     document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
     buildGenreBar(); paintDual(); syncYearUI(); render();
   });
+  /* ===== 筛选区展开/收起（默认展开，记忆手动选择）===== */
+  const panelEl = document.getElementById('panel');
+  const fbtnEl = document.getElementById('fbtn');
+  function setPanel(open){
+    panelEl.classList.toggle('is-collapsed', !open);
+    fbtnEl.setAttribute('aria-expanded', String(open));
+    try{ localStorage.setItem('film.panelOpen', open?'1':'0'); }catch(err){}
+  }
+  (function initPanel(){
+    let open = true;
+    try{ const v = localStorage.getItem('film.panelOpen'); if (v!==null) open = v==='1'; }catch(err){}
+    setPanel(open);
+    fbtnEl.addEventListener('click', ()=>setPanel(panelEl.classList.contains('is-collapsed')));
+  })();
   render();
 }
 init();
