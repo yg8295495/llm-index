@@ -332,6 +332,29 @@ select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--
 }
 .chip:hover{color:var(--tx-1);border-color:var(--gray-3)}
 .chip.on{background:var(--accent-tint);border-color:var(--accent);color:var(--accent);font-weight:600}
+/* 状态 chip 行：与类型的 chip 同一组件，唯一的差别是容器要换行 */
+.chip-row{display:flex;flex-wrap:wrap;gap:var(--sp-1)}
+.chip-n{opacity:.6;margin-left:4px;font-weight:400;font-variant-numeric:tabular-nums}
+/* 「不感兴趣」开关：28px 方块 + ✕，和卡片里的隐藏按钮同符号。
+   暗态只是一圈浅边，不需要被注意到；亮态才用琥珀，表示这档正在显示。 */
+.state-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:var(--h-pill);height:var(--h-pill);
+  font-size:12px;line-height:1;font-family:inherit;
+  color:var(--tx-2);background:transparent;
+  border:1px solid var(--gray-2);border-radius:var(--radius-input);cursor:pointer;
+  transition:color var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out),background var(--motion-fast) var(--ease-out);
+}
+.state-toggle:hover{color:var(--tx-1);border-color:var(--gray-3)}
+.state-toggle.on{color:var(--accent);border-color:currentColor;background:var(--accent-tint)}
+/* 状态 chip 默认就有三枚亮着 —— 它不该抢搜索框的焦点，所以亮态用中性填充
+   （segmented 的选中语汇），琥珀只留给「筛选已变更」的类型 chip。
+   灭态退到 65%，让「这一档被关掉了」一眼可辨。 */
+.chip.state.on{background:var(--gray-2);border-color:transparent;color:var(--tx-1);font-weight:600}
+.chip.state:not(.on){opacity:.65}
+.chip.state:not(.on):hover{opacity:1}
+/* 降透明度只是「悬停可恢复」的暗示；触摸端没有 hover，就不该把开关压暗 */
+@media (hover:none){.chip.state:not(.on){opacity:1}}
 
 /* ===== 结果计数：靠 12px 间距分列，不堆分隔符 ===== */
 .count{
@@ -339,6 +362,10 @@ select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--
   max-width:var(--col);margin:0 auto;padding:var(--sp-1) var(--sp-4) 0;
   font-size:var(--text-micro);color:var(--tx-2);font-variant-numeric:tabular-nums;
 }
+
+/* 状态筛选造成的隐藏：给一条直达开关，免得「东西不见了」变成谜 */
+.count .hidden-note{margin-left:auto;color:var(--tx-2)}
+.count .linkbtn{padding:0;border:0;background:none;color:var(--accent);font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 
 /* ===== 列表与卡片：1px 发丝线优先于投影 ===== */
 .list{display:flex;flex-direction:column;gap:var(--sp-2);max-width:var(--col);margin:0 auto;padding:var(--sp-3) var(--sp-4) 64px}
@@ -362,20 +389,52 @@ select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--
 .badge.iq-vip{color:var(--tx-2)}
 .badge.iq-no{color:var(--tx-2)}
 .meta-plat{color:var(--tx-2)}
+/* 状态标记：meta 行右端的三枚图标。
+   未标记时整组隐形（悬停/聚焦才浮出），已标记时常显 —— 状态本身要一直可见，
+   可点性随悬停出现，这样扫列表时没有 77 组图标在抢注意力。 */
+.state-strip{display:inline-flex;align-items:center;gap:2px;margin-left:auto;opacity:0;transition:opacity var(--motion-fast) var(--ease-out)}
+.card:hover .state-strip,.card:focus-within .state-strip,.card[data-mark] .state-strip{opacity:1}
+.state-strip button{
+  width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;
+  padding:0;border:0;border-radius:4px;background:none;color:var(--tx-2);
+  font:inherit;font-size:11px;line-height:1;cursor:pointer;
+  transition:color var(--motion-fast) var(--ease-out),background var(--motion-fast) var(--ease-out);
+}
+.state-strip button:hover{background:var(--gray-2);color:var(--tx-1)}
+.state-strip button.on{color:var(--accent);font-weight:700}
+/* 已标记的卡片里，未被选中的两枚退到半透明，当前状态一眼可辨 */
+.card[data-mark] .state-strip button:not(.on){opacity:.5}
+.card[data-mark="seen"] .card-title{color:var(--tx-2)}
+/* 触摸端没有 hover 可依赖：常显，且放大到 28px 才点得准 */
+@media (pointer:coarse){
+  .state-strip{opacity:1;gap:4px}
+  .state-strip button{width:28px;height:28px;font-size:13px}
+}
 .tags{display:flex;flex-wrap:wrap;gap:var(--sp-1);margin-top:var(--sp-2)}
 .tag{font-size:var(--text-micro);color:var(--tx-2);background:var(--gray-1);padding:2px var(--sp-2);border-radius:var(--radius-input)}
+/* 折叠用 max-height 而不是 -webkit-line-clamp：clamp 状态下 Chromium 连 scrollHeight
+   都压成裁剪后的高度，量不出「到底溢出没有」。文案长短由采集侧决定，模板只按
+   实际布局判断——没溢出的卡不折叠、不给入口、也不可点。见 markLongNotes()。 */
 .note{
   margin-top:var(--sp-2);font-size:var(--text-body);color:var(--tx-2);line-height:1.55;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  max-height:calc(1.55em * 2);overflow:hidden;
 }
-.card.expanded .note{display:block}
-.note-hint{margin-top:var(--sp-1);font-size:var(--text-micro);color:var(--tx-2)}
-.card.expanded .note-hint{display:none}
+.card.expanded .note{max-height:none}
+/* 展开入口要看着像个控件：上有一条分隔线，右侧一个箭头，不再混进正文里 */
+.note-hint{
+  display:none;align-items:center;gap:6px;
+  margin-top:var(--sp-2);padding-top:var(--sp-2);
+  border-top:1px solid var(--gray-2);
+  font-size:var(--text-micro);color:var(--tx-1);font-weight:500;
+}
+.card[data-long]:not(.expanded) .note-hint{display:flex}
+.note-hint::after{content:'\2304';font-size:12px;line-height:1;color:var(--tx-2)}
+.card:not([data-long]){cursor:default}
 .empty{padding:var(--sp-6) var(--sp-4);text-align:center;color:var(--tx-2);font-size:var(--text-body)}
 .empty .e-sub{margin-top:var(--sp-1);font-size:var(--text-micro);color:var(--tx-2)}
 
 /* ===== 焦点：键盘可达，2px 强调色外圈 ===== */
-:where(.tab,.fbtn,.reset,.chip,.seg button):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:where(.tab,.fbtn,.reset,.chip,.seg button,.state-strip button):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* ===== 触摸设备：iOS 只在输入框聚焦时放大页面（<16px），只放搜索框 =====
    上一版把这条也套在 select 上，下拉根本不会触发聚焦放大，却一起被炸到 16px，
@@ -477,12 +536,17 @@ select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--
     <div class="panel-body" id="panelBody">
     <div class="pb-inner">
 
+    <div class="group g-state">
+      <span class="glabel">状态</span>
+      <div class="chip-row" id="stateBar"></div>
+    </div>
+
     <div class="group">
       <span class="glabel">资源</span>
       <div class="seg" id="iqSeg">
         <button data-iq="all" class="on">全部</button>
-        <button data-iq="yes">爱奇艺有</button>
-        <button data-iq="no">无</button>
+        <button data-iq="yes">爱奇艺</button>
+        <button data-iq="no">无资源</button>
       </div>
     </div>
 
@@ -529,7 +593,45 @@ const YEAR_TICKS = ['更早',2000,2005,2010,2015,2016,2017,2018,2019,2020,2021,2
 const MAX_TICK = YEAR_TICKS.length - 1; /* 15 */
 const splitGenres = g => (g||'').split(/[,/]+/).map(t=>t.trim()).filter(Boolean);
 const iqMap = t => t==='无' ? 'no' : (t==='有（会员）' ? 'vip' : 'yes');
-const state = { tab:'movie', q:'', iq:'all', genres:[], yFrom:0, yTo:MAX_TICK, minScore:60, sort:'score-desc' };
+const state = { tab:'movie', q:'', iq:'all', genres:[], yFrom:0, yTo:MAX_TICK, minScore:60, sort:'score-desc', show:{want:1,seen:1,none:1,hide:0} };
+
+/* ===== 个人状态：想看 / 已看过 / 不感兴趣 =====
+   标记是数据（等同收藏），筛选是视图 —— 重置只恢复视图，一条标记都不删。
+   键取 库§年份§片名：电影 77 / 电视剧 203 条内均无重复，两库之间无同名（已核），
+   所以不必给数据加 id。数据管线将来改片名或年份会让对应标记成为孤儿键（无害，只是丢一条）。
+   hide（不感兴趣）默认不在可见集合里：标了就从列表消失，这才是标它的意义。 */
+const MARK_KEY='film.marks';
+const MARK_LABEL={want:'想看',seen:'已看过',none:'未标记',hide:'不感兴趣'};
+const MARK_GLYPH={want:'\u2606',seen:'\u2713',hide:'\u2715'};
+const MARK_ORDER=['want','seen','none','hide'];
+const MARK_DEFAULT={want:1,seen:1,none:1,hide:0};
+let marks={};
+try { const raw=localStorage.getItem(MARK_KEY); marks = raw ? (JSON.parse(raw)||{}) : {}; } catch(e){ marks={}; }
+const mkey = d => state.tab+'\u00a7'+d.year+'\u00a7'+d.title;
+const markOf = d => marks[mkey(d)] || 'none';
+function saveMarks(){ try{ localStorage.setItem(MARK_KEY, JSON.stringify(marks)); }catch(e){} }
+function resetShow(){ state.show = Object.assign({}, MARK_DEFAULT); }
+/* 「显示」是无条件全显：连不感兴趣也放出来看一眼，不改变默认偏好 */
+function showAllMarks(){ state.show = {want:1,seen:1,none:1,hide:1}; }
+/* 状态 chip 行：计数以「其它条件的全集」为基数，所以和列表的条数对得上 */
+function buildStateBar(){
+  const bar = document.getElementById('stateBar');
+  if (!bar) return;
+  const cnt = {want:0,seen:0,none:0,hide:0};
+  const base = baseFiltered();
+  base.forEach(d=>{ cnt[markOf(d)]++; });
+  /* 「不感兴趣」不是一种观看状态，是垃圾桶语义：做成行末的小方块，和卡片里
+     同一枚 ✕ 呼应。默认暗着，不占文字位，也就不可能把这一行挤到第二行。 */
+  bar.innerHTML = ['want','seen','none'].map(k =>
+    `<button class="chip state ${state.show[k]?'on':''}" data-m="${k}" aria-pressed="${state.show[k]?'true':'false'}">${MARK_LABEL[k]}<span class="chip-n">${cnt[k]}</span></button>`
+  ).join('')
+  + `<button class="state-toggle ${state.show.hide?'on':''}" data-m="hide" aria-pressed="${state.show.hide?'true':'false'}"
+      title="不感兴趣（${cnt.hide} 条）" aria-label="显示不感兴趣的 ${cnt.hide} 条">\u2715</button>`;
+  bar.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click', ()=>{
+    state.show[b.dataset.m] = state.show[b.dataset.m] ? 0 : 1;
+    render();
+  }));
+}
 const getData = () => state.tab==='movie' ? DATA : TV;
 const scOf = d => typeof d.score==='number' ? d.score : -1;
 const buildGenres = arr => [...new Set(arr.flatMap(d=>splitGenres(d.genres)))].sort((a,b)=>a.localeCompare(b,'zh'));
@@ -569,7 +671,13 @@ function buildYearSel(){
 window.addEventListener('resize',()=>{
   if(typeof syncGenreFade==='function')syncGenreFade();
   if(typeof paintScoreFill==='function')paintScoreFill();
+  clearTimeout(longNoteTimer);
+  longNoteTimer = setTimeout(()=>{ if(typeof markLongNotes==='function') markLongNotes(); },120);
 });
+/* 字体就绪后行高可能微调，重测一次 */
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(()=>{ if(typeof markLongNotes==='function') markLongNotes(); });
+}
 function buildGenreBar(){
   const bar = document.getElementById('genreBar');
   const all = buildGenres(getData());
@@ -642,8 +750,9 @@ function paintScoreFill(){
   else p = w ? (r + (v-min)/(max-min)*(w-2*r)) / w * 100 : 0;
   el.style.setProperty('--score-p', p.toFixed(2)+'%');
 }
-function filtered(){
-  let arr = getData().filter(d => {
+/* 不含状态条件的全集：状态 chip 的计数、以及「已隐藏 N 条」都以它为基数 */
+function baseFiltered(){
+  return getData().filter(d => {
     if (state.iq!=='all') {
       const m = iqMap(d.iqiyi);
       if (state.iq==='yes' && m==='no') return false;
@@ -663,6 +772,10 @@ function filtered(){
     }
     return true;
   });
+}
+/* 在其它条件之上，再按「当前可见的状态」过滤 */
+function filtered(){
+  let arr = baseFiltered().filter(d => state.show[markOf(d)]);
   const key = state.sort;
   if (key==='score-desc') arr.sort((a,b)=>(scOf(b)-scOf(a)) || a.title.localeCompare(b.title,'zh'));
   else if (key==='score-asc') arr.sort((a,b)=>(scOf(a)-scOf(b)));
@@ -681,12 +794,20 @@ function cardHTML(d){
   const plat = d.platform ? `<span class="meta-plat">${esc(d.platform)}</span>` : '';
   const tags = splitGenres(d.genres).map(g=>`<span class="tag">${esc(g)}</span>`).join('');
   const note = d.note ? `<div class="note">${esc(d.note)}</div><div class="note-hint">点击展开</div>` : '';
-  return `<div class="card"><div class="card-top"><div class="card-title">${esc(d.title)}</div><div class="score ${scls}">${s}</div></div>
-  <div class="meta"><span>${d.year}</span>${iqBadge}${plat}</div>
+  /* data-mark 只在有标记时输出：CSS 靠 [data-mark] 判断「常显」 */
+  const m = markOf(d);
+  const markAttr = m==='none' ? '' : ` data-mark="${m}"`;
+  const strip = `<div class="state-strip">` + ['want','seen','hide'].map(k =>
+    `<button type="button" data-m="${k}" class="${m===k?'on':''}" title="${MARK_LABEL[k]}" aria-label="${MARK_LABEL[k]}：${esc(d.title)}" aria-pressed="${m===k?'true':'false'}">${MARK_GLYPH[k]}</button>`
+  ).join('') + `</div>`;
+  return `<div class="card" data-k="${esc(mkey(d))}"${markAttr}><div class="card-top"><div class="card-title">${esc(d.title)}</div><div class="score ${scls}">${s}</div></div>
+  <div class="meta"><span>${d.year}</span>${iqBadge}${plat}${strip}</div>
   <div class="tags">${tags}</div>${note}</div>`;
 }
 function render(){
   const arr = filtered();
+  const baseN = baseFiltered().length;
+  buildStateBar();
   /* 区间文案一律取 tickRange 的真实边界：'2005' 档是 2005-2009 桶，
      直接拼档位名会渲染成「2005-2009-2026」。 */
   const yText = state.yFrom===state.yTo
@@ -698,13 +819,20 @@ function render(){
   if (state.minScore>60) parts.push(`≥${(state.minScore/10).toFixed(1)} 分`);
   if (state.q) parts.push(`「${esc(state.q)}」`);
   if (state.genres.length) parts.push(`类型 ${esc(state.genres.join('+'))}`);
-  document.getElementById('countLine').innerHTML = parts.map(p=>`<span>${p}</span>`).join('');
+  /* 状态筛选藏掉的条数要明说，并给一条返回的路 */
+  const hiddenN = baseN - arr.length;
+  document.getElementById('countLine').innerHTML = parts.map(p=>`<span>${p}</span>`).join('')
+    + (hiddenN>0 ? `<span class="hidden-note">已隐藏 ${hiddenN} 条 <button type="button" class="linkbtn" id="showAllMarks">显示</button></span>` : '');
+  const showAllEl = document.getElementById('showAllMarks');
+  if (showAllEl) showAllEl.addEventListener('click', e=>{ e.stopPropagation(); showAllMarks(); render(); });
   /* 折叠后筛选仍然生效，用徽标标出活跃条件数，避免用户误以为列表出错 */
   let act = 0;
   if (state.iq!=='all') act++;
   if (!(state.yFrom===0 && state.yTo===MAX_TICK)) act++;
   if (state.minScore>60) act++;
   if (state.genres.length) act++;
+  /* 状态显隐偏离默认，也算一个活跃条件 */
+  if (MARK_ORDER.some(k => (state.show[k]?1:0) !== MARK_DEFAULT[k])) act++;
   const fBadge = document.getElementById('fBadge');
   if (fBadge){ fBadge.textContent = act; fBadge.hidden = act===0; }
   /* dashboard 规范：重置只在有筛选时出现，且是文字链接不是按钮 */
@@ -716,8 +844,22 @@ function render(){
     return;
   }
   list.innerHTML = arr.map(cardHTML).join('');
+  markLongNotes();
   list.querySelectorAll('.card').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('expanded')));
 }
+/* 判断哪张卡的简介真的超了两行。max-height + overflow:hidden 下 scrollHeight 仍是
+   完整内容高度，所以一次读取就够，不用临时切换样式。 */
+function markLongNotes(){
+  const list = document.getElementById('list');
+  if (!list) return;
+  list.querySelectorAll('.card').forEach(c=>{
+    const n = c.querySelector('.note');
+    if (!n) return c.removeAttribute('data-long');
+    if (n.scrollHeight > n.clientHeight + 1) c.setAttribute('data-long','');
+    else c.removeAttribute('data-long');
+  });
+}
+let longNoteTimer;
 function initDual(){
   const dr = document.getElementById('yearRange');
   const track = dr.querySelector('.dr-track');
@@ -810,6 +952,7 @@ function switchTab(tab){
   paintScoreFill();
   document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
   document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
+  resetShow();
   buildGenreBar(); buildYearSel(); paintDual(); syncYearUI(); updateStats(); render();
 }
 function init(){
@@ -858,6 +1001,7 @@ function init(){
     paintScoreFill();
     document.querySelectorAll('#iqSeg button').forEach(x=>x.classList.remove('on'));
     document.querySelector('#iqSeg button[data-iq="all"]').classList.add('on');
+    resetShow();          /* 只恢复视图，标记一条不动 */
     buildGenreBar(); paintDual(); syncYearUI(); render();
   });
   /* ===== 筛选区展开/收起（默认展开，记忆手动选择）===== */
@@ -874,6 +1018,19 @@ function init(){
     setPanel(open);
     fbtnEl.addEventListener('click', ()=>setPanel(panelEl.classList.contains('is-collapsed')));
   })();
+  /* 卡片上的状态按钮用捕获阶段委托：
+     一个监听器管全部卡片，且在 .card 自己的点击（展开）之前拦下并阻断冒泡 */
+  document.getElementById('list').addEventListener('click', e=>{
+    const btn = e.target.closest && e.target.closest('.state-strip button');
+    if (!btn) return;
+    e.stopPropagation();
+    const card = btn.closest('.card');
+    const k = card && card.dataset.k;
+    if (!k) return;
+    const m = btn.dataset.m;
+    if (marks[k] === m) delete marks[k]; else marks[k] = m;
+    saveMarks(); render();
+  }, true);
   render();
 }
 init();
